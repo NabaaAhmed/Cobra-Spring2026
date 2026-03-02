@@ -2,12 +2,20 @@
 /shelf/
 /workspace.xml
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 03ca485cbd7a33dcf600794073d25739f1d1971a
 # Ignored default folder with query files
 /queries/
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+<<<<<<< HEAD
 >>>>>>> feature-BrendaBranch
+=======
+=======
+>>>>>>> a73a225778a660df5028f1f7daac1b27c1ff3e5b
+>>>>>>> 03ca485cbd7a33dcf600794073d25739f1d1971a
 # Editor-based HTTP Client requests
 /httpRequests/
