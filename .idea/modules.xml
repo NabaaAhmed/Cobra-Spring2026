@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/.idea/Cobra-Spring2026.iml" filepath="$PROJECT_DIR$/.idea/Cobra-Spring2026.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/Cobra-Spring2026.iml" filepath="$PROJECT_DIR$/Cobra-Spring2026.iml" />
+>>>>>>> feature-BrendaBranch
     </modules>
   </component>
 </project>
