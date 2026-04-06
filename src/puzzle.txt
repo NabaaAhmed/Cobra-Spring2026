@@ -1,0 +1,1 @@
+String puzzleID, String trialName, String roomID,  boolean isSolved, ArrayList <Item> rewards

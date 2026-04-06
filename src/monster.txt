@@ -1,0 +1,1 @@
+String monsterID, String name, int HP, int atkValue, ArrayList <Item> rewards
