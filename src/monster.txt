@@ -1,1 +1,10 @@
 String monsterID, String name, int HP, int atkValue, ArrayList <Item> rewards
+M-01,Mimic,0,1,null
+M-02,Guardian,0,1,Silver Sigil/Emerald Fragment
+M-03,Golem,0,1,Gold Chain
+M-04,Wraith,0,1,null
+M-05,Pursuer,0,1,null
+M-06,Shade Boss,0,1,null
+M-07,Warden,0,1,Potion
+M-08,Watcher,0,1,Watcher Corpse
+M-09,Final Trial Stalker,0,1,Stalker Corpse
