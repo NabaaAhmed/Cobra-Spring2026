@@ -1,45 +1,58 @@
 public class Item {
-    private String itemID;
+    private String itemId;
     private String name;
     private String description;
-    boolean stackable;
+    private boolean inPlayerInventory;        // True if the item is currently carried by the player.
+    private int currentRoomNumber;      // Current room number when not in inventory. Use -1 while in inventory.
 
-    //item constrctor
-    public Item(String itemID, String name, String description, boolean stackable) {
-        this.itemID = itemID;
+    // Item constructor
+    public Item(String itemId, String name, String description, int startingRoomNumber) {
+        this.itemId = itemId;
         this.name = name;
         this.description = description;
-        this.stackable = stackable;
+        this.inPlayerInventory = false;
+        this.currentRoomNumber = startingRoomNumber;
     }
 
-    //getters
-    public String getItemID() {
-        return itemID;
+    // Getter for itemId
+    public String getItemId() {
+        return itemId;
     }
-    public String getItemName() {
+
+    // Getter and setter for name
+    public String getName() {
         return name;
     }
 
-    public String getItemDescription() {
-        return description;
-    }
-
-    public boolean isStackable() {
-        return stackable;
-    }
-
-    //setters
-    public void setItemID(String itemID) {
-        this.itemID = itemID;
-    }
     public void setName(String name) {
         this.name = name;
     }
+
+    // Getter and setter for description
+    public String getDescription() {
+        return description;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
-    public void setStackable(boolean stackable) {
-        this.stackable = stackable;
+
+    // Getter and setter for inInventory
+    public boolean isInInventory() {
+        return inPlayerInventory;
+    }
+
+    public void setInInventory(boolean inPlayerInventory) {
+        this.inPlayerInventory = inPlayerInventory;
+    }
+
+    // Getter and setter for currentRoomNumber
+    public int getCurrentRoomNumber() {
+        return currentRoomNumber;
+    }
+
+    public void setCurrentRoomNumber(int currentRoomNumber) {
+        this.currentRoomNumber = currentRoomNumber;
     }
 
     // Method to move item to inventory
@@ -53,8 +66,6 @@ public class Item {
         this.inPlayerInventory = false;
         this.currentRoomNumber = roomNumber;
     }
-
-
      //toString method
      @Override
      public String toString() {
