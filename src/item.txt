@@ -18,3 +18,5 @@ I-0034,Ornate Chalice,A gold ritual cup engraved with symbols.,CM-03,false
 I-0035,Crystal Lens,A translucent optical lens.,CM-04,false
 I-0036,Ancient Map,A worn parchment marked with faded paths.,CM-06,false
 I-0037,Final Jewel,A jewel revealed beneath the cracked floor symbol.,FN-02,false
+I-0038,Stalker Corpse,Stalker corpse,FN-02,false
+I-0039,Watcher Corpse,Watcher corpse,AW-02,false
