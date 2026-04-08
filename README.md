@@ -68,9 +68,9 @@ The game follows the **Model-View-Controller (MVC)** pattern:
 
 * **Controller**
   Manages input and game flow (`GameController`)
+ 
+<img width="840" height="571" alt="Screenshot 2026-04-08 at 1 51 55 AM" src="https://github.com/user-attachments/assets/4ca7fd81-b3d1-468e-a96b-cd9fbbdb61ae" />
 
-  
-<img width="568" height="385" alt="Screenshot 2026-04-08 at 1 41 40 AM" src="https://github.com/user-attachments/assets/f0f5ca55-8b16-4aaa-9104-d5305ebb2942" />
 
 ---
 
