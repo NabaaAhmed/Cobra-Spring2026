@@ -9,8 +9,8 @@ public class Main {
         FileManager fileManager = new FileManager();
 
         // Create controller
-        GameController controller =
-                new GameController(player, roomManager, view, fileManager);
+        GameControllerNA controller =
+                new GameControllerNA(player, roomManager, view, fileManager);
 
         // Start game
         controller.startGame();
