@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class GameController {
+public class GameControllerNA {
 
     // Fields
     private Player player;
@@ -15,8 +15,8 @@ public class GameController {
     private CombatEngine combatEngine;
 
     // Constructor
-    public GameController(Player player, RoomManager roomManager,
-                          GameView gameView, FileManager saveLoad) {
+    public GameControllerNA(Player player, RoomManager roomManager,
+                            GameView gameView, FileManager saveLoad) {
         this.player = player;
         this.roomManager = roomManager;
         this.gameView = gameView;
