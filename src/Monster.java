@@ -1,79 +1,73 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Monster {
 
     private String name;
     private int hp;
-    private boolean alive;
-    private String type;     // monster type (golem, wraith, mimic, stalker)
-
     private int turnCounter;
 
     // constructor
-    public Monster(String name, int hp, String type) {
-        this.name = name;        // set name
-        this.hp = hp;            // set hp
-        this.type = type;        // set type
-        this.alive = true;       // starts alive
-        this.turnCounter = 0;    // start counter at 0
+    public Monster(String name, int hp) {
+        this.name = name;
+        this.hp = hp;
+        this.turnCounter = 0;
     }
 
-    // return name
+    // getters
     public String getName() {
         return name;
     }
 
-    // return hp
     public int getHp() {
         return hp;
     }
 
-    // check if alive
     public boolean isAlive() {
-        return alive;
+        return hp > 0;
     }
 
-    // reduce hp
-    public void takeDamage(int dmg) {
-        hp -= dmg;               // subtract damage
-
-        if (hp <= 0) {           // if dead
-            hp = 0;
-            alive = false;
-        }
+    // damage system
+    public void takeDamage(int amount) {
+        hp -= amount;
+        if (hp < 0) hp = 0;
     }
 
-    // main combat rule clash system
+    // 🔥 MAIN CLASH SYSTEM (CORE)
     public void clash(Player player) {
-        player.takeDamage(1);    // player loses 1 hp
-        this.takeDamage(1);      // monster loses 1 hp
+        player.takeDamage(1);
+        this.takeDamage(1);
     }
 
-    // runs BEFORE fight which is ambush logic
+    // runs when combat starts (can be empty/simple)
     public void onEncounter(Player player) {
-
-        if (type.equals("mimic")) {
-            // mimic attacks first
-            player.takeDamage(1);
-            System.out.println("Mimic ambush!");
-        }
+        // optional: ambush later
+        // for now keep simple
     }
 
-    // runs EACH TURN this is special attack
+    // runs each turn (optional behavior)
     public void onTurn(Player player) {
+        turnCounter++;
 
-        // wraith will cause extra damage every turn
-        if (type.equals("wraith")) {
-            player.takeDamage(1);
-            System.out.println("Wraith extra damage");
-        }
+        // keep SIMPLE for now (or remove logic)
+        // example:
+        // if(turnCounter % 2 == 0){
+        //     player.takeDamage(1);
+        // }
+    }
 
-        //  stalker will damage ever 2 turns
-        if (type.equals("stalker")) {
-            turnCounter++;   // count turns
+    // attack value (fixed system)
+    public int attack() {
+        return 1;
+    }
 
-            if (turnCounter % 2 == 0) {
-                player.takeDamage(1);
-                System.out.println("Stalker damage over time");
-            }
-        }
+    // trigger special ability (placeholder for later)
+    public void trigger() {
+        // optional future logic
+    }
+
+    // loot system
+    public List<Item> dropLoot() {
+        return new ArrayList<>(); // empty for now
     }
 }
