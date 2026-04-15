@@ -1,23 +1,54 @@
 public class Combat {
 
-    public static void fight(Player player, Monster monster) {
+    private Player player;
+    private Monster monster;
+    private int turnCount;
+    private boolean retreated;
 
-        monster.onEncounter(player); // pre-attack
+    // constructor
+    public Combat(Player player, Monster monster) {
+        this.player = player;
+        this.monster = monster;
+        this.turnCount = 1;
+        this.retreated = false;
+    }
 
-        while (player.isAlive() && monster.isAlive()) {
+    public void startBattle() {
 
-            monster.clash(player);   // main damage
+        System.out.println("Battle started with " + monster.getName());
 
-            monster.onTurn(player);  // special behavior
+        while (player.isAlive() && monster.isAlive() && !retreated) {
 
+            System.out.println("Turn " + turnCount);
+
+            // 🔥 CLASH SYSTEM (CORE)
+            if (player.hasSword()) {
+                monster.takeDamage(monster.getHp()); // insta kill
+                System.out.println("You used the sword! Instant kill.");
+            } else {
+                player.takeDamage(1);
+                monster.takeDamage(1);
+                System.out.println("You and " + monster.getName() + " both take 1 damage.");
+            }
+
+            // print status
             System.out.println("Player HP: " + player.getHp());
             System.out.println(monster.getName() + " HP: " + monster.getHp());
+
+            turnCount++;
         }
 
-        if (!player.isAlive()) {
-            System.out.println("Player died");
+        if (retreated) {
+            System.out.println("You fled the battle.");
+        } else if (!player.isAlive()) {
+            System.out.println("You died.");
         } else {
-            System.out.println("Monster defeated");
+            System.out.println("Monster defeated!");
         }
+    }
+
+    // optional command (if you want input system later)
+    public void retreat() {
+        this.retreated = true;
     }
 }
