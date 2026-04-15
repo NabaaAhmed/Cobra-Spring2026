@@ -53,3 +53,7 @@ public class Monster {
     }
 
     public List<Item> dropLoot() {
+        // Base monsters drop no guaranteed loot by default.
+        return new ArrayList<>();
+    }
+}
