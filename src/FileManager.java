@@ -11,7 +11,7 @@ public class FileManager {
             writer.write(data);
             writer.close();
             System.out.println("You're game progress has been saved!");
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Error saving game progress file.");
         }
     }
@@ -28,7 +28,7 @@ public class FileManager {
             }
 
             reader.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Error loading file.");
         }
         return data;
