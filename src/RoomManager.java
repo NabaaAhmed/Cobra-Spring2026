@@ -9,7 +9,7 @@ public class RoomManager {
     Room currentRoom;
 
     public RoomManager() {
-     loadRooms("rooms.txt");
+        loadRooms("rooms.txt");
     }
 
     private void loadRooms(String filename) {
@@ -87,7 +87,7 @@ public class RoomManager {
             currentRoom = rooms.get(id);
         }
     }
-    
+
     // CSV PARSER (IMPORTANT)
     private String[] splitCSVLine(String line) {
         ArrayList<String> result = new ArrayList<>();

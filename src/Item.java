@@ -80,4 +80,7 @@ public abstract class Item {
      public String toString() {
          return itemName + ": " + description;
      }
+
+    public java.lang.String getitemName() {
+    }
 }

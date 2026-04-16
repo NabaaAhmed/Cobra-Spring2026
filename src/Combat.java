@@ -101,7 +101,7 @@ public class Combat {
             // loot
             for (Item item : enemy.dropLoot()) {
                 player.addItem(item);
-                view.displayCombat("You got: " + item.getName());
+                view.displayCombat("You got: " + item.getitemName());
             }
         }
     }
