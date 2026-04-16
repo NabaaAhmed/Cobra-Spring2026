@@ -5,7 +5,7 @@ public class Combat {
     private int turnCount;
     private boolean retreated;
 
-    // constructor
+    // Constructor
     public Combat(Player player, Monster enemy) {
         this.player = player;
         this.enemy = enemy;
@@ -13,7 +13,7 @@ public class Combat {
         this.retreated = false;
     }
 
-    // check if battle is over
+    // Check if battle is over
     public boolean isBattleOver() {
         return !player.isAlive() || !enemy.isAlive() || retreated;
     }
@@ -30,19 +30,19 @@ public class Combat {
         return enemy.isAlive();
     }
 
-    //  MAIN ACTION SYSTEM
+    // Main action system
     public String action(String command) {
 
         String result = "";
 
         if (command.equalsIgnoreCase("attack")) {
 
-            // sword logic (optional but good)
+            // Sword logic
             if (player.hasSword()) {
                 enemy.takeDamage(enemy.getHp());
                 result += "You used the sword! Instant kill.\n";
             } else {
-                // CLASH SYSTEM
+                // Clash system
                 enemy.clash(player);
                 result += "You and " + enemy.getName() + " both take 1 damage.\n";
             }
@@ -53,15 +53,19 @@ public class Combat {
             retreated = true;
         }
 
-        else {
-            result += "Invalid command. Try again.\n";
-            turnCount--;   // don't count bad input
+        else if (command.equalsIgnoreCase("wait")) {
+            result += player.waitTurn() + "\n";
         }
 
-        // apply turn effects
+        else {
+            result += "Invalid command. Try again.\n";
+            turnCount--; // don't count bad input
+        }
+
+        // Apply turn effects
         applyTurnEffects();
 
-        // status output
+        // Status output
         result += "Player HP: " + player.getHp() + "\n";
         result += enemy.getName() + " HP: " + enemy.getHp() + "\n";
 
@@ -69,12 +73,11 @@ public class Combat {
         return result;
     }
 
-
     public void applyTurnEffects() {
         enemy.onTurn(player);
     }
 
-    // start battle loop
+    // Start battle loop
     public void startBattle(GameView view) {
 
         enemy.onEncounter(player);
@@ -82,10 +85,9 @@ public class Combat {
         view.displayCombat("A " + enemy.getName() + " appears!");
 
         while (!isBattleOver()) {
-
             view.displayCombat("Turn " + turnCount);
 
-            // for now auto-attack replace with input later
+            // For now auto-attack; replace with input later
             String result = action("attack");
 
             view.displayCombat(result);
@@ -98,10 +100,10 @@ public class Combat {
         } else {
             view.displayCombat("Monster defeated!");
 
-            // loot
+            // Loot
             for (Item item : enemy.dropLoot()) {
                 player.addItem(item);
-                view.displayCombat("You got: " + item.getName());
+                view.displayCombat("You got: " + item.getitemName());
             }
         }
     }

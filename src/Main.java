@@ -3,7 +3,7 @@ public class Main {
     public static void main(String[] args) {
 
         // Create core components
-        Player player = new Player();
+        Player player = new Player("EZ-01");
         RoomManager roomManager = new RoomManager();
         GameView view = new GameView();
         FileManager fileManager = new FileManager();
