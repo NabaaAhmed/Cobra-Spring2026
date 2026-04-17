@@ -6,6 +6,7 @@ public class Player {
     private int currentHP;
     private ArrayList<Item> inventory;
     private int attackPower;
+    private int trialTokens;
 
     // Constructor
     public Player(String startingRoomID) {
@@ -14,6 +15,7 @@ public class Player {
         this.currentHP = 5;
         this.inventory = new ArrayList<>();
         this.attackPower = 1;
+        this.trialTokens = 0;
     }
 
     // Getters
@@ -41,13 +43,17 @@ public class Player {
         return attackPower;
     }
 
-    // Setters
-    public void setAttackPower(int attackPower) {
-        this.attackPower = attackPower;
+    public int getTrialTokens() {
+        return trialTokens;
     }
 
+    // Setters
     public void setCurrentRoomID(String currentRoomID) {
         this.currentRoomID = currentRoomID;
+    }
+
+    public void setAttackPower(int attackPower) {
+        this.attackPower = attackPower;
     }
 
     // Movement
@@ -95,6 +101,15 @@ public class Player {
         return true;
     }
 
+    public boolean hasSword() {
+        for (Item item : inventory) {
+            if (item.getitemName() != null && item.getitemName().equalsIgnoreCase("sword")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Health methods
     public void takeDamage(int damage) {
         currentHP -= damage;
@@ -106,10 +121,16 @@ public class Player {
     public int heal(int amount) {
         int before = currentHP;
         currentHP += amount;
+
         if (currentHP > maxHP) {
             currentHP = maxHP;
         }
+
         return currentHP - before;
+    }
+
+    public void healToFull() {
+        currentHP = maxHP;
     }
 
     public void modifyMaxHP(int amount) {
@@ -128,11 +149,28 @@ public class Player {
         return currentHP > 0;
     }
 
+    // Trial token methods
+    public void addTrialToken() {
+        trialTokens++;
+    }
+
+    public void removeTrialToken() {
+        if (trialTokens > 0) {
+            trialTokens--;
+        }
+    }
+
+    // Wait / skip turn
+    public String waitTurn() {
+        return "You wait for a turn.";
+    }
+
     // Combat methods
     public void attack(Monster monster) {
         if (monster == null) {
             return;
         }
+
         monster.takeDamage(attackPower);
     }
 }
