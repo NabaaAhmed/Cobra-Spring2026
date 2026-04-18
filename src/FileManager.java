@@ -33,4 +33,44 @@ public class FileManager {
         }
         return data;
         }
+
+    public Player loadGame() {
+        String data = load("savegame.txt").trim();
+
+        if (data.isEmpty()) {
+            return new Player("EZ-01");
+        }
+
+        String[] parts = data.split(",");
+        Player player = new Player(parts.length > 0 ? parts[0] : "EZ-01");
+
+        try {
+            if (parts.length > 1) {
+                player.setCurrentHP(Integer.parseInt(parts[1]));
+            }
+            if (parts.length > 2) {
+                player.setMaxHP(Integer.parseInt(parts[2]));
+            }
+            if (parts.length > 3) {
+                player.setAttackPower(Integer.parseInt(parts[3]));
+            }
+        } catch (NumberFormatException ignored) {
+            // Fall back to the default player state.
+        }
+
+        return player;
+    }
+
+    public static void saveGame(Player player) {
+        if (player == null) {
+            return;
+        }
+
+        String data = String.join(",",
+                player.getCurrentRoomID(),
+                String.valueOf(player.getCurrentHP()),
+                String.valueOf(player.getMaxHP()),
+                String.valueOf(player.getAttackPower()));
+        saveGame("savegame.txt", data);
+    }
 }

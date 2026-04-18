@@ -11,9 +11,6 @@ public class GameControllerNA {
     private Scanner input;
     private boolean isRunning;
 
-    // Optional (from your example)
-    private CombatEngine combatEngine;
-
     // Constructor
     public GameControllerNA(Player player, RoomManager roomManager,
                             GameView gameView, FileManager saveLoad) {
@@ -24,7 +21,6 @@ public class GameControllerNA {
 
         this.input = new Scanner(System.in);
         this.isRunning = true;
-        this.combatEngine = new CombatEngine(player);
     }
 
     // =========================
@@ -53,7 +49,11 @@ public class GameControllerNA {
 
                 case "2":
                 case "load":
-                    player = saveLoad.loadGame();
+                    Player loaded = saveLoad.loadGame();
+                    if (loaded != null) {
+                        player = loaded;
+                        roomManager.setRoom(player.getCurrentRoomID());
+                    }
                     gameView.displayMessage("Game Loaded!");
                     runGameLoop();
                     menuActive = false;
@@ -98,7 +98,7 @@ public class GameControllerNA {
         switch (action) {
 
             case "status":
-                gameView.displayMessage("HP: " + player.getHealth());
+                gameView.displayMessage("HP: " + player.getCurrentHP() + "/" + player.getMaxHP());
                 break;
 
             case "inventory":
@@ -106,22 +106,29 @@ public class GameControllerNA {
                 break;
 
             case "inspect":
-                String result = player.inspectMonster();
-                gameView.displayMessage(result);
+                Monster monster = roomManager.getCurrentRoom().getMonster();
 
-                if (!result.equals("No Monsters detected")) {
+                if (monster == null) {
+                    gameView.displayMessage("No Monsters detected");
+                } else {
+                    String result = monster.getName() + " (HP: " + monster.getHp() + ")";
+                    gameView.displayMessage(result);
                     gameView.displayMessage("Type 'engage' to fight or anything else to ignore:");
                     String choice = input.nextLine();
 
                     if (choice.equals("engage")) {
-                        startCombat();
+                        startCombat(monster);
                     }
                 }
                 break;
 
             case "move":
                 if (parts.length > 1) {
-                    roomManager.moveToRoom(parts[1]);
+                    if (!roomManager.moveToRoom(parts[1])) {
+                        gameView.displayError("Can't move there.");
+                    } else {
+                        player.setCurrentRoomID(roomManager.getRoomId());
+                    }
                 } else {
                     gameView.displayError("Move where?");
                 }
@@ -129,8 +136,16 @@ public class GameControllerNA {
 
             case "equip":
                 if (parts.length > 1) {
-                    String itemName = command.substring(6);
-                    boolean success = player.equipWeapon(itemName);
+                    String itemName = command.substring(6).trim();
+                    boolean success = false;
+
+                    for (Item item : player.getInventory()) {
+                        if (item.getName().equalsIgnoreCase(itemName)) {
+                            item.use(player);
+                            success = true;
+                            break;
+                        }
+                    }
 
                     if (success) {
                         gameView.displayMessage("Equipped " + itemName);
@@ -141,7 +156,7 @@ public class GameControllerNA {
                 break;
 
             case "save":
-                saveLoad.saveGame(player);
+                FileManager.saveGame(player);
                 gameView.displayMessage("Game saved.");
                 break;
 
@@ -157,29 +172,42 @@ public class GameControllerNA {
     // =========================
     // COMBAT SYSTEM
     // =========================
-    private void startCombat() {
+    private void startCombat(Monster monster) {
 
-        combatEngine.resetEngine();
+        if (monster == null) {
+            gameView.displayError("There is nothing to fight.");
+            return;
+        }
 
-        while (!combatEngine.isBattleOver()) {
+        Combat combat = new Combat(player);
+        combat.resetEngine(monster);
 
-            gameView.displayCombat("Turn: " + combatEngine.getTurns());
+        gameView.displayCombat("A " + monster.getName() + " appears!");
 
+        while (!combat.isBattleOver()) {
+            gameView.displayCombat("Turn: " + combat.getTurns());
             String command = input.nextLine();
 
-            if (command.equals("help")) {
-                gameView.displayMessage("Attack / Defend / Run");
+            if (command.equalsIgnoreCase("help")) {
+                gameView.displayMessage("Attack / Wait / Retreat");
                 continue;
             }
 
-            String result = combatEngine.action(command);
+            String result = combat.action(command);
             gameView.displayCombat(result);
         }
 
-        if (!combatEngine.getMonsterAlive()) {
+        if (!monster.isAlive()) {
             gameView.displayMessage("You won!");
+            roomManager.getCurrentRoom().setMonster(null);
         } else if (!player.isAlive()) {
             gameView.displayMessage("You died...");
+            isRunning = false;
+        } else {
+            gameView.displayMessage("You fled the battle.");
+        }
+
+        if (!player.isAlive()) {
             isRunning = false;
         }
     }
