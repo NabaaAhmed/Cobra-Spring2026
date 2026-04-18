@@ -21,7 +21,7 @@ public abstract class Item {
         return itemId;
     }
 
-    // Getter and setter for name
+    // Getter and setter for itemName
     public String getitemName() {
         return itemName;
     }
@@ -39,7 +39,7 @@ public abstract class Item {
         this.description = description;
     }
 
-    // getters and setters for roomID
+    // Getter and setter for roomID
     public String getRoomID() {
         return roomID;
     }
@@ -48,6 +48,7 @@ public abstract class Item {
         this.roomID = roomID;
     }
 
+    // Getter and setter for stackable
     public Boolean getStackable() {
         return stackable;
     }
@@ -60,27 +61,23 @@ public abstract class Item {
         return inPlayerInventory;
     }
 
-    // Method to move item to inventory
+    // Move item to inventory
     public void moveToInventory() {
         this.inPlayerInventory = true;
         this.roomID = null;
     }
 
-    // Method to move item to a room
+    // Move item back to a room
     public void moveToRoom(String roomID) {
         this.inPlayerInventory = false;
         this.roomID = roomID;
     }
 
-    public abstract void use(Player player); // Abstract method to be implemented by specific item types
+    // Abstract method to be implemented by subclasses
+    public abstract void use(Player player);
 
-
-    //toString method
-     @Override
-     public String toString() {
-         return itemName + ": " + description;
-     }
-
-    public java.lang.String getitemName() {
+    @Override
+    public String toString() {
+        return itemName + ": " + description;
     }
 }
