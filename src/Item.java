@@ -22,12 +22,28 @@ public abstract class Item {
     }
 
     // Getter and setter for name
-    public String getitemName() {
+    public String getItemName() {
         return itemName;
     }
 
-    public void setitemName(String name) {
+    public void setItemName(String name) {
         this.itemName = name;
+    }
+
+    // Backward-compatible names used by existing code
+    public String getitemName() {
+        return getItemName();
+    }
+
+    public void setitemName(String name) {
+        setItemName(name);
+    }
+
+    public boolean matchesName(String candidate) {
+        if (candidate == null || itemName == null) {
+            return false;
+        }
+        return itemName.equalsIgnoreCase(candidate.trim());
     }
 
     // Getter and setter for description
@@ -52,12 +68,23 @@ public abstract class Item {
         return stackable;
     }
 
+    public boolean isStackable() {
+        return Boolean.TRUE.equals(stackable);
+    }
+
     public void setStackable(Boolean stackable) {
         this.stackable = stackable;
     }
 
     public boolean isInPlayerInventory() {
         return inPlayerInventory;
+    }
+
+    public boolean isInRoom(String roomId) {
+        if (roomId == null || roomID == null) {
+            return false;
+        }
+        return !inPlayerInventory && roomID.equalsIgnoreCase(roomId.trim());
     }
 
     // Method to move item to inventory
@@ -78,10 +105,6 @@ public abstract class Item {
     //toString method
      @Override
      public String toString() {
-         return itemName + ": " + description;
+           return getItemName() + ": " + description;
      }
-     //unequip
-    //equip
-    //consume
-    //heal
 }

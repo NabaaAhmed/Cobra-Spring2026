@@ -10,7 +10,7 @@ public class Player {
     // Constructor
     public Player(String startingRoom, int maxHP, int currentHP, int attackPower) {
         this.currentRoom = startingRoom;
-        this.maxHP = 5;
+        this.maxHP = 7;
         this.currentHP = 5;
         this.inventory = new ArrayList<>();
         this.attackPower = 1;
@@ -53,7 +53,7 @@ public class Player {
             return;
         }
         inventory.add(item);
-        item.moveToInventory(); // matches teammate's Item class
+        item.moveToInventory();
     }
 
     public void removeItem(Item item) {
@@ -63,16 +63,50 @@ public class Player {
         inventory.remove(item);
     }
 
+    public boolean dropItem(Item item, Room room) {
+        if (item == null || room == null || !inventory.contains(item)) {
+            return false;
+        }
+
+        inventory.remove(item);
+        item.moveToRoom(room.getRoomId());
+        return true;
+    }
+
+    public void displayInventory() {
+        System.out.print(getInventoryText());
+    }
+
+    public String getInventoryText() {
+        StringBuilder builder = new StringBuilder();
+        if (inventory.isEmpty()) {
+            builder.append("You have not picked up any items yet.\n");
+            return builder.toString();
+        }
+
+        builder.append("Your Inventory:\n");
+        for (Item item : inventory) {
+            builder.append("  - ").append(item.getItemName()).append("\n");
+        }
+        return builder.toString();
+    }
+
     public Item findItemByName(String itemName) {
         if (itemName == null) {
             return null;
         }
         for (Item item : inventory) {
-            if (item.getitemName() != null && item.getitemName().equalsIgnoreCase(itemName)) {
+            if (item != null && item.matchesName(itemName)) {
                 return item;
             }
         }
         return null;
+    }
+
+    public String getStatusText() {
+        return "current HP:" + currentHP +
+                "\nmax HP:" + maxHP +
+                "\nattack power:" + attackPower;
     }
 
     public boolean useItem(String itemName) {
@@ -95,5 +129,14 @@ public class Player {
         currentHP += amount;
         if (currentHP > maxHP) currentHP = maxHP;
         return currentHP - before;
+    }
+
+    public boolean unequipWeapon(String itemName) {
+        Item item = findItemByName(itemName);
+        if (item instanceof Sword) {
+            ((Sword) item).unequip(this);
+            return true;
+        }
+        return false;
     }
 }

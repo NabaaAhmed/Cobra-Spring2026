@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,10 +22,6 @@ public class Room {
 
     public String getRoomId() {
         return roomId;
-    }
-
-    public String getRoomName(String itemName) {
-        return roomName;
     }
 
     public String getRoomName() {
@@ -54,6 +51,47 @@ public class Room {
             return false;
         }
         return connections.contains(roomId.trim());
+    }
+
+    public boolean isConnectedTo(String roomId) {
+        return hasConnection(roomId);
+    }
+
+    public Item findItemInRoom(Collection<Item> items, String itemName) {
+        if (items == null || itemName == null) {
+            return null;
+        }
+
+        for (Item item : items) {
+            if (item != null && item.isInRoom(roomId) && item.matchesName(itemName)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public String getExploreText(Collection<Item> items) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("\n=== ").append(roomName).append(" ===\n");
+        builder.append(roomDesc).append("\n");
+        builder.append("Connections: ").append(connections).append("\n");
+        builder.append("Items in room:\n");
+
+        boolean foundAny = false;
+        if (items != null) {
+            for (Item item : items) {
+                if (item != null && item.isInRoom(roomId)) {
+                    builder.append("  - ").append(item.getItemName()).append("\n");
+                    foundAny = true;
+                }
+            }
+        }
+
+        if (!foundAny) {
+            builder.append("  - None\n");
+        }
+
+        return builder.toString();
     }
 
     @Override

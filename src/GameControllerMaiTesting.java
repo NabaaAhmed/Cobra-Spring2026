@@ -7,11 +7,14 @@ public class GameControllerMaiTesting {
     private final Map<String, Item> items;
     private final Map<String, Room> rooms;
     private Player player;
+    private GameView gameView;
 
     public GameControllerMaiTesting() {
         this.scanner = new Scanner(System.in);
         this.items = new HashMap<>();
         this.rooms = new HashMap<>();
+        this.gameView = new GameView();
+        this.player = new Player("R1", 7, 5, 1);
         initializeHardcodedData();
     }
 
@@ -52,10 +55,7 @@ public class GameControllerMaiTesting {
         items.put(sword.getItemId(), sword);
         items.put(potion.getItemId(), potion);
         items.put(coin.getItemId(), coin);
-
-        player = new Player("R1", 5, 5, 1);
     }
-
     private Room getCurrentRoom() {
         return rooms.get(player.getCurrentRoom());
     }
@@ -65,7 +65,7 @@ public class GameControllerMaiTesting {
             return null;
         }
 
-        String target = roomInput.trim();
+        String target = roomInput.trim().replaceAll("\\s+", " ");
         for (Room room : rooms.values()) {
             if (room.getRoomName().equalsIgnoreCase(target)
                     || room.getRoomId().equalsIgnoreCase(target)) {
@@ -81,22 +81,7 @@ public class GameControllerMaiTesting {
             return;
         }
 
-        System.out.println("\n=== " + room.getRoomName() + " ===");
-        System.out.println(room.getRoomDesc());
-        System.out.println("Connections: " + room.getConnections());
-        System.out.println("Items in room:");
-
-        boolean foundAny = false;
-        for (Item item : items.values()) {
-            if (room.getRoomId().equals(item.getRoomID()) && !item.isInPlayerInventory()) {
-                System.out.println("  - " + item.getitemName());
-                foundAny = true;
-            }
-        }
-
-        if (!foundAny) {
-            System.out.println("  - None");
-        }
+        System.out.print(room.getExploreText(items.values()));
     }
 
     public void takeItem(String itemName, Room currentRoomObj) {
@@ -105,15 +90,7 @@ public class GameControllerMaiTesting {
             return;
         }
 
-        Item itemToPick = null;
-        for (Item item : items.values()) {
-            boolean sameName = item.getitemName() != null && item.getitemName().equalsIgnoreCase(itemName.trim());
-            boolean sameRoom = currentRoomObj.getRoomId().equals(item.getRoomID());
-            if (sameName && sameRoom && !item.isInPlayerInventory()) {
-                itemToPick = item;
-                break;
-            }
-        }
+        Item itemToPick = currentRoomObj.findItemInRoom(items.values(), itemName);
 
         if (itemToPick == null) {
             System.out.println("This item is not available in the current room.");
@@ -121,7 +98,7 @@ public class GameControllerMaiTesting {
         }
 
         player.addItem(itemToPick);
-        System.out.println(itemToPick.getitemName() + " was picked up and added to inventory.");
+        System.out.println(itemToPick.getItemName() + " was picked up and added to inventory.");
     }
 
     public void dropItem(String itemName, Room currentRoomObj) {
@@ -130,31 +107,25 @@ public class GameControllerMaiTesting {
             return;
         }
 
-        Item item = getItemFromInventory(itemName);
+        Item item = player.findItemByName(itemName);
         if (item == null) {
             System.out.println("You do not have this item in your inventory.");
             return;
         }
 
-        player.removeItem(item);
-        item.moveToRoom(currentRoomObj.getRoomId());
-        System.out.println(item.getitemName() + " has been dropped in " + currentRoomObj.getRoomName() + ".");
+        if (player.dropItem(item, currentRoomObj)) {
+            System.out.println(item.getItemName() + " has been dropped in " + currentRoomObj.getRoomName() + ".");
+        } else {
+            System.out.println("You could not drop that item.");
+        }
     }
 
     public void displayInventory() {
-        if (player.getInventory().isEmpty()) {
-            System.out.println("You have not picked up any items yet.");
-            return;
-        }
-
-        System.out.println("Your Inventory:");
-        for (Item item : player.getInventory()) {
-            System.out.println("  - " + item.getitemName());
-        }
+        System.out.print(player.getInventoryText());
     }
 
     public void inspectItem(String itemName) {
-        Item item = getItemFromInventory(itemName);
+        Item item = player.findItemByName(itemName);
         if (item == null) {
             System.out.println("You do not have that item.");
             return;
@@ -172,7 +143,7 @@ public class GameControllerMaiTesting {
             return;
         }
 
-        if (currentRoom != null && !currentRoom.hasConnection(destination.getRoomId())) {
+        if (currentRoom != null && !currentRoom.isConnectedTo(destination.getRoomId())) {
             System.out.println("You can't go there from here.");
             return;
         }
@@ -182,35 +153,12 @@ public class GameControllerMaiTesting {
         System.out.println(destination.getRoomDesc());
     }
 
-    private Item getItemFromInventory(String itemName) {
-        if (itemName == null) {
-            return null;
-        }
-
-        String target = itemName.trim();
-        for (Item item : player.getInventory()) {
-            if (item.getitemName() != null && item.getitemName().equalsIgnoreCase(target)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
     public void run() {
         play();
     }
 
     public void play() {
-        System.out.println("     /\\      /\\      /\\      /\\      /\\      /\\      /\\");
-        System.out.println("    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\");
-        System.out.println("    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /");
-        System.out.println("     \\/      \\/      \\/      \\/      \\/      \\/      \\/");
-
-        System.out.println("==============WELCOME TO THE DUNGEON OF TRIALS==============");
-        System.out.println("The Dungeon of Trials was constructed by a king to find a worthy successor.");
-        System.out.println("The dungeon tests character across five themed trials.");
-        System.out.println("A detached Teleport Trap Room serves as a penalty zone for incorrect puzzle actions.");
-        System.out.println("Good Luck!");
+        GameView.displayIntro();
 
         Room currentRoom = getCurrentRoom();
         if (currentRoom != null) {
@@ -223,13 +171,14 @@ public class GameControllerMaiTesting {
 
             System.out.println("\nAvailable Commands:");
             System.out.println("  EXPLORE - See items and exits in the room");
-            System.out.println("  PICKUP <item-name> - Pick up an item");
+            System.out.println("  TAKE <item-name>");
             System.out.println("  INSPECT <item-name> - Examine an item in inventory");
             System.out.println("  DROP <item-name> - Drop an item from inventory");
             System.out.println("  INVENTORY - View your inventory");
             System.out.println("  CONSUME - Consume a potion from inventory to restore health");
             System.out.println("  MOVE TO <room name> - Move to a connected room");
             System.out.println("  USE <item-name> - Use an item from inventory");
+            System.out.println("  UNEQUIP <item-name> - Unequip a weapon to inventory");
             System.out.println("  STATUS - display player stats");
             System.out.println("  QUIT - Exit game");
 
@@ -268,10 +217,16 @@ public class GameControllerMaiTesting {
                 } else {
                     System.out.println("You don't have that item or it can't be used.");
                 }
+            } else if (upperInput.startsWith("UNEQUIP ")) {
+                String itemName = input.substring(8).trim();
+                boolean success = player.unequipWeapon(itemName);
+                if (success) {
+                    System.out.println("You unequipped " + itemName + " and moved it to your inventory.");
+                } else {
+                    System.out.println("You don't have that weapon equipped or it can't be unequipped.");
+                }
             } else if (upperInput.equals("STATUS")){
-                System.out.println("current HP:" + player.getCurrentHP()+
-                        "\nmax HP:" + player.getMaxHP()+
-                        "\nattack power:" + player.getAttackPower());
+                System.out.println(player.getStatusText());
             }
             else {
                 System.out.println("Invalid Command. Try Again.");
