@@ -7,7 +7,7 @@ public class Sword extends Item {
     }
 
     @Override
-    public void use(Player player) {
+     public void use(Player player) {
         player.setAttackPower(player.getAttackPower() + damageBonus);
     }
 

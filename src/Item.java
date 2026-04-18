@@ -80,4 +80,8 @@ public abstract class Item {
      public String toString() {
          return itemName + ": " + description;
      }
+     //unequip
+    //equip
+    //consume
+    //heal
 }

@@ -1,15 +1,15 @@
 import java.util.ArrayList;
 
 public class Player {
-    private int currentRoomNumber;
+    private String currentRoom;
     private int maxHP;
     private int currentHP;
     private ArrayList<Item> inventory;
     private int attackPower;
 
     // Constructor
-    public Player(int startingRoom) {
-        this.currentRoomNumber = startingRoom;
+    public Player(String startingRoom, int maxHP, int currentHP, int attackPower) {
+        this.currentRoom = startingRoom;
         this.maxHP = 5;
         this.currentHP = 5;
         this.inventory = new ArrayList<>();
@@ -26,12 +26,16 @@ public class Player {
     }
 
     // Getters
-    public int getCurrentRoomNumber() {
-        return currentRoomNumber;
+    public String getCurrentRoom() {
+        return currentRoom;
     }
 
     public int getCurrentHP() {
         return currentHP;
+    }
+
+    public int getMaxHP() {
+        return maxHP;
     }
 
     public ArrayList<Item> getInventory() {
@@ -39,8 +43,8 @@ public class Player {
     }
 
     // Movement
-    public void moveToRoom(int roomNumber) {
-        this.currentRoomNumber = roomNumber;
+    public void moveToRoom(String newRoom) {
+        this.currentRoom = newRoom;
     }
 
     // Inventory methods

@@ -1,18 +1,14 @@
 public class Main {
-
     public static void main(String[] args) {
+        // Create game instance
+        GameControllerMaiTesting game = new GameControllerMaiTesting();
 
-        // Create core components
-        Player player = new Player();
-        RoomManager roomManager = new RoomManager();
-        GameView view = new GameView();
-        FileManager fileManager = new FileManager();
+        // Load all game data from external files
+        // game.loadRooms("rooms.txt");
+        game.loadItems("item.txt");
+        // game.loadPuzzles("puzzle.txt");
 
-        // Create controller
-        GameController controller =
-                new GameController(player, roomManager, view, fileManager);
-
-        // Start game
-        controller.startGame();
+        // Start the game
+        game.run();
     }
 }
