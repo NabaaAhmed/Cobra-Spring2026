@@ -2,67 +2,53 @@ import java.util.Scanner;
 
 public class GameControllerNA {
 
-    // Fields
     private Player player;
     private RoomManager roomManager;
     private GameView gameView;
-    private FileManager saveLoad;
+    private FileManager fileManager;
 
     private Scanner input;
     private boolean isRunning;
 
-    // Constructor
     public GameControllerNA(Player player, RoomManager roomManager,
-                            GameView gameView, FileManager saveLoad) {
+                            GameView gameView, FileManager fileManager) {
         this.player = player;
         this.roomManager = roomManager;
         this.gameView = gameView;
-        this.saveLoad = saveLoad;
-
+        this.fileManager = fileManager;
         this.input = new Scanner(System.in);
         this.isRunning = true;
     }
 
-    // =========================
-    // START GAME (MENU)
-    // =========================
     public void startGame() {
-
         gameView.displayMessage("=== Dungeon of Trials ===");
 
         boolean menuActive = true;
 
         while (menuActive) {
             gameView.displayMessage("[1] Start New Game");
-            gameView.displayMessage("[2] Load Game");
+            gameView.displayMessage("[2] About");
             gameView.displayMessage("[3] Quit");
 
-            String choice = input.nextLine().toLowerCase();
+            String choice = input.nextLine().trim().toLowerCase();
 
             switch (choice) {
                 case "1":
                 case "start":
                     gameView.displayMessage("Starting new game...");
-                    runGameLoop();
                     menuActive = false;
+                    runGameLoop();
                     break;
 
                 case "2":
-                case "load":
-                    Player loaded = saveLoad.loadGame();
-                    if (loaded != null) {
-                        player = loaded;
-                        roomManager.setRoom(player.getCurrentRoomID());
-                    }
-                    gameView.displayMessage("Game Loaded!");
-                    runGameLoop();
-                    menuActive = false;
+                case "about":
+                    gameView.displayMessage("Dungeon of Trials - simplified text version.");
                     break;
 
                 case "3":
                 case "quit":
                     gameView.displayMessage("Goodbye!");
-                    System.exit(0);
+                    menuActive = false;
                     break;
 
                 default:
@@ -71,97 +57,74 @@ public class GameControllerNA {
         }
     }
 
-    // =========================
-    // MAIN GAME LOOP
-    // =========================
     private void runGameLoop() {
-
         while (isRunning) {
+            if (roomManager.currentRoom != null) {
+                gameView.displayRoom(roomManager.currentRoom);
+            }
 
-            gameView.displayRoom(roomManager.getCurrentRoom());
-            gameView.displayMessage("Enter command:");
-
-            String command = input.nextLine();
+            gameView.displayMessage("Enter command (type help for commands):");
+            String command = input.nextLine().trim();
             processCommand(command);
             updateState();
         }
     }
 
-    // =========================
-    // COMMAND HANDLER
-    // =========================
     public void processCommand(String command) {
+        if (command.isEmpty()) {
+            gameView.displayError("Please enter a command.");
+            return;
+        }
 
         String[] parts = command.split(" ");
         String action = parts[0].toLowerCase();
 
         switch (action) {
+            case "help":
+                gameView.displayHelp();
+                break;
+
+            case "room":
+                if (roomManager.currentRoom != null) {
+                    gameView.displayRoom(roomManager.currentRoom);
+                } else {
+                    gameView.displayError("No room loaded.");
+                }
+                break;
 
             case "status":
-                gameView.displayMessage("HP: " + player.getCurrentHP() + "/" + player.getMaxHP());
+                gameView.displayStatus(player);
                 break;
 
             case "inventory":
                 gameView.displayInventory(player);
                 break;
 
-            case "inspect":
-                Monster monster = roomManager.getCurrentRoom().getMonster();
-
-                if (monster == null) {
-                    gameView.displayMessage("No Monsters detected");
-                } else {
-                    String result = monster.getName() + " (HP: " + monster.getHp() + ")";
-                    gameView.displayMessage(result);
-                    gameView.displayMessage("Type 'engage' to fight or anything else to ignore:");
-                    String choice = input.nextLine();
-
-                    if (choice.equals("engage")) {
-                        startCombat(monster);
-                    }
-                }
-                break;
-
             case "move":
                 if (parts.length > 1) {
-                    if (!roomManager.moveToRoom(parts[1])) {
-                        gameView.displayError("Can't move there.");
-                    } else {
+                    try {
+                        int index = Integer.parseInt(parts[1]);
+                        roomManager.move(index);
                         player.setCurrentRoomID(roomManager.getRoomId());
+                    } catch (NumberFormatException e) {
+                        gameView.displayError("Use a room connection number. Example: move 0");
                     }
                 } else {
-                    gameView.displayError("Move where?");
+                    gameView.displayError("Move where? Example: move 0");
                 }
                 break;
 
-            case "equip":
-                if (parts.length > 1) {
-                    String itemName = command.substring(6).trim();
-                    boolean success = false;
-
-                    for (Item item : player.getInventory()) {
-                        if (item.getName().equalsIgnoreCase(itemName)) {
-                            item.use(player);
-                            success = true;
-                            break;
-                        }
-                    }
-
-                    if (success) {
-                        gameView.displayMessage("Equipped " + itemName);
-                    } else {
-                        gameView.displayError("Item not found.");
-                    }
-                }
+            case "wait":
+                gameView.displayMessage(player.waitTurn());
                 break;
 
-            case "save":
-                FileManager.saveGame(player);
-                gameView.displayMessage("Game saved.");
+            case "fight":
+                startCombat();
                 break;
 
             case "exit":
                 isRunning = false;
+                gameView.displayMessage("Exiting game...");
                 break;
 
             default:
@@ -169,52 +132,13 @@ public class GameControllerNA {
         }
     }
 
-    // =========================
-    // COMBAT SYSTEM
-    // =========================
-    private void startCombat(Monster monster) {
-
-        if (monster == null) {
-            gameView.displayError("There is nothing to fight.");
-            return;
-        }
-
-        Combat combat = new Combat(player);
-        combat.resetEngine(monster);
-
-        gameView.displayCombat("A " + monster.getName() + " appears!");
-
-        while (!combat.isBattleOver()) {
-            gameView.displayCombat("Turn: " + combat.getTurns());
-            String command = input.nextLine();
-
-            if (command.equalsIgnoreCase("help")) {
-                gameView.displayMessage("Attack / Wait / Retreat");
-                continue;
-            }
-
-            String result = combat.action(command);
-            gameView.displayCombat(result);
-        }
-
-        if (!monster.isAlive()) {
-            gameView.displayMessage("You won!");
-            roomManager.getCurrentRoom().setMonster(null);
-        } else if (!player.isAlive()) {
-            gameView.displayMessage("You died...");
-            isRunning = false;
-        } else {
-            gameView.displayMessage("You fled the battle.");
-        }
-
-        if (!player.isAlive()) {
-            isRunning = false;
-        }
+    private void startCombat() {
+        Monster monster = new Monster("Goblin", 2);
+        Combat combat = new Combat(player, monster);
+        combat.startBattle(gameView, input);
     }
 
-
     public void updateState() {
-
         if (!player.isAlive()) {
             gameView.displayMessage("Game Over.");
             isRunning = false;

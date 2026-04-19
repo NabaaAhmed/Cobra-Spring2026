@@ -1,18 +1,38 @@
+import java.util.Scanner;
+
 public class Main {
 
     public static void main(String[] args) {
 
-        // Create core components
-        Player player = new Player("EZ-01");
-        RoomManager roomManager = new RoomManager();
-        GameView view = new GameView();
-        FileManager fileManager = new FileManager();
+        Player player = new Player();
+        Monster monster = new Monster("Goblin", 2);
 
-        // Create controller
-        GameControllerNA controller =
-                new GameControllerNA(player, roomManager, view, fileManager);
+        // give sword item
+        Sword sword = new Sword("I1", "Trial Sword", "Powerful sword", null, false, 1);
+        sword.use(player); // equip sword
 
-        // Start game
-        controller.startGame();
+        Combat combat = new Combat(player, monster);
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("=== COMBAT START ===");
+
+        while (!combat.isBattleOver()) {
+
+            System.out.println("\nTurn: " + combat.getTurnCount());
+            System.out.println("Enter command (attack, defend, dodge, retreat):");
+
+            String cmd = input.nextLine();
+
+            String result = combat.action(cmd);
+            System.out.println(result);
+        }
+
+        if (!player.isAlive()) {
+            System.out.println("You died.");
+        } else if (!combat.isMonsterAlive()) {
+            System.out.println("Monster defeated!");
+        } else {
+            System.out.println("You fled.");
+        }
     }
 }
