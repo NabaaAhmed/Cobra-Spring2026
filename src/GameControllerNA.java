@@ -30,6 +30,9 @@ public class GameControllerNA {
     public GameControllerNA(Player player, RoomManager roomManager, GameView view, FileManager fileManager) {
     }
 
+    public GameControllerNA(Player player, RoomManager roomManager, GameView view, FileManager fileManager) {
+    }
+
     // =========================
     // START GAME (MENU)
     // =========================

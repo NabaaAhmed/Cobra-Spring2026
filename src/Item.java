@@ -81,6 +81,4 @@ public abstract class Item {
          return itemName + ": " + description;
      }
 
-    public java.lang.String getitemName() {
-    }
 }

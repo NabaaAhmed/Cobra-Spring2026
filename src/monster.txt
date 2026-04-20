@@ -4,7 +4,7 @@ M-02,Guardian,2,1,Silver Sigil/Emerald Fragment
 M-03,Golem,2,1,Gold Chain
 M-04,Wraith,2,1,null
 M-05,Pursuer,2,1,null
-M-06,Shade Boss,2,1,null
 M-07,Warden,2,1,Potion
 M-08,Watcher,2,1,Watcher Corpse
 M-09,Final Trial Stalker,5,1,Stalker Corpse
+
