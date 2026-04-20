@@ -1,17 +1,33 @@
 public class GameView {
 
-    // Display general messages
     public void displayMessage(String message) {
         System.out.println(message);
     }
 
-    // Display current room
     public void displayRoom(Room room) {
-        System.out.println("=== " + room.getRoomName() + " ===");
+        if (room == null) {
+            System.out.println("No room loaded.");
+            return;
+        }
+
+        System.out.println("\n=== " + room.getRoomName() + " ===");
         System.out.println(room.getRoomDesc());
+
+        if (!room.getItems().isEmpty()) {
+            System.out.println("\nItems in room:");
+            for (Item item : room.getItems()) {
+                System.out.println("- " + item.getitemName());
+            }
+        }
+
+        if (!room.getConnections().isEmpty()) {
+            System.out.println("\nConnections:");
+            for (int i = 0; i < room.getConnections().size(); i++) {
+                System.out.println(i + ": " + room.getConnections().get(i).getRoomName());
+            }
+        }
     }
 
-    // Display inventory
     public void displayInventory(Player player) {
         System.out.println("=== Inventory ===");
         if (player.getInventory().isEmpty()) {
@@ -21,5 +37,38 @@ public class GameView {
                     System.out.println("- " + item.getitemName())
             );
         }
+    }
+
+    public void displayStatus(Player player) {
+        System.out.println("=== Player Status ===");
+        System.out.println("Current Room: " + player.getCurrentRoomID());
+        System.out.println("HP: " + player.getCurrentHP() + "/" + player.getMaxHP());
+        System.out.println("Attack Power: " + player.getAttackPower());
+        System.out.println("Trial Tokens: " + player.getTrialTokens());
+    }
+
+    public void displayCombat(String message) {
+        System.out.println("[COMBAT] " + message);
+    }
+
+    public void displayError(String message) {
+        System.out.println("[ERROR] " + message);
+    }
+
+    public void displayHelp() {
+        System.out.println("=== Commands ===");
+        System.out.println("help");
+        System.out.println("room");
+        System.out.println("move [number]");
+        System.out.println("inventory");
+        System.out.println("status");
+        System.out.println("take [item]");
+        System.out.println("drop [item]");
+        System.out.println("use [item]");
+        System.out.println("fight");
+        System.out.println("puzzle");
+        System.out.println("save");
+        System.out.println("load");
+        System.out.println("exit");
     }
 }

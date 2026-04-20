@@ -8,7 +8,6 @@ public class Player {
     private int attackPower;
     private int trialTokens;
 
-    // Constructor
     public Player(String startingRoomID) {
         this.currentRoomID = startingRoomID;
         this.maxHP = 5;
@@ -18,7 +17,6 @@ public class Player {
         this.trialTokens = 0;
     }
 
-    // Getters
     public String getCurrentRoomID() {
         return currentRoomID;
     }
@@ -47,7 +45,6 @@ public class Player {
         return trialTokens;
     }
 
-    // Setters
     public void setCurrentRoomID(String currentRoomID) {
         this.currentRoomID = currentRoomID;
     }
@@ -56,34 +53,27 @@ public class Player {
         this.attackPower = attackPower;
     }
 
-    // Movement
     public void moveToRoom(String roomID) {
         this.currentRoomID = roomID;
     }
 
-    // Inventory methods
     public void addItem(Item item) {
-        if (item == null) {
-            return;
-        }
+        if (item == null) return;
         inventory.add(item);
         item.moveToInventory();
     }
 
     public void removeItem(Item item) {
-        if (item == null) {
-            return;
-        }
+        if (item == null) return;
         inventory.remove(item);
     }
 
     public Item findItemByName(String itemName) {
-        if (itemName == null) {
-            return null;
-        }
+        if (itemName == null) return null;
 
         for (Item item : inventory) {
-            if (item.getitemName() != null && item.getitemName().equalsIgnoreCase(itemName)) {
+            if (item.getitemName() != null &&
+                    item.getitemName().equalsIgnoreCase(itemName)) {
                 return item;
             }
         }
@@ -92,10 +82,7 @@ public class Player {
 
     public boolean useItem(String itemName) {
         Item item = findItemByName(itemName);
-
-        if (item == null) {
-            return false;
-        }
+        if (item == null) return false;
 
         item.use(this);
         return true;
@@ -103,14 +90,14 @@ public class Player {
 
     public boolean hasSword() {
         for (Item item : inventory) {
-            if (item.getitemName() != null && item.getitemName().equalsIgnoreCase("sword")) {
+            if (item.getitemName() != null &&
+                    item.getitemName().toLowerCase().contains("sword")) {
                 return true;
             }
         }
         return false;
     }
 
-    // Health methods
     public void takeDamage(int damage) {
         currentHP -= damage;
         if (currentHP < 0) {
@@ -149,7 +136,6 @@ public class Player {
         return currentHP > 0;
     }
 
-    // Trial token methods
     public void addTrialToken() {
         trialTokens++;
     }
@@ -160,17 +146,12 @@ public class Player {
         }
     }
 
-    // Wait / skip turn
     public String waitTurn() {
         return "You wait for a turn.";
     }
 
-    // Combat methods
     public void attack(Monster monster) {
-        if (monster == null) {
-            return;
-        }
-
+        if (monster == null) return;
         monster.takeDamage(attackPower);
     }
 }

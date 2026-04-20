@@ -1,22 +1,88 @@
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Scanner;
 
 public class FileManager {
 
-    public static void saveGame(String filename, String data) {
+    public static void savePlayer(String filename, Player player) {
         try {
             FileWriter writer = new FileWriter(filename);
-            writer.write(data);
+
+            writer.write(player.getCurrentRoomID() + "\n");
+            writer.write(player.getCurrentHP() + "\n");
+            writer.write(player.getMaxHP() + "\n");
+            writer.write(player.getAttackPower() + "\n");
+            writer.write(player.getTrialTokens() + "\n");
+
+            StringBuilder inventoryLine = new StringBuilder();
+            for (Item item : player.getInventory()) {
+                inventoryLine.append(item.getitemName()).append(";");
+            }
+            writer.write(inventoryLine.toString() + "\n");
+
             writer.close();
-            System.out.println("You're game progress has been saved!");
+            System.out.println("Game progress has been saved!");
         } catch (Exception e) {
             System.out.println("Error saving game progress file.");
         }
     }
 
-    public static String load (String filename){
+    public static Player loadPlayer(String filename) {
+        try {
+            File file = new File(filename);
+            Scanner reader = new Scanner(file);
+
+            String roomID = reader.nextLine();
+            int currentHP = Integer.parseInt(reader.nextLine());
+            int maxHP = Integer.parseInt(reader.nextLine());
+            int attackPower = Integer.parseInt(reader.nextLine());
+            int trialTokens = Integer.parseInt(reader.nextLine());
+            String inventoryLine = reader.nextLine();
+
+            Player player = new Player(roomID);
+
+            if (maxHP != 5) {
+                player.modifyMaxHP(maxHP - 5);
+            }
+
+            if (currentHP < player.getCurrentHP()) {
+                player.takeDamage(player.getCurrentHP() - currentHP);
+            } else if (currentHP > player.getCurrentHP()) {
+                player.heal(currentHP - player.getCurrentHP());
+            }
+
+            player.setAttackPower(attackPower);
+
+            for (int i = 0; i < trialTokens; i++) {
+                player.addTrialToken();
+            }
+
+            if (!inventoryLine.isEmpty()) {
+                String[] inventoryNames = inventoryLine.split(";");
+                for (String name : inventoryNames) {
+                    if (!name.trim().isEmpty()) {
+                        Item item;
+                        if (name.equalsIgnoreCase("Potion")) {
+                            item = new Potion("LOAD-POTION", "Potion", "A small vial of restorative red liquid.", "0", true, 2);
+                        } else if (name.toLowerCase().contains("sword")) {
+                            item = new Sword("LOAD-SWORD", name, name, "0", false, 2);
+                        } else {
+                            item = new QuestItems("LOAD-" + name.toUpperCase().replace(" ", "_"), name, name, "0", false);
+                        }
+                        player.addItem(item);
+                    }
+                }
+            }
+
+            reader.close();
+            return player;
+        } catch (Exception e) {
+            System.out.println("Error loading game.");
+            return null;
+        }
+    }
+
+    public static String load(String filename) {
         String data = "";
 
         try {
@@ -31,6 +97,7 @@ public class FileManager {
         } catch (Exception e) {
             System.out.println("Error loading file.");
         }
+
         return data;
-        }
+    }
 }

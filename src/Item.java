@@ -6,7 +6,6 @@ public abstract class Item {
     private Boolean stackable;
     private boolean inPlayerInventory;
 
-    // Item constructor
     public Item(String itemId, String itemName, String description, String roomID, Boolean stackable) {
         this.itemId = itemId;
         this.itemName = itemName;
@@ -16,12 +15,10 @@ public abstract class Item {
         this.inPlayerInventory = false;
     }
 
-    // Getter for itemId
     public String getItemId() {
         return itemId;
     }
 
-    // Getter and setter for itemName
     public String getitemName() {
         return itemName;
     }
@@ -30,7 +27,6 @@ public abstract class Item {
         this.itemName = name;
     }
 
-    // Getter and setter for description
     public String getDescription() {
         return description;
     }
@@ -39,7 +35,6 @@ public abstract class Item {
         this.description = description;
     }
 
-    // Getter and setter for roomID
     public String getRoomID() {
         return roomID;
     }
@@ -48,7 +43,6 @@ public abstract class Item {
         this.roomID = roomID;
     }
 
-    // Getter and setter for stackable
     public Boolean getStackable() {
         return stackable;
     }
@@ -61,19 +55,16 @@ public abstract class Item {
         return inPlayerInventory;
     }
 
-    // Move item to inventory
     public void moveToInventory() {
         this.inPlayerInventory = true;
         this.roomID = null;
     }
 
-    // Move item back to a room
     public void moveToRoom(String roomID) {
         this.inPlayerInventory = false;
         this.roomID = roomID;
     }
 
-    // Abstract method to be implemented by subclasses
     public abstract void use(Player player);
 
     @Override
