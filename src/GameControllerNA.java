@@ -27,6 +27,9 @@ public class GameControllerNA {
         this.combatEngine = new CombatEngine(player);
     }
 
+    public GameControllerNA(Player player, RoomManager roomManager, GameView view, FileManager fileManager) {
+    }
+
     // =========================
     // START GAME (MENU)
     // =========================

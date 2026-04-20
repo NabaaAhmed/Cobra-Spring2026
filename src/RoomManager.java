@@ -1,7 +1,6 @@
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
+import java.util.List;
 
 public class RoomManager {
 
@@ -37,13 +36,21 @@ public class RoomManager {
         // 3. Connect rooms (SECOND PASS)
         for (String[] parts : rawData) {
 
-            Room room = rooms.get(parts[0]);
+            String roomId = parts[0].trim();
+            Room room = rooms.get(roomId);
+
+            if (room == null) continue;
+
+            int optionNumber = 1;
 
             for (int i = 3; i < parts.length; i++) {
                 String targetId = parts[i].trim();
 
+                if (targetId.isEmpty()) continue;
+
                 if (rooms.containsKey(targetId)) {
-                    room.connection(rooms.get(targetId));
+                    room.addExit("Option " + optionNumber, targetId);
+                    optionNumber++;
                 }
             }
         }
@@ -52,43 +59,65 @@ public class RoomManager {
         currentRoom = rooms.get("EZ-01");
     }
 
-    // -------------------------
     // MOVE SYSTEM
-    // -------------------------
     public void move(int index) {
-        if (index >= 0 && index < currentRoom.connections.size()) {
-            currentRoom = currentRoom.connections.get(index);
-            showRoom();
+        if (currentRoom == null) {
+            System.out.println("There is no current room set.");
+            return;
+        }
+
+        List<String> directions = new ArrayList<>(currentRoom.getExits().keySet());
+
+        if (index >= 0 && index < directions.size()) {
+            String dir = directions.get(index);
+            String destId = currentRoom.getExits().get(dir);
+
+            if (destId != null && rooms.containsKey(destId)) {
+                currentRoom = rooms.get(destId);
+                showRoom();
+            } else {
+                System.out.println("Destination room not found: " + destId);
+            }
         } else {
             System.out.println("You can't go there.");
         }
     }
 
-    // -------------------------
     // DISPLAY ROOM INFO
-    // -------------------------
     public void showRoom() {
-        System.out.println("\n" + currentRoom.name);
-        System.out.println(currentRoom.description);
+        if (currentRoom == null) {
+            System.out.println("No room to show.");
+            return;
+        }
+
+        System.out.println("\n" + currentRoom.getRoomName());
+        System.out.println(currentRoom.getRoomDesc());
 
         System.out.println("\nConnections:");
 
-        for (int i = 0; i < currentRoom.connections.size(); i++) {
-            System.out.println(i + ": " + currentRoom.connections.get(i).name);
+        List<String> directions = new ArrayList<>(currentRoom.getExits().keySet());
+
+        for (int i = 0; i < directions.size(); i++) {
+            String direction = directions.get(i);
+            String destId = currentRoom.getExits().get(direction);
+            Room destRoom = rooms.get(destId);
+            String destName = destRoom != null ? destRoom.getRoomName() : destId;
+            System.out.println(i + ": " + direction + " -> " + destName);
         }
     }
     //Save and load current room
     public String getRoomId() {
-        return currentRoom.id;
+        return currentRoom.getRoomID();
     }
 
     public void setRoom(String id) {
+        if (id == null) return;
         if (rooms.containsKey(id)) {
             currentRoom = rooms.get(id);
         }
     }
 
-    // CSV PARSER (IMPORTANT)
+    // CSV PARSER
     private String[] splitCSVLine(String line) {
         ArrayList<String> result = new ArrayList<>();
         StringBuilder current = new StringBuilder();
