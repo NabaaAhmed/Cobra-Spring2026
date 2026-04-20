@@ -173,4 +173,12 @@ public class Player {
 
         monster.takeDamage(attackPower);
     }
+
+    public String inspectMonster() {
+        return "";
+    }
+
+    public boolean equipWeapon(String itemName) {
+        return false;
+    }
 }

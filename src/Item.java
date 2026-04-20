@@ -7,7 +7,7 @@ public abstract class Item {
     private boolean inPlayerInventory;
 
     // Item constructor
-    public Item(String itemId, String itemName, String description, String roomID, Boolean stackable) {
+    public Item(String itemId, String itemName, String description, String roomID, boolean stackable) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.description = description;

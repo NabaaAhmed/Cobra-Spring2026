@@ -364,4 +364,7 @@ public class Puzzle
     {
         return puzzleID + " - " + trialName + " (Variant " + variant + ")";
     }
+
+    public String getRoomID() {
+        return successRoomID;  }
 }

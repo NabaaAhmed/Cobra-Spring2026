@@ -3,6 +3,7 @@ import java.util.List;
 
 public class Monster {
 
+    private String id;
     private String name;
     private int hp;
     private int turnCounter;

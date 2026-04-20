@@ -27,12 +27,6 @@ public class GameControllerNA {
         this.combatEngine = new CombatEngine(player);
     }
 
-    public GameControllerNA(Player player, RoomManager roomManager, GameView view, FileManager fileManager) {
-    }
-
-    public GameControllerNA(Player player, RoomManager roomManager, GameView view, FileManager fileManager) {
-    }
-
     // =========================
     // START GAME (MENU)
     // =========================
@@ -84,7 +78,7 @@ public class GameControllerNA {
 
         while (isRunning) {
 
-            gameView.displayRoom(roomManager.getCurrentRoom());
+            gameView.displayRoom(roomManager.getRoom());
             gameView.displayMessage("Enter command:");
 
             String command = input.nextLine();
@@ -104,7 +98,7 @@ public class GameControllerNA {
         switch (action) {
 
             case "status":
-                gameView.displayMessage("HP: " + player.getHealth());
+                gameView.displayMessage("HP: " + player.getCurrentHP());
                 break;
 
             case "inventory":

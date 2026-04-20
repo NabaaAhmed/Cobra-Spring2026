@@ -16,7 +16,7 @@ public class FileManager {
         }
     }
 
-    public static String load (String filename){
+    public static String loadGame (String filename){
         String data = "";
 
         try {
