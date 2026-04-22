@@ -1,4 +1,4 @@
-String monsterID, String name, int HP, int atkValue, ArrayList <Item> rewards
+monsterID,name,HP,atkValue,reward
 M-01,Mimic,2,1,null
 M-02,Guardian,2,1,Silver Sigil/Emerald Fragment
 M-03,Golem,2,1,Gold Chain

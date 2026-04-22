@@ -93,6 +93,9 @@ public class GameControllerNA {
     public void play() {
         gameView.displayHelp();
 
+        // Add puzzle items and monsters to rooms after loading from file
+        roomManager.addPuzzleItemsToRooms();
+
         while (isRunning) {
             if (roomManager.getCurrentRoom() != null) {
                 gameView.displayRoom(roomManager.getCurrentRoom());
@@ -213,6 +216,16 @@ public class GameControllerNA {
             case "puzzle2":
             case "restraint":
                 handlePuzzle2();
+                break;
+
+            case "puzzle3":
+            case "trust":
+                handlePuzzle3();
+                break;
+
+            case "puzzle4":
+            case "sacrifice":
+                handlePuzzle4();
                 break;
 
             case "exit":
@@ -343,7 +356,6 @@ public class GameControllerNA {
 
             if (puzzle.checkSolution(solution)) {
                 puzzle.setSolved(true);
-                // CORRECT ORDER: Increase Max HP first, then heal
                 player.setMaxHP(player.getMaxHP() + 1);
                 player.fullHeal();
                 System.out.println("\nCORRECT! You completed the " + puzzle.getTrialName() + " Trial!");
@@ -501,18 +513,14 @@ public class GameControllerNA {
                 int result = puzzle.processThrow(itemName, gameView, player, scanner);
 
                 if (result == 1) {
-                    // WIN - complete puzzle and go to EZ-01
                     puzzle.completePuzzle(gameView, player, roomManager);
                     roomManager.setPuzzle1Active(false);
                     inPuzzle = false;
                 } else if (result == -1) {
-                    // LOSE - explosion + send to Trap Room
                     if (player.isAlive()) {
                         puzzle.handlePenalty(gameView, player, roomManager);
                         roomManager.setPuzzle1Active(false);
                         inPuzzle = false;
-
-                        // Spawn Warden in Trap Room
                         roomManager.spawnWardenInTrapRoom();
                     } else {
                         gameView.displayGameOver();
@@ -593,6 +601,123 @@ public class GameControllerNA {
                 }
             } else {
                 System.out.println("Invalid command. Available: take coin, examine chest, open chest, place coin, leave, hint, exit");
+            }
+        }
+    }
+
+    private void handlePuzzle3() {
+        if (!roomManager.isPuzzle3Active()) {
+            System.out.println("This trial is already complete.");
+            return;
+        }
+
+        Puzzle3Trust puzzle = new Puzzle3Trust();
+        String currentRoomId = roomManager.getCurrentRoom().getId();
+
+        if (!currentRoomId.equals("TR-02")) {
+            System.out.println("You are not in the Trust Trial room.");
+            System.out.println("Go to the Guardian Chamber first.");
+            return;
+        }
+
+        System.out.println(puzzle.startPuzzle());
+
+        boolean inPuzzle = true;
+        while (inPuzzle && !puzzle.isFinished() && isRunning) {
+            System.out.print("\n[Trial of Trust] What would you like to do?\n> ");
+            String input = scanner.nextLine().trim().toLowerCase();
+
+            if (input.equals("exit")) {
+                System.out.println("You leave the trial room.");
+                inPuzzle = false;
+            } else if (input.equals("help")) {
+                System.out.println("attack guardian");
+                System.out.println("inspect chest");
+                System.out.println("destroy chest");
+                System.out.println("open chest");
+                System.out.println("exit");
+            } else {
+                String result = puzzle.handleCommand(player, input);
+                System.out.println(result);
+
+                if (puzzle.isFinished()) {
+                    if (puzzle.isCombatTriggered()) {
+                        Monster monster = puzzle.getFailureMonster();
+                        if (monster != null) {
+                            Room currentRoom = roomManager.getCurrentRoom();
+                            currentRoom.setMonster(monster);
+                            startCombat();
+                        }
+                        if (!player.isAlive()) {
+                            gameView.displayGameOver();
+                            isRunning = false;
+                            return;
+                        }
+                        System.out.println("You have completed Trial of Trust (No Reward).");
+                        player.setCurrentRoomID("EZ-01");
+                    }
+                    roomManager.setPuzzle3Active(false);
+                    inPuzzle = false;
+                }
+            }
+        }
+    }
+
+    private void handlePuzzle4() {
+        if (!roomManager.isPuzzle4Active()) {
+            System.out.println("This trial is already complete.");
+            return;
+        }
+
+        Puzzle4Sacrifice puzzle = new Puzzle4Sacrifice();
+        String currentRoomId = roomManager.getCurrentRoom().getId();
+
+        if (!currentRoomId.equals("SC-01")) {
+            System.out.println("You are not in the Sacrifice Trial room.");
+            System.out.println("Go to the Sacrifice Antechamber first.");
+            return;
+        }
+
+        System.out.println(puzzle.startPuzzle());
+
+        boolean inPuzzle = true;
+        while (inPuzzle && !puzzle.isFinished() && isRunning) {
+            System.out.print("\n[Trial of Sacrifice] What would you like to do?\n> ");
+            String input = scanner.nextLine().trim().toLowerCase();
+
+            if (input.equals("exit")) {
+                System.out.println("You leave the trial room.");
+                inPuzzle = false;
+            } else if (input.equals("help")) {
+                System.out.println("take sword");
+                System.out.println("move bridge");
+                System.out.println("throw sword");
+                System.out.println("inspect bridge");
+                System.out.println("move forward");
+                System.out.println("exit");
+            } else {
+                String result = puzzle.handleCommand(player, input);
+                System.out.println(result);
+
+                if (puzzle.isFinished()) {
+                    if (puzzle.isCombatTriggered()) {
+                        Monster monster = puzzle.getFailureMonster();
+                        if (monster != null) {
+                            Room currentRoom = roomManager.getCurrentRoom();
+                            currentRoom.setMonster(monster);
+                            startCombat();
+                        }
+                        if (!player.isAlive()) {
+                            gameView.displayGameOver();
+                            isRunning = false;
+                            return;
+                        }
+                        System.out.println("You have completed Trial of Sacrifice (No Reward).");
+                        player.setCurrentRoomID("EZ-01");
+                    }
+                    roomManager.setPuzzle4Active(false);
+                    inPuzzle = false;
+                }
             }
         }
     }

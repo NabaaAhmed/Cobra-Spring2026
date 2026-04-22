@@ -15,11 +15,11 @@ public class Player {
     private Sword equippedSword;
 
     public Player() {
-        this("EZ-01", 5);  // Changed from 10 to 5
+        this("EZ-01", 5);
     }
 
     public Player(String currentRoomID) {
-        this(currentRoomID, 5);  // Changed from 10 to 5
+        this(currentRoomID, 5);
     }
 
     public Player(int hp) {
@@ -177,5 +177,38 @@ public class Player {
             }
         }
         return null;
+    }
+
+    // ===== ADDED METHODS FOR PUZZLE 3 & 4 =====
+
+    public void modifyMaxHP(int amount) {
+        this.maxHP = Math.max(1, this.maxHP + amount);
+        if (currentHP > this.maxHP) {
+            currentHP = this.maxHP;
+        }
+    }
+
+    public void healToFull() {
+        this.currentHP = this.maxHP;
+    }
+
+    public void addTrialToken() {
+        Item token = new Potion("TKN-01", "Trial Token",
+                "A small glowing token awarded for completing a trial.", false, 0);
+        this.addItem(token);
+    }
+
+    public int getTrialTokens() {
+        int count = 0;
+        for (Item item : inventory) {
+            if (item.getName().equals("Trial Token")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public Item findItemByName(String name) {
+        return findItem(name);
     }
 }

@@ -1,7 +1,8 @@
-String puzzleID, String trialName, String roomID,boolean isSolved
+puzzleID,trialName,roomID,isSolved
 PZ-01,Awareness,AW-02,false
 PZ-02,Restraint,RS-02,false
 PZ-03,Trust,TR-02,false
 PZ-04,Sacrifice,SC-01,false
 PZ-05,Commitment,CM-07,false
 PZ-06,Final,FN-02,false
+PZ-07,Hell,END-01,false
