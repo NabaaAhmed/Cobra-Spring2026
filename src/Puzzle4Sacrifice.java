@@ -175,6 +175,6 @@ public class Puzzle4Sacrifice {
                     + "Combat begins!";
         }
 
-        return "Nothing important happens.";
+        return "Invalid trial command.";
     }
 }

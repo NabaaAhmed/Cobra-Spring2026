@@ -113,6 +113,6 @@ public class Puzzle5Commitment {
                     + "You have completed Trial of Commitment (No Reward).";
         }
 
-        return "That command does not work in this puzzle. Try something else.";
+        return "Invalid trial command.";
     }
 }

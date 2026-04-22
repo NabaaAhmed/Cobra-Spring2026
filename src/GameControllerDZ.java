@@ -16,7 +16,8 @@ public class GameControllerDZ {
             System.out.println("3 - Trial of Trust");
             System.out.println("4 - Trial of Sacrifice");
             System.out.println("5 - Trial of Commitment");
-            System.out.println("Type 3, 4, 5, or exit.");
+            System.out.println("6 - Final Trial");
+            System.out.println("Type 3, 4, 5, 6, or exit.");
             System.out.print("> ");
 
             String choice = input.nextLine().trim();
@@ -41,6 +42,11 @@ public class GameControllerDZ {
                 player.setCurrentRoomID("CM-01");
                 Puzzle5Commitment puzzle = new Puzzle5Commitment();
                 runPuzzle5(input, player, puzzle, view);
+
+            } else if (choice.equals("6")) {
+                player.setCurrentRoomID("FN-02");
+                Puzzle6FinalTrial puzzle = new Puzzle6FinalTrial();
+                runPuzzle6(input, player, puzzle, view);
 
             } else {
                 System.out.println("Invalid choice.");
@@ -166,6 +172,57 @@ public class GameControllerDZ {
 
             System.out.println();
             System.out.println(result);
+            System.out.println();
+            printPlayerStatus(player);
+        }
+    }
+
+    private static void runPuzzle6(Scanner input, Player player, Puzzle6FinalTrial puzzle, GameView view) {
+        System.out.println();
+        System.out.println(puzzle.startPuzzle());
+        System.out.println();
+
+        while (!puzzle.isFinished()) {
+            System.out.println("Enter a command. Type 'help' for trial commands.");
+            System.out.print("> ");
+
+            String command = input.nextLine().trim();
+
+            if (command.equalsIgnoreCase("help")) {
+                System.out.println("burn chest");
+                System.out.println("extinguish fire");
+                System.out.println("open chest");
+                System.out.println("insert explosive device");
+                System.out.println("place core fragment");
+                System.out.println("step symbol");
+                System.out.println("throw final jewel");
+                System.out.println("enter unstable teleporter");
+                System.out.println("yes / no");
+                continue;
+            }
+
+            String result = puzzle.handleCommand(player, command);
+
+            System.out.println();
+            System.out.println(result);
+            System.out.println();
+            printPlayerStatus(player);
+        }
+
+        if (puzzle.isCombatTriggered()) {
+            System.out.println();
+            System.out.println("Punishment combat has started.");
+
+            Combat combat = new Combat(player, puzzle.getFailureMonster());
+            combat.startBattle(view, input);
+
+            if (player.isAlive()) {
+                player.setCurrentRoomID("EZ-01");
+                System.out.println("You have completed Final Trial (No Reward).");
+            } else {
+                System.out.println("You died during the Final Trial.");
+            }
+
             System.out.println();
             printPlayerStatus(player);
         }

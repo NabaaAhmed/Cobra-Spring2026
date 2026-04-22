@@ -126,6 +126,6 @@ public class Puzzle3Trust {
                     + "Combat begins!";
         }
 
-        return "Nothing important happens.";
+        return "Invalid trial command.";
     }
 }
