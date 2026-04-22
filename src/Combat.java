@@ -1,3 +1,4 @@
+//Nabaa Class
 public class Combat {
 
     private final Player player;
