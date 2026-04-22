@@ -54,6 +54,14 @@ public class Player {
         this.attackPower = attackPower;
     }
 
+    public void setMaxHP(int MaxHP){
+        this.maxHP = maxHP;
+    }
+
+    public void setCurrentHP(int currentHP) {
+        this.currentHP = currentHP;
+    }
+
     public void moveToRoom(String roomID) {
         this.currentRoomID = roomID;
     }
