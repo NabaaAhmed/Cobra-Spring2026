@@ -62,14 +62,26 @@ public class Player {
         this.currentHP = currentHP;
     }
 
-    public void moveToRoom(String roomID) {
-        this.currentRoomID = roomID;
+    public void moveToRoom(String newRoomID) {
+        this.currentRoomID = newRoomID;
     }
 
-    public void addItem(Item item) {
-        if (item == null) return;
-        inventory.add(item);
-        item.moveToInventory();
+    //Inventory methods -Mai
+    public void takeItem(Item item, Room currentRoomObj) {
+        if (item.getItemName() == null || currentRoomObj == null) {
+            System.out.println("Invalid pickup request.");
+            return;
+        }
+
+        Item itemToPick = currentRoomObj.findItemInRoom(item.values(), itemName);
+
+        if (itemToPick == null) {
+            System.out.println("This item is not available in the current room.");
+            return;
+        }
+
+        currentRoomObj.addItem(itemToPick);
+        System.out.println(itemToPick.getItemName() + " was picked up and added to inventory.");
     }
 
     public void removeItem(Item item) {
@@ -77,41 +89,33 @@ public class Player {
         inventory.remove(item);
     }
 
+    public boolean dropItem(Item item, Room room) {
+        if (item == null || room == null || !inventory.contains(item)) {
+            return false;
+        }
+        inventory.remove(item);
+        item.moveToRoom(room.getRoomID());
+        return true;
+    }
     public Item findItemByName(String itemName) {
         if (itemName == null) return null;
 
         for (Item item : inventory) {
-            if (item.getitemName() != null &&
-                    item.getitemName().equalsIgnoreCase(itemName)) {
+            if (item.getItemName() != null &&
+                    item.getItemName().equalsIgnoreCase(itemName)) {
                 return item;
             }
         }
         return null;
     }
 
+    //Using methods -Mai
     public boolean useItem(String itemName) {
         Item item = findItemByName(itemName);
         if (item == null) return false;
 
         item.use(this);
         return true;
-    }
-
-    public boolean hasSword() {
-        for (Item item : inventory) {
-            if (item.getitemName() != null &&
-                    item.getitemName().toLowerCase().contains("sword")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void takeDamage(int damage) {
-        currentHP -= damage;
-        if (currentHP < 0) {
-            currentHP = 0;
-        }
     }
 
     public int heal(int amount) {
@@ -125,9 +129,32 @@ public class Player {
         return currentHP - before;
     }
 
-    public void healToFull() {
-        currentHP = maxHP;
+    public boolean hasSword() {
+        for (Item item : inventory) {
+            if (item.getItemName() != null &&
+                    item.getItemName().toLowerCase().contains("sword")) {
+                return true;
+            }
+        }
+        return false;
     }
+
+    public boolean unequipWeapon(String itemName) {
+        Item item = findItemByName(itemName);
+        if (item instanceof Sword) {
+            ((Sword) item).unequip(this);
+            return true;
+        }
+        return false;
+    }
+
+    public void takeDamage(int damage) {
+        currentHP -= damage;
+        if (currentHP < 0) {
+            currentHP = 0;
+        }
+    }
+
 
     public void modifyMaxHP(int amount) {
         maxHP += amount;
@@ -153,10 +180,6 @@ public class Player {
         if (trialTokens > 0) {
             trialTokens--;
         }
-    }
-
-    public String waitTurn() {
-        return "You wait for a turn.";
     }
 
     public void attack(Monster monster) {

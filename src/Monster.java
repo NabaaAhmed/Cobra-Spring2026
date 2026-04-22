@@ -7,7 +7,7 @@ public class Monster {
     private String monsterID;
     private String name;
     private int hp;
-    private int atkValue;
+    private int attackValue;
     private ArrayList<Item> inventory;
     private int turnCounter;
 
@@ -63,5 +63,13 @@ public class Monster {
 
     public List<Item> dropLoot() {
         return new ArrayList<>();
+    }
+
+    public int getAttackValue() {
+        return attackValue;
+    }
+
+    public void setAttackValue(int attackValue) {
+        this.attackValue = attackValue;
     }
 }
