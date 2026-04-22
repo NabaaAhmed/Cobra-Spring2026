@@ -5,7 +5,6 @@ public class Combat {
     private int turnCount;
     private boolean retreated;
 
-    // Constructor
     public Combat(Player player, Monster enemy) {
         this.player = player;
         this.enemy = enemy;
@@ -13,7 +12,6 @@ public class Combat {
         this.retreated = false;
     }
 
-    // Check if battle is over
     public boolean isBattleOver() {
         return !player.isAlive() || !enemy.isAlive() || retreated;
     }
@@ -30,43 +28,30 @@ public class Combat {
         return enemy.isAlive();
     }
 
-    // Main action system
     public String action(String command) {
-
         String result = "";
 
         if (command.equalsIgnoreCase("attack")) {
-
-            // Sword logic
             if (player.hasSword()) {
                 enemy.takeDamage(enemy.getHp());
-                result += "You used the sword! Instant kill.\n";
+                result += "You used a sword! Instant kill.\n";
             } else {
-                // Clash system
                 enemy.clash(player);
                 result += "You and " + enemy.getName() + " both take 1 damage.\n";
             }
-        }
-
-        else if (command.equalsIgnoreCase("retreat")) {
-            result += "You retreat from the battle.\n";
+        } else if (command.equalsIgnoreCase("retreat")) {
             retreated = true;
-        }
-
-        else if (command.equalsIgnoreCase("wait")) {
+            result += "You retreat from the battle.\n";
+        } else if (command.equalsIgnoreCase("wait")) {
             result += player.waitTurn() + "\n";
+        } else {
+            result += "Invalid combat command. Try attack, wait, or retreat.\n";
+            return result;
         }
 
-        else {
-            result += "Invalid command. Try again.\n";
-            turnCount--; // don't count bad input
-        }
-
-        // Apply turn effects
         applyTurnEffects();
 
-        // Status output
-        result += "Player HP: " + player.getHp() + "\n";
+        result += "Player HP: " + player.getCurrentHP() + "\n";
         result += enemy.getName() + " HP: " + enemy.getHp() + "\n";
 
         turnCount++;
@@ -77,19 +62,16 @@ public class Combat {
         enemy.onTurn(player);
     }
 
-    // Start battle loop
-    public void startBattle(GameView view) {
-
+    public void startBattle(GameView view, java.util.Scanner input) {
         enemy.onEncounter(player);
-
         view.displayCombat("A " + enemy.getName() + " appears!");
 
         while (!isBattleOver()) {
             view.displayCombat("Turn " + turnCount);
+            view.displayCombat("Type: attack / wait / retreat");
 
-            // For now auto-attack; replace with input later
-            String result = action("attack");
-
+            String command = input.nextLine();
+            String result = action(command);
             view.displayCombat(result);
         }
 
@@ -100,7 +82,6 @@ public class Combat {
         } else {
             view.displayCombat("Monster defeated!");
 
-            // Loot
             for (Item item : enemy.dropLoot()) {
                 player.addItem(item);
                 view.displayCombat("You got: " + item.getitemName());

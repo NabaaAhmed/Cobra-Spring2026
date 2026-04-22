@@ -3,9 +3,11 @@ import java.util.List;
 
 public class Monster {
 
-    private String id;
+    private String monsterID;
     private String name;
     private int hp;
+    private int atkValue;
+    private ArrayList<Item> inventory;
     private int turnCounter;
 
     public Monster(String name, int hp) {
@@ -28,21 +30,26 @@ public class Monster {
 
     public void takeDamage(int amount) {
         hp -= amount;
-        if (hp < 0) hp = 0;
+        if (hp < 0) {
+            hp = 0;
+        }
     }
 
-    // core clash
     public void clash(Player player) {
         player.takeDamage(1);
         this.takeDamage(1);
     }
 
     public void onEncounter(Player player) {
-        // optional
+        // optional special effect later
     }
 
     public void onTurn(Player player) {
         turnCounter++;
+    }
+
+    public int getTurnCounter() {
+        return turnCounter;
     }
 
     public int attack() {
@@ -50,11 +57,10 @@ public class Monster {
     }
 
     public void trigger() {
-        // optional
+        // optional special trigger later
     }
 
     public List<Item> dropLoot() {
-        // Base monsters drop no guaranteed loot by default.
         return new ArrayList<>();
     }
 }
