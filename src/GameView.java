@@ -80,4 +80,19 @@ public class GameView {
         System.out.println("Exit <Exits current game>");
     }
 
+    //Mai
+    public static void displayIntro() {
+        System.out.println("     /\\      /\\      /\\      /\\      /\\      /\\      /\\");
+        System.out.println("    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\");
+        System.out.println("    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /");
+        System.out.println("     \\/      \\/      \\/      \\/      \\/      \\/      \\/");
+
+        System.out.println("==============WELCOME TO THE DUNGEON OF TRIALS==============");
+        System.out.println("The Dungeon of Trials was constructed by a king to find a worthy successor.");
+        System.out.println("The dungeon tests character across five themed trials.");
+        System.out.println("A detached Teleport Trap Room serves as a penalty zone for incorrect puzzle actions.");
+        System.out.println("Good Luck!");
+    }
+
+
 }

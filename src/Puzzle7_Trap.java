@@ -95,7 +95,7 @@ public class Puzzle7_Trap {
     }
 
 
-     //Complete the puzzle and give rewards (win path)
+    //Complete the puzzle and give rewards (win path)
 
     public void completePuzzle(GameView view, Player player, RoomManager roomManager) {
         if (completed) return;
@@ -127,7 +127,7 @@ public class Puzzle7_Trap {
     }
 
 
-     //Handle penalty path
+    //Handle penalty path
 
     public void handlePenalty(GameView view, Player player, RoomManager roomManager) {
         if (completed) return;
