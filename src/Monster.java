@@ -49,7 +49,7 @@ public class Monster {
     }
 
     public void onEncounter(Player player) {
-        System.out.println(name + " appears!");
+        // kept empty for now to avoid duplicate encounter messages
     }
 
     public void onTurn(Player player) {

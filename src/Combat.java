@@ -5,17 +5,15 @@ public class Combat {
     private final Player player;
     private Monster enemy;
     private int turnCount;
-    private boolean retreated;
 
     public Combat(Player player, Monster enemy) {
         this.player = player;
         this.enemy = enemy;
         this.turnCount = 1;
-        this.retreated = false;
     }
 
     public boolean isBattleOver() {
-        return !player.isAlive() || !enemy.isAlive() || retreated;
+        return !player.isAlive() || !enemy.isAlive();
     }
 
     public int getTurnCount() {
@@ -34,6 +32,7 @@ public class Combat {
         String result = "";
 
         if (command.equalsIgnoreCase("attack")) {
+
             if (player.hasSword()) {
                 enemy.takeDamage(enemy.getHp());
                 result += "You used the sword! Instant kill.\n";
@@ -41,17 +40,9 @@ public class Combat {
                 enemy.clash(player);
                 result += "You and " + enemy.getName() + " clash.\n";
             }
-        } else if (command.equalsIgnoreCase("retreat")) {
-            retreated = true;
-            result += "You retreat from the battle.\n";
-        } else if (command.equalsIgnoreCase("wait")) {
-            result += player.waitTurn() + "\n";
-        } else {
-            return "Invalid combat command. Try: attack, wait, or retreat.\n";
-        }
 
-        if (enemy.isAlive()) {
-            enemy.onTurn(player);
+        } else {
+            return "Invalid combat command. Only 'attack' is allowed.\n";
         }
 
         result += "Player HP: " + player.getCurrentHP() + "\n";
@@ -67,15 +58,14 @@ public class Combat {
 
         while (!isBattleOver()) {
             view.displayCombat("Turn " + turnCount);
-            view.displayCombat("Type: attack / wait / retreat");
-            String command = input.nextLine();
+            view.displayCombat("Type: attack");
+
+            String command = input.nextLine().trim();
             String result = action(command);
             view.displayCombat(result);
         }
 
-        if (retreated) {
-            view.displayCombat("You fled the battle.");
-        } else if (!player.isAlive()) {
+        if (!player.isAlive()) {
             view.displayCombat("You died.");
         } else {
             view.displayCombat("Monster defeated!");
