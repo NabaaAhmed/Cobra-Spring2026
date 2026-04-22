@@ -5,25 +5,26 @@ public class GameControllerDZ {
         Scanner input = new Scanner(System.in);
         GameView view = new GameView();
 
-        System.out.println("=== Dan Puzzle Testing Controller ===");
+        boolean isRunning = true;
 
-        boolean keepPlaying = true;
-
-        while (keepPlaying) {
+        while (isRunning) {
             Player player = new Player("EZ-01");
 
             System.out.println();
-            System.out.println("Choose a puzzle to test:");
-            System.out.println("3 - Trust");
-            System.out.println("4 - Sacrifice");
-            System.out.println("Type 3, 4, or exit.");
+            System.out.println("=== Dungeon of Trials ===");
+            System.out.println("Choose a trial to enter:");
+            System.out.println("3 - Trial of Trust");
+            System.out.println("4 - Trial of Sacrifice");
+            System.out.println("5 - Trial of Commitment");
+            System.out.println("Type 3, 4, 5, or exit.");
             System.out.print("> ");
 
             String choice = input.nextLine().trim();
 
             if (choice.equalsIgnoreCase("exit")) {
-                System.out.println("Exiting puzzle tester.");
-                break;
+                System.out.println("Exiting game.");
+                isRunning = false;
+                continue;
             }
 
             if (choice.equals("3")) {
@@ -36,9 +37,13 @@ public class GameControllerDZ {
                 Puzzle4Sacrifice puzzle = new Puzzle4Sacrifice();
                 runPuzzle4(input, player, puzzle, view);
 
+            } else if (choice.equals("5")) {
+                player.setCurrentRoomID("CM-01");
+                Puzzle5Commitment puzzle = new Puzzle5Commitment();
+                runPuzzle5(input, player, puzzle, view);
+
             } else {
                 System.out.println("Invalid choice.");
-                continue;
             }
         }
 
@@ -51,8 +56,7 @@ public class GameControllerDZ {
         System.out.println();
 
         while (!puzzle.isFinished()) {
-            System.out.println("Type a command for this puzzle.");
-            System.out.println("Type 'help' to see sample commands.");
+            System.out.println("Enter a command. Type 'help' for trial commands.");
             System.out.print("> ");
 
             String command = input.nextLine().trim();
@@ -75,7 +79,7 @@ public class GameControllerDZ {
 
         if (puzzle.isCombatTriggered()) {
             System.out.println();
-            System.out.println("Trial punishment combat has started. Retreat is disabled.");
+            System.out.println("Punishment combat has started.");
 
             Combat combat = new Combat(player, puzzle.getFailureMonster());
             combat.startBattle(view, input);
@@ -98,8 +102,7 @@ public class GameControllerDZ {
         System.out.println();
 
         while (!puzzle.isFinished()) {
-            System.out.println("Type a command for this puzzle.");
-            System.out.println("Type 'help' to see sample commands.");
+            System.out.println("Enter a command. Type 'help' for trial commands.");
             System.out.print("> ");
 
             String command = input.nextLine().trim();
@@ -123,7 +126,7 @@ public class GameControllerDZ {
 
         if (puzzle.isCombatTriggered()) {
             System.out.println();
-            System.out.println("Trial punishment combat has started. Retreat is disabled.");
+            System.out.println("Punishment combat has started.");
 
             Combat combat = new Combat(player, puzzle.getFailureMonster());
             combat.startBattle(view, input);
@@ -135,6 +138,34 @@ public class GameControllerDZ {
                 System.out.println("You died during the Trial of Sacrifice.");
             }
 
+            System.out.println();
+            printPlayerStatus(player);
+        }
+    }
+
+    private static void runPuzzle5(Scanner input, Player player, Puzzle5Commitment puzzle, GameView view) {
+        System.out.println();
+        System.out.println(puzzle.startPuzzle());
+        System.out.println();
+
+        while (!puzzle.isFinished()) {
+            System.out.println("Enter a command. Type 'help' for trial commands.");
+            System.out.print("> ");
+
+            String command = input.nextLine().trim();
+
+            if (command.equalsIgnoreCase("help")) {
+                System.out.println("move forward");
+                System.out.println("examine item");
+                System.out.println("take item");
+                System.out.println("kill pursuer");
+                continue;
+            }
+
+            String result = puzzle.handleCommand(player, command);
+
+            System.out.println();
+            System.out.println(result);
             System.out.println();
             printPlayerStatus(player);
         }
