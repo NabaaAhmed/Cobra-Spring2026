@@ -19,24 +19,27 @@ public class GameControllerMaiTesting {
     public void loadItems(String filename) {
         try {
             Scanner fileScanner = new Scanner(new File(filename));
+            boolean firstLine = true;
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine().trim();
+                if (firstLine) {
+                    firstLine = false;
+                    continue;
+                }
                 if (line.isEmpty()) continue;
 
                 String[] parts = line.split(",", 5);
-                String itemId = parts[0].trim();
-                String itemName = parts[1].trim();
-                String description = parts[2].trim();
-                String roomID = parts[3].trim();
-                Boolean stackable = Boolean.parseBoolean(parts[4].trim());
+                if (parts.length >= 5) {
+                    String itemId = parts[0].trim();
+                    String itemName = parts[1].trim();
+                    String description = parts[2].trim();
+                    String roomID = parts[3].trim();
+                    boolean stackable = Boolean.parseBoolean(parts[4].trim());
 
-                Item item = new Item(itemId, itemName, description, roomID, stackable) {
-                    @Override
-                    public void use(Player player) {
-                        // Generic items do nothing by default.
-                    }
-                };
-                items.put(itemId, item);
+                    // Create a concrete item instead of abstract Item
+                    Potion item = new Potion(itemId, itemName, description, stackable, 0);
+                    items.put(itemId, item);
+                }
             }
             fileScanner.close();
             System.out.println("Items loaded successfully!");
@@ -51,9 +54,9 @@ public class GameControllerMaiTesting {
     public void play() {
 
         System.out.println("     /\\      /\\      /\\      /\\      /\\      /\\      /\\\n" +
-                           "    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\\n" +
-                           "    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /\n" +
-                           "     \\/      \\/      \\/      \\/      \\/      \\/      \\/" );
+                                        "    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\\n" +
+                                       "    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /\n" +
+                                       "     \\/      \\/      \\/      \\/      \\/      \\/      \\/" );
 
 
         System.out.println("==============WELCOME TO THE DUNGEON OF TRIALS==============");
