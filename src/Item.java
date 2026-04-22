@@ -1,9 +1,10 @@
+//Mai
 public abstract class Item {
     private String itemId;
     private String itemName;
     private String description;
     private String roomID;
-    private Boolean stackable;
+    private boolean stackable;
     private boolean inPlayerInventory;
 
     // Item constructor
@@ -22,12 +23,19 @@ public abstract class Item {
     }
 
     // Getter and setter for name
-    public String getitemName() {
+    public String getItemName() {
         return itemName;
     }
 
-    public void setitemName(String name) {
+    public void setItemName(String name) {
         this.itemName = name;
+    }
+
+    public boolean matchesName(String candidate) {
+        if (candidate == null || itemName == null) {
+            return false;
+        }
+        return itemName.equalsIgnoreCase(candidate.trim());
     }
 
     // Getter and setter for description
@@ -56,8 +64,19 @@ public abstract class Item {
         this.stackable = stackable;
     }
 
+    public boolean isStackable() {
+        return stackable;
+    }
+
     public boolean isInPlayerInventory() {
         return inPlayerInventory;
+    }
+
+    public boolean isInRoom(String roomId) {
+        if (roomId == null || roomID == null) {
+            return false;
+        }
+        return !inPlayerInventory && roomID.equalsIgnoreCase(roomId.trim());
     }
 
     // Method to move item to inventory
@@ -76,9 +95,8 @@ public abstract class Item {
 
 
     //toString method
-     @Override
-     public String toString() {
-         return itemName + ": " + description;
-     }
-
+    @Override
+    public String toString() {
+        return getItemName() + ": " + description;
+    }
 }

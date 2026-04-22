@@ -1,3 +1,4 @@
+//Mai
 public class Sword extends Item {
     private int damageBonus;
 
@@ -9,6 +10,7 @@ public class Sword extends Item {
     @Override
     public void use(Player player) {
         player.setAttackPower(player.getAttackPower() + damageBonus);
+        System.out.println("You ready the sword and gain " + damageBonus + " attack power.");
     }
 
     public void unequip(Player player) {
