@@ -1,13 +1,14 @@
+//Mai
 public abstract class Item {
     private String itemId;
     private String itemName;
     private String description;
     private String roomID;
-    private Boolean stackable;
+    private boolean stackable;
     private boolean inPlayerInventory;
 
     // Item constructor
-    public Item(String itemId, String itemName, String description, String roomID, Boolean stackable) {
+    public Item(String itemId, String itemName, String description, String roomID, boolean stackable) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.description = description;
@@ -28,15 +29,6 @@ public abstract class Item {
 
     public void setItemName(String name) {
         this.itemName = name;
-    }
-
-    // Backward-compatible names used by existing code
-    public String getitemName() {
-        return getItemName();
-    }
-
-    public void setitemName(String name) {
-        setItemName(name);
     }
 
     public boolean matchesName(String candidate) {
@@ -68,12 +60,12 @@ public abstract class Item {
         return stackable;
     }
 
-    public boolean isStackable() {
-        return Boolean.TRUE.equals(stackable);
-    }
-
     public void setStackable(Boolean stackable) {
         this.stackable = stackable;
+    }
+
+    public boolean isStackable() {
+        return stackable;
     }
 
     public boolean isInPlayerInventory() {
@@ -103,8 +95,8 @@ public abstract class Item {
 
 
     //toString method
-     @Override
-     public String toString() {
-           return getItemName() + ": " + description;
-     }
+    @Override
+    public String toString() {
+        return getItemName() + ": " + description;
+    }
 }

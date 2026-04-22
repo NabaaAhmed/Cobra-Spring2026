@@ -1,36 +1,32 @@
+//Danny Class
 import java.util.ArrayList;
 
 public class Player {
-    private String currentRoom;
+    private String currentRoomID;
     private int maxHP;
     private int currentHP;
     private ArrayList<Item> inventory;
     private int attackPower;
+    private int trialTokens;
 
-    // Constructor
-    public Player(String startingRoom, int maxHP, int currentHP, int attackPower) {
-        this.currentRoom = startingRoom;
-        this.maxHP = 7;
+    public Player(String startingRoomID) {
+        this.currentRoomID = startingRoomID;
+        this.maxHP = 5;
         this.currentHP = 5;
         this.inventory = new ArrayList<>();
         this.attackPower = 1;
+        this.trialTokens = 0;
     }
 
-    // Getters and setters for attack power
-    public int getAttackPower() {
-        return attackPower;
-    }
-
-    public void setAttackPower(int attackPower) {
-        this.attackPower = attackPower;
-    }
-
-    // Getters
-    public String getCurrentRoom() {
-        return currentRoom;
+    public String getCurrentRoomID() {
+        return currentRoomID;
     }
 
     public int getCurrentHP() {
+        return currentHP;
+    }
+
+    public int getHp() {
         return currentHP;
     }
 
@@ -42,101 +38,129 @@ public class Player {
         return inventory;
     }
 
-    // Movement
-    public void moveToRoom(String newRoom) {
-        this.currentRoom = newRoom;
+    public int getAttackPower() {
+        return attackPower;
     }
 
-    // Inventory methods
+    public int getTrialTokens() {
+        return trialTokens;
+    }
+
+    public void setCurrentRoomID(String currentRoomID) {
+        this.currentRoomID = currentRoomID;
+    }
+
+    public void setAttackPower(int attackPower) {
+        this.attackPower = attackPower;
+    }
+
+    public void setMaxHP(int MaxHP){
+        this.maxHP = maxHP;
+    }
+
+    public void setCurrentHP(int currentHP) {
+        this.currentHP = currentHP;
+    }
+
+    public void moveToRoom(String roomID) {
+        this.currentRoomID = roomID;
+    }
+
     public void addItem(Item item) {
-        if (item == null) {
-            return;
-        }
+        if (item == null) return;
         inventory.add(item);
         item.moveToInventory();
     }
 
     public void removeItem(Item item) {
-        if (item == null) {
-            return;
-        }
+        if (item == null) return;
         inventory.remove(item);
-    }
-
-    public boolean dropItem(Item item, Room room) {
-        if (item == null || room == null || !inventory.contains(item)) {
-            return false;
-        }
-
-        inventory.remove(item);
-        item.moveToRoom(room.getRoomId());
-        return true;
-    }
-
-    public void displayInventory() {
-        System.out.print(getInventoryText());
-    }
-
-    public String getInventoryText() {
-        StringBuilder builder = new StringBuilder();
-        if (inventory.isEmpty()) {
-            builder.append("You have not picked up any items yet.\n");
-            return builder.toString();
-        }
-
-        builder.append("Your Inventory:\n");
-        for (Item item : inventory) {
-            builder.append("  - ").append(item.getItemName()).append("\n");
-        }
-        return builder.toString();
     }
 
     public Item findItemByName(String itemName) {
-        if (itemName == null) {
-            return null;
-        }
+        if (itemName == null) return null;
+
         for (Item item : inventory) {
-            if (item != null && item.matchesName(itemName)) {
+            if (item.getitemName() != null &&
+                    item.getitemName().equalsIgnoreCase(itemName)) {
                 return item;
             }
         }
         return null;
     }
 
-    public String getStatusText() {
-        return "current HP:" + currentHP +
-                "\nmax HP:" + maxHP +
-                "\nattack power:" + attackPower;
-    }
-
     public boolean useItem(String itemName) {
         Item item = findItemByName(itemName);
-        if (item == null) {
-            return false;
-        }
+        if (item == null) return false;
+
         item.use(this);
         return true;
     }
 
-    // Health
+    public boolean hasSword() {
+        for (Item item : inventory) {
+            if (item.getitemName() != null &&
+                    item.getitemName().toLowerCase().contains("sword")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void takeDamage(int damage) {
         currentHP -= damage;
-        if (currentHP < 0) currentHP = 0;
+        if (currentHP < 0) {
+            currentHP = 0;
+        }
     }
 
     public int heal(int amount) {
         int before = currentHP;
         currentHP += amount;
-        if (currentHP > maxHP) currentHP = maxHP;
+
+        if (currentHP > maxHP) {
+            currentHP = maxHP;
+        }
+
         return currentHP - before;
     }
 
-    public boolean unequipWeapon(String itemName) {
-        Item item = findItemByName(itemName);
-        if (item instanceof Sword) {
-            ((Sword) item).unequip(this);
-            return true;
+    public void healToFull() {
+        currentHP = maxHP;
+    }
+
+    public void modifyMaxHP(int amount) {
+        maxHP += amount;
+
+        if (maxHP < 1) {
+            maxHP = 1;
         }
-        return false;
+
+        if (currentHP > maxHP) {
+            currentHP = maxHP;
+        }
+    }
+
+    public boolean isAlive() {
+        return currentHP > 0;
+    }
+
+    public void addTrialToken() {
+        trialTokens++;
+    }
+
+    public void removeTrialToken() {
+        if (trialTokens > 0) {
+            trialTokens--;
+        }
+    }
+
+    public String waitTurn() {
+        return "You wait for a turn.";
+    }
+
+    public void attack(Monster monster) {
+        if (monster == null) return;
+        monster.takeDamage(attackPower);
     }
 }
