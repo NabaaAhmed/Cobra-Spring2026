@@ -1,17 +1,14 @@
+//Mai
 public class Potion extends Item {
-    private int healAmount;
+    private final int healAmount;
 
-    public Potion(String id, String name, String description, boolean stackable, int healAmount) {
-        super(id, name, description, stackable, "potion");
-        this.healAmount = healAmount;
+    public Potion(String itemId, String itemName, String description, String roomID, Boolean stackable, int healAmount) {
+        super(itemId, itemName, description, roomID, stackable);
+        this.healAmount = 9;
     }
 
     @Override
     public void use(Player player) {
-        player.heal(healAmount);
-    }
-
-    public int getHealAmount() {
-        return healAmount;
-    }
+        int healed = player.heal(healAmount);
+        System.out.println("You drink the potion and recover " + healed + " HP.");    }
 }

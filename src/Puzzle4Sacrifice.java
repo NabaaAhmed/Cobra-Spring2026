@@ -1,3 +1,4 @@
+//Danny
 public class Puzzle4Sacrifice {
     private final String puzzleID;
     private final String trialName;
@@ -82,9 +83,19 @@ public class Puzzle4Sacrifice {
 
             swordTaken = true;
 
-            // FIXED: Use Sword class instead of anonymous Item
-            Sword sword = new Sword("TRIAL-SWORD", "Trial Sword",
-                    "A powerful sword used in the Trial of Sacrifice.", false, 3, 2);
+            Item sword = new Item(
+                    "TRIAL-SWORD",
+                    "Trial Sword",
+                    "A powerful sword used in the Trial of Sacrifice.",
+                    null,
+                    false
+            ) {
+                @Override
+                public void use(Player player) {
+                    // no special effect
+                }
+            };
+
             player.addItem(sword);
             return "You took the sword.";
         }
@@ -156,7 +167,7 @@ public class Puzzle4Sacrifice {
                 player.removeItem(sword);
             }
 
-            failureMonster = new Monster("M-SAC", "Wraith", 2, 1, false);
+            failureMonster = new Monster("M-SAC", "Wraith", 2, 1, null);
             combatTriggered = true;
             isFinished = true;
 
@@ -168,3 +179,4 @@ public class Puzzle4Sacrifice {
         return "Nothing important happens.";
     }
 }
+

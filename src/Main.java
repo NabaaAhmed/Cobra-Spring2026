@@ -8,4 +8,16 @@ public class Main {
         GameControllerNA game = new GameControllerNA(player, roomManager, view, fileManager);
         game.startGame();
     }
+    public class Main {
+        public static void main(String[] args) {
+
+            System.out.println("Starting test...");
+
+            RoomManager rm = new RoomManager();
+
+            rm.showRoom();   // should print first room
+
+        }
+    }
+
 }

@@ -1,42 +1,23 @@
+//Mai
 public class Sword extends Item {
     private int damageBonus;
-    private int durability;
-    private int maxDurability;
 
-    public Sword(String id, String name, String description, boolean stackable, int damageBonus, int durability) {
-        super(id, name, description, stackable, "sword");
+    public Sword(String itemId, String itemName, String description, String roomID, Boolean stackable, int damageBonus) {
+        super(itemId, itemName, description, roomID, stackable);
         this.damageBonus = damageBonus;
-        this.durability = durability;
-        this.maxDurability = durability;
     }
 
     @Override
     public void use(Player player) {
-        player.equipSword(this);
+        player.setAttackPower(player.getAttackPower() + damageBonus);
+        System.out.println("You ready the sword and gain " + damageBonus + " attack power.");
     }
 
     public void unequip(Player player) {
-        if (player.getEquippedSword() == this) {
-            player.unequipSword();
-        }
+        player.setAttackPower(player.getAttackPower() - damageBonus);
     }
 
     public int getDamageBonus() {
         return damageBonus;
-    }
-
-    public int getDurability() {
-        return durability;
-    }
-
-    public void useDurability() {
-        durability--;
-        if (durability <= 0) {
-            System.out.println("Your " + name + " has broken!");
-        }
-    }
-
-    public boolean isBroken() {
-        return durability <= 0;
     }
 }

@@ -1,99 +1,67 @@
+//Nabaa Class
 import java.util.ArrayList;
 import java.util.List;
 
 public class Monster {
-    private String id;
+
+    private String monsterID;
     private String name;
     private int hp;
-    private int attackValue;
-    private boolean canAmbush;
-    private List<Item> rewards;
-    private boolean isAlive;
+    private int atkValue;
+    private ArrayList<Item> inventory;
+    private int turnCounter;
 
-    public Monster(String name, int hp, int attackValue, boolean canAmbush) {
-        this.id = "M-000";
+    public Monster(String name, int hp) {
         this.name = name;
         this.hp = hp;
-        this.attackValue = attackValue;
-        this.canAmbush = canAmbush;
-        this.rewards = new ArrayList<>();
-        this.isAlive = true;
+        this.turnCounter = 0;
     }
 
-    public Monster(String id, String name, int hp, int attackValue, boolean canAmbush) {
-        this.id = id;
-        this.name = name;
-        this.hp = hp;
-        this.attackValue = attackValue;
-        this.canAmbush = canAmbush;
-        this.rewards = new ArrayList<>();
-        this.isAlive = true;
+    public String getName() {
+        return name;
     }
 
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public int getHp() { return hp; }
-    public int getAttackValue() { return attackValue; }
-    public boolean isAlive() { return isAlive && hp > 0; }
+    public int getHp() {
+        return hp;
+    }
+
+    public boolean isAlive() {
+        return hp > 0;
+    }
 
     public void takeDamage(int amount) {
         hp -= amount;
-        if (hp <= 0) {
-            isAlive = false;
+        if (hp < 0) {
             hp = 0;
         }
     }
 
-    /**
-     * Clash combat - both player and monster take damage
-     */
     public void clash(Player player) {
-        // Monster damages player
-        player.takeDamage(attackValue);
-        // Player damages monster
-        this.takeDamage(player.getAttackPower());
+        player.takeDamage(1);
+        this.takeDamage(1);
     }
 
-    /**
-     * Pre-emptive ambush attack before combat begins
-     */
-    public void ambush(Player player) {
-        player.takeDamage(attackValue);
-    }
-
-    /**
-     * Called when player encounters monster
-     */
     public void onEncounter(Player player) {
-        if (canAmbush) {
-            ambush(player);
-        }
+        // optional special effect later
     }
 
-    public void addReward(Item item) {
-        if (item != null) {
-            rewards.add(item);
-        }
+    public void onTurn(Player player) {
+        turnCounter++;
     }
 
-    public void addRewards(List<Item> items) {
-        if (items != null) {
-            rewards.addAll(items);
-        }
+    public int getTurnCounter() {
+        return turnCounter;
+    }
+
+    public int attack() {
+        return 1;
+    }
+
+    public void trigger() {
+        // optional special trigger later
     }
 
     public List<Item> dropLoot() {
-        List<Item> dropped = new ArrayList<>(rewards);
-        rewards.clear();
-        return dropped;
-    }
-
-    public void setRewards(List<Item> rewards) {
-        this.rewards = rewards != null ? rewards : new ArrayList<>();
-    }
-
-    public void reset() {
-        isAlive = true;
-        // Note: hp reset would need original HP stored
+        return new ArrayList<>();
     }
 }

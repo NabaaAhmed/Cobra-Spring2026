@@ -1,214 +1,158 @@
+//Danny Class
 import java.util.ArrayList;
-import java.util.List;
 
 public class Player {
-
     private String currentRoomID;
     private int maxHP;
     private int currentHP;
+    private ArrayList<Item> inventory;
     private int attackPower;
-    private final List<Item> inventory;
+    private int trialTokens;
 
-    // sword system
-    private boolean hasSword;
-    private int swordDurability;
-    private Sword equippedSword;
-
-    public Player() {
-        this("EZ-01", 5);
-    }
-
-    public Player(String currentRoomID) {
-        this(currentRoomID, 5);
-    }
-
-    public Player(int hp) {
-        this("EZ-01", hp);
-    }
-
-    public Player(String currentRoomID, int hp) {
-        this.currentRoomID = currentRoomID;
-        this.maxHP = Math.max(1, hp);
-        this.currentHP = this.maxHP;
-        this.attackPower = 1;
+    public Player(String startingRoomID) {
+        this.currentRoomID = startingRoomID;
+        this.maxHP = 5;
+        this.currentHP = 5;
         this.inventory = new ArrayList<>();
-        this.hasSword = false;
-        this.swordDurability = 0;
-        this.equippedSword = null;
+        this.attackPower = 1;
+        this.trialTokens = 0;
     }
 
     public String getCurrentRoomID() {
         return currentRoomID;
     }
 
-    public void setCurrentRoomID(String currentRoomID) {
-        this.currentRoomID = currentRoomID;
-    }
-
     public int getCurrentHP() {
         return currentHP;
-    }
-
-    public void setCurrentHP(int currentHP) {
-        this.currentHP = Math.max(0, Math.min(currentHP, maxHP));
-    }
-
-    public int getMaxHP() {
-        return maxHP;
-    }
-
-    public void setMaxHP(int maxHP) {
-        this.maxHP = Math.max(1, maxHP);
-        if (currentHP > this.maxHP) {
-            currentHP = this.maxHP;
-        }
-    }
-
-    public int getAttackPower() {
-        return attackPower;
-    }
-
-    public void setAttackPower(int attackPower) {
-        this.attackPower = Math.max(0, attackPower);
-    }
-
-    public List<Item> getInventory() {
-        return inventory;
-    }
-
-    public void addItem(Item item) {
-        if (item != null) {
-            inventory.add(item);
-        }
-    }
-
-    public void removeItem(Item item) {
-        inventory.remove(item);
     }
 
     public int getHp() {
         return currentHP;
     }
 
-    public boolean isAlive() {
-        return currentHP > 0;
+    public int getMaxHP() {
+        return maxHP;
     }
 
-    public void takeDamage(int dmg) {
-        currentHP -= Math.max(0, dmg);
-        if (currentHP < 0) currentHP = 0;
+    public ArrayList<Item> getInventory() {
+        return inventory;
     }
 
-    public void heal(int amount) {
-        currentHP += Math.max(0, amount);
-        if (currentHP > maxHP) currentHP = maxHP;
+    public int getAttackPower() {
+        return attackPower;
     }
 
-    public void fullHeal() {
-        currentHP = maxHP;
+    public int getTrialTokens() {
+        return trialTokens;
     }
 
-    public void attack(Monster monster) {
-        if (monster != null) {
-            monster.takeDamage(attackPower);
-        }
+    public void setCurrentRoomID(String currentRoomID) {
+        this.currentRoomID = currentRoomID;
     }
 
-    // ===== SWORD =====
-
-    public void equipSword(Sword sword) {
-        this.equippedSword = sword;
-        this.hasSword = true;
-        this.swordDurability = sword.getDurability();
-        this.attackPower += sword.getDamageBonus();
+    public void setAttackPower(int attackPower) {
+        this.attackPower = attackPower;
     }
 
-    public void equipSword(int durability) {
-        hasSword = durability > 0;
-        swordDurability = Math.max(0, durability);
-        if (hasSword) {
-            attackPower += 3;
-        }
+    public void moveToRoom(String roomID) {
+        this.currentRoomID = roomID;
     }
 
-    public boolean hasSword() {
-        return hasSword && equippedSword != null;
+    public void addItem(Item item) {
+        if (item == null) return;
+        inventory.add(item);
+        item.moveToInventory();
     }
 
-    public void useSword() {
-        if (!hasSword()) return;
-
-        swordDurability--;
-        if (equippedSword != null) {
-            equippedSword.useDurability();
-        }
-
-        if (swordDurability <= 0) {
-            hasSword = false;
-            swordDurability = 0;
-            if (equippedSword != null) {
-                attackPower -= equippedSword.getDamageBonus();
-                equippedSword = null;
-            }
-        }
+    public void removeItem(Item item) {
+        if (item == null) return;
+        inventory.remove(item);
     }
 
-    public int getSwordDurability() {
-        return swordDurability;
-    }
+    public Item findItemByName(String itemName) {
+        if (itemName == null) return null;
 
-    public Sword getEquippedSword() {
-        return equippedSword;
-    }
-
-    public void unequipSword() {
-        if (equippedSword != null) {
-            attackPower -= equippedSword.getDamageBonus();
-            equippedSword = null;
-            hasSword = false;
-            swordDurability = 0;
-        }
-    }
-
-    public Item findItem(String name) {
         for (Item item : inventory) {
-            if (item.getName().equalsIgnoreCase(name)) {
+            if (item.getitemName() != null &&
+                    item.getitemName().equalsIgnoreCase(itemName)) {
                 return item;
             }
         }
         return null;
     }
 
-    // ===== ADDED METHODS FOR PUZZLE 3 & 4 =====
+    public boolean useItem(String itemName) {
+        Item item = findItemByName(itemName);
+        if (item == null) return false;
 
-    public void modifyMaxHP(int amount) {
-        this.maxHP = Math.max(1, this.maxHP + amount);
-        if (currentHP > this.maxHP) {
-            currentHP = this.maxHP;
+        item.use(this);
+        return true;
+    }
+
+    public boolean hasSword() {
+        for (Item item : inventory) {
+            if (item.getitemName() != null &&
+                    item.getitemName().toLowerCase().contains("sword")) {
+                return true;
+            }
         }
+        return false;
+    }
+
+    public void takeDamage(int damage) {
+        currentHP -= damage;
+        if (currentHP < 0) {
+            currentHP = 0;
+        }
+    }
+
+    public int heal(int amount) {
+        int before = currentHP;
+        currentHP += amount;
+
+        if (currentHP > maxHP) {
+            currentHP = maxHP;
+        }
+
+        return currentHP - before;
     }
 
     public void healToFull() {
-        this.currentHP = this.maxHP;
+        currentHP = maxHP;
+    }
+
+    public void modifyMaxHP(int amount) {
+        maxHP += amount;
+
+        if (maxHP < 1) {
+            maxHP = 1;
+        }
+
+        if (currentHP > maxHP) {
+            currentHP = maxHP;
+        }
+    }
+
+    public boolean isAlive() {
+        return currentHP > 0;
     }
 
     public void addTrialToken() {
-        Item token = new Potion("TKN-01", "Trial Token",
-                "A small glowing token awarded for completing a trial.", false, 0);
-        this.addItem(token);
+        trialTokens++;
     }
 
-    public int getTrialTokens() {
-        int count = 0;
-        for (Item item : inventory) {
-            if (item.getName().equals("Trial Token")) {
-                count++;
-            }
+    public void removeTrialToken() {
+        if (trialTokens > 0) {
+            trialTokens--;
         }
-        return count;
     }
 
-    public Item findItemByName(String name) {
-        return findItem(name);
+    public String waitTurn() {
+        return "You wait for a turn.";
+    }
+
+    public void attack(Monster monster) {
+        if (monster == null) return;
+        monster.takeDamage(attackPower);
     }
 }
