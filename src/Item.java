@@ -27,10 +27,6 @@ public abstract class Item {
         return itemName;
     }
 
-    public void setItemName(String name) {
-        this.itemName = name;
-    }
-
     public boolean matchesName(String candidate) {
         if (candidate == null || itemName == null) {
             return false;
@@ -38,39 +34,11 @@ public abstract class Item {
         return itemName.equalsIgnoreCase(candidate.trim());
     }
 
-    // Getter and setter for description
+    // Getter for description
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    // getters and setters for roomID
-    public String getRoomID() {
-        return roomID;
-    }
-
-    public void setRoomID(String roomID) {
-        this.roomID = roomID;
-    }
-
-    public Boolean getStackable() {
-        return stackable;
-    }
-
-    public void setStackable(Boolean stackable) {
-        this.stackable = stackable;
-    }
-
-    public boolean isStackable() {
-        return stackable;
-    }
-
-    public boolean isInPlayerInventory() {
-        return inPlayerInventory;
-    }
 
     public boolean isInRoom(String roomId) {
         if (roomId == null || roomID == null) {

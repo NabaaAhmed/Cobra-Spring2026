@@ -19,3 +19,4 @@ I-16,Crystal Lens,A translucent optical lens.,CM-04, 0, false
 I-17,Ancient Map,A worn parchment marked with faded paths.,CM-06, 0, false
 I-18,Final Jewel,A jewel revealed beneath the cracked floor symbol.,FN-02, 0, false
 I-19,Monster potion,A potion dropped by the Warden.,0, M-07, false
+

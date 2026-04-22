@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,16 +7,14 @@ public class Room {
     private final String roomName;
     private final String roomDesc;
     private final ArrayList<String> connections;
+    private final ArrayList<Item> itemsInRoom;
 
-    public Room(String roomId, String roomName, String roomDesc) {
-        this(roomId, roomName, roomDesc, new ArrayList<>());
-    }
-
-    public Room(String roomID, String roomName, String roomDesc, List<String> connections) {
+    public Room(String roomID, String roomName, String roomDesc, List<String> connections, List<Item> itemsInRoom) {
         this.roomID = roomID;
         this.roomName = roomName;
         this.roomDesc = roomDesc;
         this.connections = new ArrayList<>(connections);
+        this.itemsInRoom = new ArrayList<>(itemsInRoom);
     }
 
     public String getRoomID() {
@@ -37,12 +34,12 @@ public class Room {
     }
 
     public void addConnection(String roomId) {
-        if (roomId == null || roomId.trim().isEmpty()) {
+        if (roomId == null || roomId.isEmpty()) {
             return;
         }
-        String trimmed = roomId.trim();
-        if (!connections.contains(trimmed)) {
-            connections.add(trimmed);
+
+        if (!connections.contains(roomId)) {
+            connections.add(roomId);
         }
     }
 
@@ -50,52 +47,24 @@ public class Room {
         if (roomId == null) {
             return false;
         }
-        return connections.contains(roomId.trim());
+        return connections.contains(roomId);
     }
 
     public boolean isConnectedTo(String roomId) {
         return hasConnection(roomId);
     }
+    
 
-    public Item findItemInRoom(Collection<Item> items, String itemName) {
-        if (items == null || itemName == null) {
-            return null;
-        }
 
-        for (Item item : items) {
-            if (item != null && item.isInRoom(roomId) && item.matchesName(itemName)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public String getExploreText(Collection<Item> items) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("\n=== ").append(roomName).append(" ===\n");
-        builder.append(roomDesc).append("\n");
-        builder.append("Connections: ").append(connections).append("\n");
-        builder.append("Items in room:\n");
-
-        boolean foundAny = false;
-        if (items != null) {
-            for (Item item : items) {
-                if (item != null && item.isInRoom(roomId)) {
-                    builder.append("  - ").append(item.getItemName()).append("\n");
-                    foundAny = true;
-                }
-            }
-        }
-
-        if (!foundAny) {
-            builder.append("  - None\n");
-        }
-
-        return builder.toString();
-    }
 
     @Override
     public String toString() {
         return roomName + ": " + roomDesc;
+    }
+
+    public void addItem(Item item) {
+        if (item != null) {
+            item.moveToRoom(roomID);
+        }
     }
 }
