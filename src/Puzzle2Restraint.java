@@ -1,6 +1,4 @@
-import java.util.Scanner;
-
-public class Puzzle2_Restraint {
+public class Puzzle2Restraint {
     private boolean completed;
     private boolean solved;
     private boolean mimicTriggered;
@@ -13,7 +11,7 @@ public class Puzzle2_Restraint {
     private Item baitCoin;
     private boolean chestVisible;
 
-    public Puzzle2_Restraint(String roomId) {
+    public Puzzle2Restraint(String roomId) {
         this.completed = false;
         this.solved = false;
         this.mimicTriggered = false;

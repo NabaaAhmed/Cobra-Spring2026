@@ -3,6 +3,16 @@ public class GameView {
     public void displayMessage(String message) {
         System.out.println(message);
     }
+    //Nabaa
+    public void displayHint(String hint) {
+        System.out.println("[HINT] " + hint);
+    }
+
+    public void displayPuzzle(Puzzle puzzle) {
+        System.out.println("\n========== " + puzzle.getTrialName() + " TRIAL ==========");
+        System.out.println(puzzle.getDescription());
+        System.out.println("==========================================\n");
+    }
 
     //Nabaa and Danny
     public void displayRoom(Room room) {
@@ -94,5 +104,21 @@ public class GameView {
         System.out.println("Good Luck!");
     }
 
+    //Nabaa
+    public void displayGameOver() {
+        System.out.println("\n=========================================");
+        System.out.println("              GAME OVER!                 ");
+        System.out.println("        You have been defeated.          ");
+        System.out.println("          Your journey ends.             ");
+        System.out.println("=========================================\n");
+    }
+
+    public void displaySaveSuccess() {
+        System.out.println("[SAVE] Game saved successfully!");
+    }
+
+    public void displayLoadSuccess() {
+        System.out.println("[LOAD] Game loaded successfully!");
+    }
 
 }

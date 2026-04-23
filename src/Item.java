@@ -31,7 +31,7 @@ public abstract class Item {
         if (candidate == null || itemName == null) {
             return false;
         }
-        return itemName.equalsIgnoreCase(candidate.trim());
+        return itemName.equalsIgnoreCase(candidate);
     }
 
     // Getter for description
@@ -44,7 +44,7 @@ public abstract class Item {
         if (roomId == null || roomID == null) {
             return false;
         }
-        return !inPlayerInventory && roomID.equalsIgnoreCase(roomId.trim());
+        return !inPlayerInventory && roomID.equalsIgnoreCase(roomId);
     }
 
     // Method to move item to inventory

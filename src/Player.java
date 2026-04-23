@@ -54,7 +54,7 @@ public class Player {
         this.attackPower = attackPower;
     }
 
-    public void setMaxHP(int MaxHP){
+    public void setMaxHP(int maxHP){
         this.maxHP = maxHP;
     }
 
@@ -68,20 +68,24 @@ public class Player {
 
     //Inventory methods -Mai
     public void takeItem(Item item, Room currentRoomObj) {
-        if (item.getItemName() == null || currentRoomObj == null) {
+        if (item == null || item.getItemName() == null || currentRoomObj == null) {
             System.out.println("Invalid pickup request.");
             return;
         }
 
-        Item itemToPick = currentRoomObj.findItemInRoom(item.values(), itemName);
-
-        if (itemToPick == null) {
+        if (!item.isInRoom(currentRoomObj.getRoomID())) {
             System.out.println("This item is not available in the current room.");
             return;
         }
 
-        currentRoomObj.addItem(itemToPick);
-        System.out.println(itemToPick.getItemName() + " was picked up and added to inventory.");
+        if (inventory.contains(item)) {
+            System.out.println(item.getItemName() + " is already in your inventory.");
+            return;
+        }
+
+        item.moveToInventory();
+        inventory.add(item);
+        System.out.println(item.getItemName() + " was picked up and added to inventory.");
     }
 
     public void removeItem(Item item) {

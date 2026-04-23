@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class Puzzle1_Awareness {
+public class Puzzle1Awareness {
     private boolean completed;
     private boolean solved;
     private boolean explosionTriggered;
@@ -12,7 +12,7 @@ public class Puzzle1_Awareness {
     private boolean gemTaken;
     private boolean rubbleTaken;
 
-    public Puzzle1_Awareness(String roomId) {
+    public Puzzle1Awareness(String roomId) {
         this.completed = false;
         this.solved = false;
         this.explosionTriggered = false;
@@ -43,7 +43,7 @@ public class Puzzle1_Awareness {
         view.displayMessage("\n===== Welcome to the Trial of Awareness =====");
         view.displayMessage("You stand in a chamber with an unstable teleporter in the center.");
         view.displayMessage("The teleporter crackles with unstable energy.");
-        view.displayMessage("");
+         view.displayMessage("");
         view.displayMessage("Items in the room:");
         if (!gemTaken) view.displayMessage("  - A Glowing Red Gem (radiating heat and light)");
         if (!rubbleTaken) view.displayMessage("  - Rubble (broken stone fragments)");

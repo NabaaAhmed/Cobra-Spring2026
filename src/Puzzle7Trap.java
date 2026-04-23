@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class Puzzle7_Trap {
+public class Puzzle7Trap {
     private boolean completed;
     private boolean solved;
     private boolean explosionTriggered;
@@ -12,7 +12,7 @@ public class Puzzle7_Trap {
     private boolean gemTaken;
     private boolean rubbleTaken;
 
-    public Puzzle7_Trap(String roomId) {
+    public Puzzle7Trap(String roomId) {
         this.completed = false;
         this.solved = false;
         this.explosionTriggered = false;
@@ -108,7 +108,7 @@ public class Puzzle7_Trap {
 
             // CORRECT ORDER: Increase Max HP first, then heal
             player.setMaxHP(player.getMaxHP() + 1);
-            player.fullHeal();
+            player.heal(player.getMaxHP());
 
             // Add Trial Token
             Item token = new Potion("TKN-01", "Trial Token",
