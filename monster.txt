@@ -1,4 +1,3 @@
-String monsterID,String name,int HP,int attackValue
 M-01,Mimic,2,1
 M-02,Guardian,2,1
 M-03,Golem,2,1

@@ -1,5 +1,4 @@
 //Danny and Mai
-String id,String name,String description,String roomID,String monsterID, boolean stackable
 I-01,Broken Torch Handle,A cracked wooden torch shaft found at the dungeon entrance.,EZ-01, 0, false
 I-02,Strong Trial Sword,A glowing blade filled with unstable power.,SC-01, 0, false
 I-03,Explosive Device,A compact cylindrical bomb, half the size of a hand.,EZ-02, 0, false

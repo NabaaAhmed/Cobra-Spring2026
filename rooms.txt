@@ -1,4 +1,3 @@
-id,name,description,exits/connections
 EZ-01,Main Hall,"Large cracked hall. 5 teleporters in arc, each connected by a glowing line to a jewel embedded in the far wall. Jewel is immovable while any trial remains active.",EZ-02;AW-01;RS-01;TR-01;SC-01;CM-01;TP-TRAP-01;FN-01
 EZ-02,Hidden Bomb Room,"Small stone chamber accessed only after all 5 trials complete, by removing the wall jewel from EZ-01. Single pedestal. Heavy dust.",EZ-01
 AW-01,Awareness Antechamber,"Quiet entry room. Broken teleporter parts scattered. Wall inscription: 'Some exits are not given. They are rebuilt.' Examinables: broken crystal lens, burned wiring, stone manual fragments.",AW-02

@@ -1,5 +1,4 @@
 //Mai
-String puzzleID, String trialName, String roomID, String description, String hint, boolean isSolved
 PZ-01, Trial of Awareness,AW-02, You must find something to stabilize the teleporter., The teleporter's core is shifting toward a deep crimson. The teleporter's erratic pulse matches the hue of the item you need., false
 PZ-02,Trial of Restraint,RS-02, A chest is in the center of the room with a coin nearby., The coin may not help you. Be careful how you interact with the chest., false
 PZ-03,Trial of Trust,TR-02,You stand before a guardian statue… it watches your every move., Not everything should be taken at face value. Sometimes trust must be placed in action... not reward,false

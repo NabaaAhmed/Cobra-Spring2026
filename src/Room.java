@@ -9,13 +9,15 @@ public class Room {
     private final ArrayList<String> connections;
     private final ArrayList<Item> itemsInRoom;
 
-    public Room(String roomID, String roomName, String roomDesc, List<String> connections, List<Item> itemsInRoom) {
+    public Room(String roomID, String roomName, String roomDesc) {
         this.roomID = roomID;
         this.roomName = roomName;
         this.roomDesc = roomDesc;
-        this.connections = new ArrayList<>(connections);
-        this.itemsInRoom = new ArrayList<>(itemsInRoom);
+        this.connections = new ArrayList<>();
+        this.itemsInRoom = new ArrayList<>();
     }
+
+    public ArrayList<Item> getItemsInRoom() {return itemsInRoom;}
 
     public String getRoomID() {
         return roomID;
@@ -67,4 +69,9 @@ public class Room {
             item.moveToRoom(roomID);
         }
     }
+
+    public void addExit(String roomID) {
+        connections.add(roomID);
+    }
+
 }
