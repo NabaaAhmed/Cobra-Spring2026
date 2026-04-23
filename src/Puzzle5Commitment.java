@@ -4,10 +4,9 @@ public class Puzzle5Commitment extends Puzzle {
 
     public Puzzle5Commitment() {
         super("PZ-05", "Commitment", "CM-05",
-                "A long corridor with many tempting items.\n" +
-                        "You hear footsteps behind you. Don't stop to pick up items!",
+                "A long corridor with tempting items. Footsteps echo behind you.",
                 "move forward six times",
-                "The Pursuer is behind you. Every time you stop to examine or take an item, it gets closer.");
+                "Keep moving forward. Don't stop to take or examine items.");
 
         this.forwardMoves = 0;
         this.takeCount = 0;
@@ -15,38 +14,35 @@ public class Puzzle5Commitment extends Puzzle {
 
     @Override
     public String startPuzzle() {
-        return "==== Welcome to the Trial of Commitment ====\n" +
-                "You hear heavy footsteps echoing from the entrance... Commit to your path. Do not linger.\n" +
-                "Hint: The Pursuer is two rooms behind you. Every time you stop to examine or take an item, it gets closer.";
+        String result = "\n===== Trial of Commitment =====\n";
+        result += "Footsteps echo behind you. Keep moving!\n";
+        result += "Hint: " + getHint();
+        return result;
     }
 
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) return "Invalid command.";
-        if (finished) return "This puzzle is already finished.";
+        if (isFinished()) return "Trial already complete.";
 
         String cmd = command.trim().toLowerCase();
 
         if (cmd.equals("move forward")) {
             forwardMoves++;
             if (forwardMoves >= 6) {
-                solved = true;
-                finished = true;
+                setSolved(true);
+                setFinished(true);
                 completePuzzle(player);
-                return "You stayed the course. Commitment proven.\n" +
-                        "You have completed the Trial of Commitment!\n" +
-                        "You get +1 Max HP, Trial Token, full HP restore!\n" +
-                        "You are teleported back to the Entrance Zone.";
+                return "You stayed the course!\nTrial of Commitment Complete!\n+1 Max HP, Token, Full Heal!";
             }
-            return "You move forward.\nProgress: " + forwardMoves + "/6";
+            return "You move forward. Progress: " + forwardMoves + "/6";
         }
 
         if (cmd.equals("examine item") || cmd.equals("inspect item")) {
             player.takeDamage(1);
             player.setCurrentRoomID("EZ-01");
-            finished = true;
-            return "You're too slow. The Pursuer has caught you! You lose 1 HP.\n" +
-                    "You have failed the Trial of Commitment. You must try again.";
+            setFinished(true);
+            return "Too slow! The Pursuer caught you! You lose 1 HP. Trial failed.";
         }
 
         if (cmd.equals("take item")) {
@@ -54,25 +50,12 @@ public class Puzzle5Commitment extends Puzzle {
             if (takeCount >= 2) {
                 player.takeDamage(1);
                 player.setCurrentRoomID("EZ-01");
-                finished = true;
-                return "You're too slow. The Pursuer has caught you! You lose 1 HP.\n" +
-                        "You have failed the Trial of Commitment. You must try again.";
+                setFinished(true);
+                return "Too slow! The Pursuer caught you! You lose 1 HP. Trial failed.";
             }
-            return "You stop to take an item.\nThe Pursuer gets closer!";
+            return "You take an item. The Pursuer gets closer!";
         }
 
-        if (cmd.equals("kill pursuer")) {
-            player.takeDamage(1);
-            player.setCurrentRoomID("EZ-01");
-            finished = true;
-            return "You killed the Pursuer. BOOM! The Pursuer implodes, destroying the path forward and you lose 1 HP.\n" +
-                    "You have completed Trial of Commitment (No Reward).";
-        }
-
-        if (cmd.equals("hint")) {
-            return hint;
-        }
-
-        return "That command does not work in this puzzle. Try: move forward, take item, examine item, hint";
+        return "Invalid command. Try: move forward, take item, examine item";
     }
 }

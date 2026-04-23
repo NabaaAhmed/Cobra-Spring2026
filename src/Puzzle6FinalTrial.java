@@ -12,9 +12,9 @@ public class Puzzle6FinalTrial extends Puzzle {
 
     public Puzzle6FinalTrial() {
         super("PZ-06", "Final", "FT-06",
-                "The final chamber! The Catalyst glows in the center, protected by ancient magic.",
+                "The final chamber! The Catalyst glows in the center.",
                 "burn chest then insert explosive device then place core fragment then step symbol then throw final jewel",
-                "Do not extinguish the fire. Order: burn chest, insert explosive device, place core fragment, step symbol, throw final jewel");
+                "Order: burn chest, insert explosive device, place core fragment, step symbol, throw final jewel");
 
         this.chestBurned = false;
         this.fireExtinguished = false;
@@ -30,122 +30,103 @@ public class Puzzle6FinalTrial extends Puzzle {
 
     @Override
     public String startPuzzle() {
-        return "==== Welcome to the Final Trial ====\n" +
-                "Everything you have learned will now be tested.\n" +
-                "A chest burns before you... a statue looms nearby... the floor beneath you feels unstable.\n" +
-                "Hint: Do not extinguish the fire.\n" +
-                "Timing and order matter.\n" +
-                "Some actions cannot be undone.";
+        String result = "\n===== Final Trial =====\n";
+        result += "A chest burns... a statue looms... the floor feels unstable.\n";
+        result += "Hint: " + getHint();
+        return result;
     }
 
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) return "Invalid command.";
-        if (finished) return "This puzzle is already finished.";
+        if (isFinished()) return "Trial already complete.";
 
         String cmd = command.trim().toLowerCase();
 
         if (awaitingChoice) {
             if (cmd.equals("yes")) {
-                solved = true;
-                finished = true;
-                return "You have completed the Final Trial!\n" +
-                        "You obtain the Catalyst... You Win!";
+                setSolved(true);
+                setFinished(true);
+                return "You win! You have obtained the Catalyst!";
             }
             if (cmd.equals("no")) {
-                solved = true;
-                finished = true;
-                return "You must enter the teleporter to complete your journey.\n" +
-                        "You obtain the Catalyst... You Win!";
+                setSolved(true);
+                setFinished(true);
+                return "You win! You have obtained the Catalyst!";
             }
             return "Please answer yes or no.";
         }
 
         if (cmd.equals("burn chest")) {
-            if (fireExtinguished) return "The fire is already gone. The trial cannot proceed normally.";
-            if (chestBurned) return "The chest is already burning.";
+            if (fireExtinguished) return "Fire is gone. Trial cannot proceed.";
+            if (chestBurned) return "Chest already burning.";
             chestBurned = true;
             crackedFloorVisible = true;
-            return "The chest continues to burn.\nA cracked floor symbol appears.";
+            return "The chest burns. A cracked floor symbol appears.";
         }
 
         if (cmd.equals("extinguish fire")) {
             fireExtinguished = true;
-            Monster stalker = new Monster("M-FINAL-01", "Stalker", 3, 1, false);
+            Monster stalker = new Monster("Stalker", 3, 1, false);
             failPuzzle(player, stalker);
-            return "The trial cannot progress... something is missing.\nA Stalker appears!\nCombat begins!";
+            return "You extinguished the fire! A Stalker appears! Combat begins!";
         }
 
         if (cmd.equals("open chest")) {
             player.takeDamage(5);
             player.modifyMaxHP(-5);
-            Monster stalker = new Monster("M-FINAL-02", "Stalker", 3, 1, false);
+            Monster stalker = new Monster("Stalker", 3, 1, false);
             failPuzzle(player, stalker);
-            if (!player.isAlive()) {
-                return "A trap is triggered!\nYou lose 5 HP and 5 Max HP.\nYou died during the Final Trial.";
-            }
-            return "A trap is triggered!\nYou lose 5 HP and 5 Max HP.\nA Stalker appears!\nCombat begins!";
+            if (!player.isAlive()) return "You died in the trap!";
+            return "Trap triggered! -5 HP, -5 Max HP! A Stalker appears!";
         }
 
-        if (cmd.equals("insert explosive device") || cmd.equals("insert explosive device into statue")) {
+        if (cmd.equals("insert explosive device")) {
             if (!chestBurned) {
                 player.takeDamage(player.getCurrentHP());
-                finished = true;
-                return "The chamber collapses around you!\nYou died.";
+                setFinished(true);
+                return "The chamber collapses! You died.";
             }
-            if (statueBroken) return "The statue has already been shattered.";
+            if (statueBroken) return "Statue already shattered.";
             statueBroken = true;
             coreFragmentDropped = true;
-            return "You insert the explosive device into the statue.\nThe statue shatters.\nA Core Fragment drops.";
+            return "Statue shatters! A Core Fragment drops.";
         }
 
-        if (cmd.equals("place core fragment") || cmd.equals("place core fragment into broken pillar")) {
+        if (cmd.equals("place core fragment")) {
             if (!coreFragmentDropped) {
                 player.takeDamage(player.getCurrentHP());
-                finished = true;
-                return "The chamber collapses around you!\nYou died.";
+                setFinished(true);
+                return "The chamber collapses! You died.";
             }
-            if (corePlaced) return "The Core Fragment is already placed.";
+            if (corePlaced) return "Core already placed.";
             corePlaced = true;
             teleporterActivated = true;
-            return "You place the Core Fragment into the broken pillar.\nThe teleporter activates, but it is unstable.";
+            return "Teleporter activates, but is unstable.";
         }
 
-        if (cmd.equals("step symbol") || cmd.equals("step onto cracked floor symbol")) {
+        if (cmd.equals("step symbol")) {
             if (!crackedFloorVisible || !corePlaced) {
                 player.takeDamage(player.getCurrentHP());
-                finished = true;
-                return "The chamber collapses around you!\nYou died.";
+                setFinished(true);
+                return "The chamber collapses! You died.";
             }
-            if (finalJewelAppeared) return "The floor has already collapsed. The Final Jewel is already here.";
+            if (finalJewelAppeared) return "Final Jewel already here.";
             finalJewelAppeared = true;
-            return "You step onto the cracked floor symbol.\nThe floor collapses.\nThe Final Jewel appears.";
+            return "Floor collapses! The Final Jewel appears.";
         }
 
-        if (cmd.equals("throw final jewel") || cmd.equals("throw final jewel onto teleporter")) {
+        if (cmd.equals("throw final jewel")) {
             if (!finalJewelAppeared) {
                 player.takeDamage(player.getCurrentHP());
-                finished = true;
-                return "The teleporter destabilizes violently!\nYou died.";
+                setFinished(true);
+                return "The teleporter destabilizes! You died.";
             }
             teleporterStabilized = true;
             awaitingChoice = true;
-            return "The teleporter stabilizes.\nWould you like to go through the teleporter? Yes or no";
+            return "Teleporter stabilizes. Go through? (yes/no)";
         }
 
-        if (cmd.equals("enter unstable teleporter")) {
-            if (teleporterActivated && !teleporterStabilized) {
-                player.setCurrentRoomID("TP-TRAP-01");
-                finished = true;
-                return "You are pulled into a distorted space...\nYou are sent to the Trap Room.";
-            }
-            return "There is no unstable teleporter to enter right now.";
-        }
-
-        if (cmd.equals("hint")) {
-            return hint;
-        }
-
-        return "Invalid trial command.";
+        return "Invalid command. Follow the sequence: burn chest, insert explosive device, place core fragment, step symbol, throw final jewel";
     }
 }

@@ -4,10 +4,9 @@ public class Puzzle3Trust extends Puzzle {
 
     public Puzzle3Trust() {
         super("PZ-03", "Trust", "TR-03",
-                "A guardian statue watches your every move.\n" +
-                        "The statue seems to be protecting something, but what?",
+                "A guardian statue watches your every move.",
                 "attack guardian then destroy chest",
-                "The guardian must be destroyed to reveal the truth. Then destroy the chest.");
+                "Destroy the guardian, then destroy the chest.");
 
         this.guardianBroken = false;
         this.chestAppeared = false;
@@ -15,56 +14,42 @@ public class Puzzle3Trust extends Puzzle {
 
     @Override
     public String startPuzzle() {
-        return "==== Welcome to the Trial of Trust ====\n" +
-                "You stand before a guardian statue... it watches your every move.\n" +
-                "Hint: Not everything should be taken at face value.\n" +
-                "Sometimes trust must be placed in action, not reward.";
+        String result = "\n===== Trial of Trust =====\n";
+        result += "A guardian statue watches you.\n";
+        result += "Hint: " + getHint();
+        return result;
     }
 
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) return "Invalid command.";
-        if (finished) return "This puzzle is already finished.";
+        if (isFinished()) return "Trial already complete.";
 
         String cmd = command.trim().toLowerCase();
 
-        if (cmd.equals("attack guardian") || cmd.equals("attack guardian statue")) {
-            if (guardianBroken) return "The guardian statue is already broken.";
+        if (cmd.equals("attack guardian")) {
+            if (guardianBroken) return "Guardian already broken.";
             guardianBroken = true;
             chestAppeared = true;
-            return "The guardian breaks.\nA chest appears.";
-        }
-
-        if (cmd.equals("inspect chest") || cmd.equals("examine chest")) {
-            if (!chestAppeared) return "There is no chest here yet.";
-            return "The chest looks tempting, but something feels wrong about it.";
+            return "Guardian breaks! A chest appears.";
         }
 
         if (cmd.equals("destroy chest")) {
-            if (!guardianBroken) return "You need to break the guardian first.";
-            solved = true;
-            finished = true;
+            if (!guardianBroken) return "Break the guardian first.";
+            setSolved(true);
+            setFinished(true);
             completePuzzle(player);
-            return "You saw through the illusion and made the right choice.\n" +
-                    "You have completed the Trial of Trust!\n" +
-                    "You get +1 Max HP, Trial Token, full HP restore!\n" +
-                    "You are teleported back to the Entrance Zone.";
+            return "You made the right choice! Trial of Trust Complete!\n+1 Max HP, Token, Full Heal!";
         }
 
         if (cmd.equals("open chest")) {
-            if (!chestAppeared) return "There is no chest here to open.";
+            if (!chestAppeared) return "No chest here.";
             player.takeDamage(1);
-            Monster guardian = new Monster("M-TRUST", "Guardian", 2, 1, false);
+            Monster guardian = new Monster("Guardian", 2, 1, false);
             failPuzzle(player, guardian);
-            return "The guardian reforms and attacks you!\n" +
-                    "You lose 1 HP.\n" +
-                    "Combat begins!";
+            return "Guardian reforms! You lose 1 HP! Combat begins!";
         }
 
-        if (cmd.equals("hint")) {
-            return hint;
-        }
-
-        return "Nothing important happens. Try: attack guardian, inspect chest, destroy chest, open chest";
+        return "Invalid command. Try: attack guardian, destroy chest, open chest";
     }
 }

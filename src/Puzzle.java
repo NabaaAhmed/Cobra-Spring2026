@@ -1,14 +1,14 @@
 public abstract class Puzzle {
-    protected String puzzleId;
-    protected String trialName;
-    protected String roomId;
-    protected boolean solved;
-    protected boolean finished;
-    protected String description;
-    protected String solution;
-    protected String hint;
-    protected boolean combatTriggered;
-    protected Monster failureMonster;
+    private String puzzleId;
+    private String trialName;
+    private String roomId;
+    private boolean solved;
+    private boolean finished;
+    private String description;
+    private String solution;
+    private String hint;
+    private boolean combatTriggered;
+    private Monster failureMonster;
 
     public Puzzle(String puzzleId, String trialName, String roomId, String description, String solution, String hint) {
         this.puzzleId = puzzleId;
@@ -23,7 +23,6 @@ public abstract class Puzzle {
         this.failureMonster = null;
     }
 
-    // Getters
     public String getPuzzleId() { return puzzleId; }
     public String getTrialName() { return trialName; }
     public String getRoomId() { return roomId; }
@@ -34,7 +33,6 @@ public abstract class Puzzle {
     public boolean isCombatTriggered() { return combatTriggered; }
     public Monster getFailureMonster() { return failureMonster; }
 
-    // Setters
     public void setSolved(boolean solved) { this.solved = solved; }
     public void setFinished(boolean finished) { this.finished = finished; }
     public void setCombatTriggered(boolean triggered) { this.combatTriggered = triggered; }
@@ -46,14 +44,11 @@ public abstract class Puzzle {
 
     public String getSolution() { return solution; }
 
-    // Abstract methods to be implemented by subclasses
     public abstract String startPuzzle();
     public abstract String handleCommand(Player player, String command);
 
-    // Template method for completing puzzle
-    protected void completePuzzle(Player player) {
+    public void completePuzzle(Player player) {
         if (finished) return;
-
         if (solved) {
             player.modifyMaxHP(1);
             player.fullHeal();
@@ -63,7 +58,7 @@ public abstract class Puzzle {
         finished = true;
     }
 
-    protected void failPuzzle(Player player, Monster monster) {
+    public void failPuzzle(Player player, Monster monster) {
         this.combatTriggered = true;
         this.failureMonster = monster;
         this.finished = true;
