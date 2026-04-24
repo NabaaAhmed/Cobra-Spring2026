@@ -1,5 +1,4 @@
 public class Monster {
-
     private String monsterID;
     private String name;
     private int hp;
@@ -49,11 +48,7 @@ public class Monster {
     }
 
     public void onEncounter(Player player) {
-        // kept empty for now to avoid duplicate encounter messages
-    }
-
-    public void onTurn(Player player) {
-        // optional future behavior
+        // kept empty on purpose
     }
 
     public Item dropReward() {
@@ -62,14 +57,21 @@ public class Monster {
         }
 
         if (rewardItemName.equalsIgnoreCase("Potion")) {
-            return new Potion("DROP-POTION", "Potion", "A small vial of restorative red liquid.", "0", true, 2);
+            return new Potion("DROP-POTION", "Potion",
+                    "A small vial of restorative red liquid.", "0", true, 2);
         }
 
         if (rewardItemName.toLowerCase().contains("sword")) {
-            return new Sword("DROP-SWORD", rewardItemName, rewardItemName, "0", false, 2);
+            return new Sword("DROP-SWORD", rewardItemName,
+                    rewardItemName, "0", false, 2);
         }
 
-        return new QuestItems("DROP-" + rewardItemName.toUpperCase().replace(" ", "_"),
-                rewardItemName, rewardItemName, "0", false);
+        return new QuestItems(
+                "DROP-" + rewardItemName.toUpperCase().replace(" ", "_"),
+                rewardItemName,
+                rewardItemName,
+                "0",
+                false
+        );
     }
 }

@@ -31,11 +31,11 @@ public class GameView {
     public void displayInventory(Player player) {
         System.out.println("=== Inventory ===");
         if (player.getInventory().isEmpty()) {
-            System.out.println("Inventory is empty.");
+            System.out.println("- empty");
         } else {
-            player.getInventory().forEach(item ->
-                    System.out.println("- " + item.getitemName())
-            );
+            for (Item item : player.getInventory()) {
+                System.out.println("- " + item.getitemName());
+            }
         }
     }
 
@@ -53,22 +53,5 @@ public class GameView {
 
     public void displayError(String message) {
         System.out.println("[ERROR] " + message);
-    }
-
-    public void displayHelp() {
-        System.out.println("=== Commands ===");
-        System.out.println("help");
-        System.out.println("room");
-        System.out.println("move [number]");
-        System.out.println("inventory");
-        System.out.println("status");
-        System.out.println("take [item]");
-        System.out.println("drop [item]");
-        System.out.println("use [item]");
-        System.out.println("fight");
-        System.out.println("puzzle");
-        System.out.println("save");
-        System.out.println("load");
-        System.out.println("exit");
     }
 }

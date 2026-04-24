@@ -20,6 +20,12 @@ public class FileManager {
             }
             writer.write(inventoryLine.toString() + "\n");
 
+            StringBuilder completedTrialsLine = new StringBuilder();
+            for (String trial : player.getCompletedTrials()) {
+                completedTrialsLine.append(trial).append(";");
+            }
+            writer.write(completedTrialsLine.toString() + "\n");
+
             writer.close();
             System.out.println("Game progress has been saved!");
         } catch (Exception e) {
@@ -38,6 +44,7 @@ public class FileManager {
             int attackPower = Integer.parseInt(reader.nextLine());
             int trialTokens = Integer.parseInt(reader.nextLine());
             String inventoryLine = reader.nextLine();
+            String completedTrialsLine = reader.hasNextLine() ? reader.nextLine() : "";
 
             Player player = new Player(roomID);
 
@@ -62,14 +69,45 @@ public class FileManager {
                 for (String name : inventoryNames) {
                     if (!name.trim().isEmpty()) {
                         Item item;
-                        if (name.equalsIgnoreCase("Potion")) {
-                            item = new Potion("LOAD-POTION", "Potion", "A small vial of restorative red liquid.", "0", true, 2);
+
+                        if (name.equalsIgnoreCase("Potion") || name.equalsIgnoreCase("Monster potion")) {
+                            item = new Potion(
+                                    "LOAD-POTION",
+                                    name,
+                                    "A small vial of restorative red liquid.",
+                                    "0",
+                                    true,
+                                    2
+                            );
                         } else if (name.toLowerCase().contains("sword")) {
-                            item = new Sword("LOAD-SWORD", name, name, "0", false, 2);
+                            item = new Sword(
+                                    "LOAD-SWORD",
+                                    name,
+                                    name,
+                                    "0",
+                                    false,
+                                    2
+                            );
                         } else {
-                            item = new QuestItems("LOAD-" + name.toUpperCase().replace(" ", "_"), name, name, "0", false);
+                            item = new QuestItems(
+                                    "LOAD-" + name.toUpperCase().replace(" ", "_"),
+                                    name,
+                                    name,
+                                    "0",
+                                    false
+                            );
                         }
+
                         player.addItem(item);
+                    }
+                }
+            }
+
+            if (!completedTrialsLine.isEmpty()) {
+                String[] trials = completedTrialsLine.split(";");
+                for (String trial : trials) {
+                    if (!trial.trim().isEmpty()) {
+                        player.markTrialCompleted(trial.trim());
                     }
                 }
             }
@@ -83,21 +121,21 @@ public class FileManager {
     }
 
     public static String load(String filename) {
-        String data = "";
+        StringBuilder data = new StringBuilder();
 
         try {
             File file = new File(filename);
             Scanner reader = new Scanner(file);
 
             while (reader.hasNextLine()) {
-                data += reader.nextLine() + "\n";
+                data.append(reader.nextLine()).append("\n");
             }
 
             reader.close();
         } catch (Exception e) {
-            System.out.println("Error loading file.");
+            System.out.println("Error loading file: " + filename);
         }
 
-        return data;
+        return data.toString();
     }
 }

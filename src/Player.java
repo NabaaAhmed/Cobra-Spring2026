@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Player {
     private String currentRoomID;
@@ -7,6 +9,7 @@ public class Player {
     private ArrayList<Item> inventory;
     private int attackPower;
     private int trialTokens;
+    private HashSet<String> completedTrials;
 
     public Player(String startingRoomID) {
         this.currentRoomID = startingRoomID;
@@ -15,6 +18,7 @@ public class Player {
         this.inventory = new ArrayList<>();
         this.attackPower = 1;
         this.trialTokens = 0;
+        this.completedTrials = new HashSet<>();
     }
 
     public String getCurrentRoomID() {
@@ -43,6 +47,10 @@ public class Player {
 
     public int getTrialTokens() {
         return trialTokens;
+    }
+
+    public Set<String> getCompletedTrials() {
+        return completedTrials;
     }
 
     public void setCurrentRoomID(String currentRoomID) {
@@ -116,15 +124,15 @@ public class Player {
         return currentHP - before;
     }
 
-    public void healToFull() {
-        currentHP = maxHP;
-    }
-
     public void modifyMaxHP(int amount) {
         maxHP += amount;
 
         if (maxHP < 1) {
             maxHP = 1;
+        }
+
+        if (maxHP > 10) {
+            maxHP = 10;
         }
 
         if (currentHP > maxHP) {
@@ -137,7 +145,9 @@ public class Player {
     }
 
     public void addTrialToken() {
-        trialTokens++;
+        if (trialTokens < 5) {
+            trialTokens++;
+        }
     }
 
     public void removeTrialToken() {
@@ -146,12 +156,11 @@ public class Player {
         }
     }
 
-    public String waitTurn() {
-        return "You wait for a turn.";
+    public boolean hasCompletedTrial(String trialKey) {
+        return completedTrials.contains(trialKey);
     }
 
-    public void attack(Monster monster) {
-        if (monster == null) return;
-        monster.takeDamage(attackPower);
+    public void markTrialCompleted(String trialKey) {
+        completedTrials.add(trialKey);
     }
 }

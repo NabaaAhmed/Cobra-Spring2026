@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 
 public class Room {
-    String id;
-    String name;
-    String description;
-    ArrayList<Room> connections;
-    ArrayList<Item> items;
+    private String id;
+    private String name;
+    private String description;
+    private ArrayList<Room> connections;
+    private ArrayList<Item> items;
 
     public Room(String id, String name, String description) {
         this.id = id;

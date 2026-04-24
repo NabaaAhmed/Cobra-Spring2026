@@ -23,10 +23,17 @@ public class Sword extends Item {
         if (equipped) {
             player.setAttackPower(player.getAttackPower() - damageBonus);
             equipped = false;
+            System.out.println("You unequip the sword.");
+        } else {
+            System.out.println("The sword is not equipped.");
         }
     }
 
     public int getDamageBonus() {
         return damageBonus;
+    }
+
+    public boolean isEquipped() {
+        return equipped;
     }
 }
