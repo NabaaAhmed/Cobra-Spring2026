@@ -62,24 +62,27 @@ public class RoomManager1 {
     }
 
     // ---------------- ITEMS ----------------
-    private void loadItems() {
-        //String id,String name,String description,String roomID,String monsterID, boolean stackable
-        String data = FileManager.loadGame("items.txt");
-        try{
-            Scanner fileScanner = new Scanner(new File(data));
-            while (fileScanner.hasNextLine()) {
-                String line = fileScanner.nextLine().trim();
-                if (line.isEmpty()) continue;
+    private void loadItems(String filename) {
+        String fileData = FileManager.loadGame(filename);
+        String[] lines = fileData.split("\n");
 
-                // Parse item data: itemId,name,description,roomNumber
-                String[] parts = line.split(",", 4);
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+
+                // Parse item data:String id,String name,String description,String roomID,String monsterID, boolean stackable
+                String[] parts = line.split(",", 6);
                 String itemId = parts[0].trim();
                 String name = parts[1].trim();
                 String description = parts[2].trim();
-                int roomNumber = Integer.parseInt(parts[3].trim());
+                String roomID = parts[3].trim();
+                String monsterID = parts[4].trim();
+                boolean stackable = Boolean.parseBoolean(parts[5].trim());
 
                 // Create item and add to map
-                Item item = new Item(itemId, name, description, roomNumber);
+                Item item = new Item(itemId, name, description, roomID, monsterID, stackable);
                 items.put(itemId, item);
 
                 // Add item to room

@@ -4,15 +4,17 @@ public abstract class Item {
     private String itemName;
     private String description;
     private String roomID;
+    private String monsterID;
     private boolean stackable;
     private boolean inPlayerInventory;
 
     // Item constructor
-    public Item(String itemId, String itemName, String description, String roomID, boolean stackable) {
+    public Item(String itemId, String itemName, String description, String roomID, String monsterID, boolean stackable) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.description = description;
         this.roomID = roomID;
+        this.monsterID = monsterID;
         this.stackable = stackable;
         this.inPlayerInventory = false;
     }
