@@ -54,4 +54,31 @@ public class GameView {
     public void displayError(String message) {
         System.out.println("[ERROR] " + message);
     }
+
+    public void displayIntro() {
+        System.out.println("======================================");
+        System.out.println("         DUNGEON OF TRIALS");
+        System.out.println("======================================");
+        System.out.println("You stand in a dungeon built to test those who enter.");
+        System.out.println("Each path leads to a different trial.");
+        System.out.println("Solve the trials, survive their punishments, and reach the end.");
+        System.out.println("Type 'help' for commands.");
+    }
+
+    public void displayMainHelp() {
+        System.out.println("=== Commands ===");
+        System.out.println("inspect room  - look at the current room");
+        System.out.println("move [number] - move to a connected room");
+        System.out.println("take [item]   - pick up an item");
+        System.out.println("drop [item]   - drop an item");
+        System.out.println("consume [item]");
+        System.out.println("equip [item]");
+        System.out.println("unequip [item]");
+        System.out.println("inventory     - view inventory");
+        System.out.println("status        - view player status");
+        System.out.println("fight         - start combat if a monster is present");
+        System.out.println("save          - save the game");
+        System.out.println("load          - load the game");
+        System.out.println("exit          - quit the game");
+    }
 }

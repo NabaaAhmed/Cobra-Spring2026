@@ -1,10 +1,10 @@
 id,name,description,exits/connections
-EZ-01,Main Hall,"Large cracked hall. Trial paths branch out from here.",AW-02,RS-02,TR-02,SC-01,CM-01,FN-02
-AW-02,Awareness Trial Room,"A strange teleporter sits in the room. A glowing red gem and rubble lie nearby.",EZ-01
-RS-02,Restraint Trial Chamber,"A chest is in the center of the room with a coin nearby.",EZ-01
-TR-02,Guardian Chamber,"A guardian statue stands before you. A chest is hidden here.",EZ-01
-SC-01,Sacrifice Antechamber,"A powerful sword rests before a bridge.",EZ-01
-CM-01,Commitment Entry,"Forward is safety. The path ahead demands commitment.",EZ-01
-FN-02,The Last Mechanism,"A large chamber with a chest, statue, cracked floor area, and unstable teleporter pad.",EZ-01,TP-TRAP-01,END-01
-TP-TRAP-01,Trap Room,"A ruined chamber with debris and an unstable teleporter frame. This is your second chance.",EZ-01
-END-01,Ascension Chamber,"Bright chamber. A glowing jewel floats above the center. A pedestal holds the Catalyst.",0
+EZ-01,Main Hall,"A large cracked hall where the trial paths branch out from the entrance. The air is still, and each path leads to a different test.",AW-02,RS-02,TR-02,SC-01,CM-01,FN-02
+AW-02,Awareness Trial Room,"A strange teleporter crackles in the center of the room. A glowing red gem and a pile of rubble lie nearby.",EZ-01
+RS-02,Restraint Trial Chamber,"A chest rests in the center of the chamber. A single coin lies nearby, tempting anyone who enters.",EZ-01
+TR-02,Guardian Chamber,"A silent guardian statue stands before you. Something about the room suggests not everything here should be trusted.",EZ-01
+SC-01,Sacrifice Antechamber,"A powerful sword rests before a narrow bridge. The room feels like a test of what you are willing to give up.",EZ-01
+CM-01,Commitment Entry,"A long path stretches ahead. Forward feels safe, but every delay carries a sense of danger.",EZ-01
+FN-02,The Last Mechanism,"A large chamber holds a chest, a looming statue, a cracked floor symbol, and an unstable teleporter pad. Everything here feels important.",EZ-01,TP-TRAP-01,END-01
+TP-TRAP-01,Trap Room,"A ruined chamber littered with debris and broken stone. An unstable teleporter frame offers a second chance.",EZ-01
+END-01,Ascension Chamber,"A bright chamber beyond the trials. A glowing jewel floats above the center, and a pedestal holds the Catalyst.",0
