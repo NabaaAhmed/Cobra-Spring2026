@@ -36,7 +36,7 @@ public abstract class Item {
     }
 
     public String getRoomID() {
-        return roomID;
+        return roomId;
     }
 
     public void setRoomID(String roomID) {
