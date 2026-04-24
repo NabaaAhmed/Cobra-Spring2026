@@ -34,8 +34,8 @@ public class Room {
 
     public Item findItemByName(String itemName) {
         for (Item item : items) {
-            if (item.getitemName() != null &&
-                    item.getitemName().equalsIgnoreCase(itemName)) {
+            if (item.getItemName() != null &&
+                    item.getItemName().equalsIgnoreCase(itemName)) {
                 return item;
             }
         }

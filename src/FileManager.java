@@ -16,7 +16,7 @@ public class FileManager {
 
             StringBuilder inventoryLine = new StringBuilder();
             for (Item item : player.getInventory()) {
-                inventoryLine.append(item.getitemName()).append(";");
+                inventoryLine.append(item.getItemName()).append(";");
             }
             writer.write(inventoryLine.toString() + "\n");
 

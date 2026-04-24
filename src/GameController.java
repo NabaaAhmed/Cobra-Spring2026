@@ -143,59 +143,19 @@ public class GameController {
     }
 
     private void handlePuzzleLoop(String command) {
-        if (command.isEmpty()) {
-            view.displayError("Please enter a command.");
+        if (command.equalsIgnoreCase("help")) {
+            printPuzzleHelp(model.getActivePuzzle());
             return;
         }
 
-        String action = command.split(" ")[0].toLowerCase();
+        if (command.equalsIgnoreCase("hint") || command.equalsIgnoreCase("givehint")) {
+            view.displayMessage(model.getActivePuzzle().getHint());
+            return;
+        }
 
-        switch (action) {
-            case "help":
-                printPuzzleHelp(model.getActivePuzzle());
-                return;
-
-            case "hint":
-            case "givehint":
-                view.displayMessage(model.getActivePuzzle().getHint());
-                return;
-
-            case "inspect":
-                if (command.equalsIgnoreCase("inspect room")) {
-                    view.displayMessage(model.lookRoom().getMessage());
-                    return;
-                }
-                break;
-
-            case "inventory":
-                view.displayMessage(model.showInventory().getMessage());
-                return;
-
-            case "status":
-                view.displayMessage(model.showStatus().getMessage());
-                return;
-
-            case "save":
-                displayResult(model.saveGame());
-                return;
-
-            case "load":
-                displayResult(model.loadGame());
-                return;
-
-            case "fight":
-            case "startcombat":
-                GameResult combatResult = model.startCombatForCurrentRoom();
-                displayResult(combatResult);
-                if (combatResult.isCombatStarted()) {
-                    runCombat(combatResult.getMonster());
-                }
-                return;
-
-            case "exit":
-                view.displayMessage("Exiting game.");
-                isRunning = false;
-                return;
+        if (command.equalsIgnoreCase("inspect room")) {
+            view.displayMessage(model.lookRoom().getMessage());
+            return;
         }
 
         GameResult result = model.handlePuzzleCommand(command);
@@ -252,7 +212,7 @@ public class GameController {
             Item reward = monster.dropReward();
             if (reward != null) {
                 model.getPlayer().addItem(reward);
-                view.displayMessage("Monster dropped: " + reward.getitemName());
+                view.displayMessage("Monster dropped: " + reward.getItemName());
             }
 
             if (activePuzzleBeforeCombat instanceof Puzzle2Restraint) {
@@ -313,6 +273,7 @@ public class GameController {
         view.displayMessage("inventory");
         view.displayMessage("status");
         view.displayMessage("fight");
+        view.displayMessage("hint");
         view.displayMessage("save");
         view.displayMessage("load");
         view.displayMessage("exit");
@@ -326,14 +287,6 @@ public class GameController {
 
         view.displayMessage("=== Puzzle Commands ===");
         view.displayMessage("hint");
-        view.displayMessage("status");
-        view.displayMessage("inventory");
-        view.displayMessage("save");
-        view.displayMessage("load");
-
-        if (puzzle instanceof Puzzle7AwarenessTrap) {
-            view.displayMessage("fight");
-        }
 
         if (puzzle instanceof Puzzle1Awareness) {
             view.displayMessage("take red gem");
@@ -402,6 +355,7 @@ public class GameController {
             view.displayMessage("throw red gem");
             view.displayMessage("enter teleporter");
             view.displayMessage("yes / no");
+            return;
         }
     }
 }

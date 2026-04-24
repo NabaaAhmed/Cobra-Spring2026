@@ -53,7 +53,7 @@ public class GameModel {
         if (!room.getItems().isEmpty()) {
             sb.append("\n\nItems in room:");
             for (Item item : room.getItems()) {
-                sb.append("\n- ").append(item.getitemName());
+                sb.append("\n- ").append(item.getItemName());
             }
         }
 
@@ -132,7 +132,7 @@ public class GameModel {
         }
 
         player.addItem(item);
-        return new GameResult("You picked up: " + item.getitemName());
+        return new GameResult("You picked up: " + item.getItemName());
     }
 
     public GameResult dropItem(String command) {
@@ -153,7 +153,7 @@ public class GameModel {
 
         player.removeItem(item);
         roomManager.getCurrentRoom().addItem(item);
-        return new GameResult("You dropped: " + item.getitemName());
+        return new GameResult("You dropped: " + item.getItemName());
     }
 
     public GameResult useItem(String command) {
@@ -178,7 +178,7 @@ public class GameModel {
 
             if (item instanceof Sword) {
                 ((Sword) item).unequip(player);
-                return new GameResult("You unequipped " + item.getitemName() + ".");
+                return new GameResult("You unequipped " + item.getItemName() + ".");
             }
 
             GameResult result = new GameResult("That item cannot be unequipped.");
@@ -215,10 +215,10 @@ public class GameModel {
         }
 
         if (lower.startsWith("equip ")) {
-            return new GameResult("You equipped " + item.getitemName() + ".");
+            return new GameResult("You equipped " + item.getItemName() + ".");
         }
 
-        return new GameResult("You used " + item.getitemName() + ".");
+        return new GameResult("You used " + item.getItemName() + ".");
     }
 
     public GameResult showInventory() {
@@ -229,7 +229,7 @@ public class GameModel {
             sb.append("\n- empty");
         } else {
             for (Item item : player.getInventory()) {
-                sb.append("\n- ").append(item.getitemName());
+                sb.append("\n- ").append(item.getItemName());
             }
         }
 
@@ -452,7 +452,7 @@ public class GameModel {
             return null;
         }
 
-        String rewardName = template.dropReward() == null ? "null" : template.dropReward().getitemName();
+        String rewardName = template.dropReward() == null ? "null" : template.dropReward().getItemName();
 
         return new Monster(
                 template.getMonsterID(),

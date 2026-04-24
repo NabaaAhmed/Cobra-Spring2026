@@ -80,8 +80,8 @@ public class Player {
         if (itemName == null) return null;
 
         for (Item item : inventory) {
-            if (item.getitemName() != null &&
-                    item.getitemName().equalsIgnoreCase(itemName)) {
+            if (item.getItemName() != null &&
+                    item.getItemName().equalsIgnoreCase(itemName)) {
                 return item;
             }
         }
@@ -98,8 +98,8 @@ public class Player {
 
     public boolean hasSword() {
         for (Item item : inventory) {
-            if (item.getitemName() != null &&
-                    item.getitemName().toLowerCase().contains("sword")) {
+            if (item.getItemName() != null &&
+                    item.getItemName().toLowerCase().contains("sword")) {
                 return true;
             }
         }

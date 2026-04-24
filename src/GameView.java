@@ -16,7 +16,7 @@ public class GameView {
         if (!room.getItems().isEmpty()) {
             System.out.println("\nItems in room:");
             for (Item item : room.getItems()) {
-                System.out.println("- " + item.getitemName());
+                System.out.println("- " + item.getItemName());
             }
         }
 
@@ -34,7 +34,7 @@ public class GameView {
             System.out.println("- empty");
         } else {
             for (Item item : player.getInventory()) {
-                System.out.println("- " + item.getitemName());
+                System.out.println("- " + item.getItemName());
             }
         }
     }

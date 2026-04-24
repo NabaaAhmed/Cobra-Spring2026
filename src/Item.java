@@ -19,11 +19,11 @@ public abstract class Item {
         return itemId;
     }
 
-    public String getitemName() {
+    public String getItemName() {
         return itemName;
     }
 
-    public void setitemName(String name) {
+    public void setItemName(String name) {
         this.itemName = name;
     }
 
