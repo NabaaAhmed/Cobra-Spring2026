@@ -5,16 +5,16 @@ public class Puzzle7Trap extends Puzzle{
     private boolean gemTaken;
     private boolean rubbleTaken;
 
-    public Puzzle7Trap(String roomId) {
-        super("PZ-07", "Trap", roomId,
+    public Puzzle7Trap() {
+        super("PZ-07", "Trap", "TP-TRAP-01",
                 "A dark room with rubble and a glowing red gem. The teleporter is broken.",
                 "throw rubble", "Throw the rubble at the teleporter.");
 
         this.explosionTriggered = false;
         this.gemTaken = false;
         this.rubbleTaken = false;
-        this.glowingRedGem = new Potion("I-09", "Glowing Red Gem", "A radiant gem.", false, 0);
-        this.rubble = new Potion("I-10", "Rubble", "Broken stone.", false, 0);
+        this.glowingRedGem = new QuestItems("I-09", "Glowing Red Gem", "A radiant gem.", "TP-TRAP-01", false);
+        this.rubble = new QuestItems("I-10", "Rubble", "Broken stone.", "TP-TRAP-01", false);
     }
 
     public boolean isExplosionTriggered() { return explosionTriggered; }
@@ -43,14 +43,14 @@ public class Puzzle7Trap extends Puzzle{
 
         if (cmd.equals("take gem")) {
             if (gemTaken) return "Gem already taken.";
-            player.addItem(glowingRedGem);
+            player.takeItem(glowingRedGem);
             gemTaken = true;
             return "You took the Glowing Red Gem.";
         }
 
         if (cmd.equals("take rubble")) {
             if (rubbleTaken) return "Rubble already taken.";
-            player.addItem(rubble);
+            player.takeItem(rubble);
             rubbleTaken = true;
             return "You took the rubble.";
         }

@@ -5,4 +5,4 @@ PZ-03,Trial of Trust,TR-02,You stand before a guardian statue… it watches your
 PZ-04,Trial of Sacrifice,SC-01,A powerful sword rests before you… but not everything is meant to be kept. A bridge lies ahead… something waits at the end., Not all strength should be carried forward., false
 PZ-05,Trial of Commitment,CM-01,You hear heavy footsteps echoing from the entrance… Commit to your path. Do not linger., The Pursuer is two rooms behind you. Every time you stop to examine or take an item, it gets closer., false
 PZ-06,Final Trial,FN-02, Everything you have learned will now be tested. A chest burns before you… a statue looms nearby… the floor beneath you feels unstable., Do not extinguish the fire. Timing and order matter. Some actions cannot be undone., false
-PZ-07,Trap Trial,Tp-TRAP-01,false
+PZ-07,Trap Trial,TP-TRAP-01,false

@@ -104,7 +104,7 @@ public class GameModel {
             }
 
             roomManager.move(index);
-            player.setCurrentRoomId(roomManager.getRoomId());
+            player.setCurrentRoomID(roomManager.getRoomId());
 
             return new GameResult("You moved to " + roomManager.getCurrentRoom().getRoomName());
         } catch (NumberFormatException e) {
@@ -131,7 +131,7 @@ public class GameModel {
             return result;
         }
 
-        player.addItem(item);
+        player.takeItem(item);
         return new GameResult("You picked up: " + item.getItemName());
     }
 
@@ -238,7 +238,7 @@ public class GameModel {
 
     public GameResult showStatus() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Current Room: ").append(player.getCurrentRoomId());
+        sb.append("Current Room: ").append(player.getCurrentRoomID());
         sb.append("\nCurrent HP: ").append(player.getCurrentHP());
         sb.append("\nMax HP: ").append(player.getMaxHP());
         sb.append("\nAttack Power: ").append(player.getAttackPower());
@@ -262,13 +262,13 @@ public class GameModel {
         }
 
         this.player = loaded;
-        roomManager.setRoom(player.getCurrentRoomId());
+        roomManager.setRoom(player.getCurrentRoomID());
         activePuzzle = null;
         return new GameResult("Game loaded.");
     }
 
     public GameResult autoStartPuzzleIfPresent() {
-        String roomId = player.getCurrentRoomId();
+        String roomId = player.getCurrentRoomID();
         String trialKey = getTrialKeyForRoom(roomId);
 
         if (trialKey != null && player.hasCompletedTrial(trialKey)) {
@@ -314,7 +314,7 @@ public class GameModel {
             result.setPuzzleFinished(true);
         }
 
-        roomManager.setRoom(player.getCurrentRoomId());
+        roomManager.setRoom(player.getCurrentRoomID());
         return result;
     }
 
@@ -343,7 +343,7 @@ public class GameModel {
             return;
         }
 
-        if (puzzle instanceof Puzzle1Awareness && player.getCurrentRoomId().equals("TP-TRAP-01")) {
+        if (puzzle instanceof Puzzle1Awareness && player.getCurrentRoomID().equals("TP-TRAP-01")) {
             return;
         }
 
@@ -371,7 +371,7 @@ public class GameModel {
     }
 
     private String getTrialKeyForPuzzle(Puzzle puzzle) {
-        if (puzzle instanceof Puzzle1Awareness || puzzle instanceof Puzzle7AwarenessTrap) {
+        if (puzzle instanceof Puzzle1Awareness || puzzle instanceof Puzzle7Trap) {
             return "AWARENESS";
         }
         if (puzzle instanceof Puzzle2Restraint) {
@@ -411,9 +411,9 @@ public class GameModel {
             String name = parts[1].trim();
             int hp = Integer.parseInt(parts[2].trim());
             int atkValue = Integer.parseInt(parts[3].trim());
-            String reward = parts[4].trim();
+            boolean canAmbush = Boolean.parseBoolean(parts[4].trim());
 
-            monsterTemplates.put(monsterID, new Monster(monsterID, name, hp, atkValue, reward));
+            monsterTemplates.put(monsterID, new Monster(monsterID, name, hp, atkValue, canAmbush));
         }
     }
 
@@ -440,7 +440,7 @@ public class GameModel {
     }
 
     private Monster getMonsterForCurrentRoom() {
-        if ("TP-TRAP-01".equals(player.getCurrentRoomId())) {
+        if ("TP-TRAP-01".equals(player.getCurrentRoomID())) {
             return copyMonster("M-07");
         }
         return null;
@@ -452,14 +452,14 @@ public class GameModel {
             return null;
         }
 
-        String rewardName = template.dropReward() == null ? "null" : template.dropReward().getItemName();
+        String rewardName = (template.dropLoot() == null) ? "null" : template.dropLoot().getItemName();
 
         return new Monster(
-                template.getMonsterID(),
+                template.getId(),
                 template.getName(),
                 template.getHp(),
                 template.getAttackValue(),
-                rewardName
+                template.isCanAmbush()
         );
     }
 
@@ -478,7 +478,7 @@ public class GameModel {
             case "PZ-06":
                 return new Puzzle6FinalTrial();
             case "PZ-07":
-                return new Puzzle7AwarenessTrap();
+                return new Puzzle7Trap();
             default:
                 return null;
         }

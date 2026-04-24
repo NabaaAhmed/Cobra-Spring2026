@@ -1,4 +1,4 @@
-public Puzzle2Restraint extends Puzzle{
+public class Puzzle2Restraint extends Puzzle{
 private boolean mimicTriggered;
 private boolean coinTaken;
 private boolean chestExamined;
@@ -6,8 +6,8 @@ private boolean chestOpened;
 private boolean coinPlaced;
 private Item baitCoin;
 
-public Puzzle2Restraint(String roomId) {
-    super("PZ-02", "Restraint", roomId,
+public Puzzle2Restraint() {
+    super("PZ-02", "Restraint", "RS-02",
             "A golden chest sits in the center with a bait coin nearby.",
             "examine chest", "Don't pick up the coin before examining the chest");
 
@@ -16,7 +16,7 @@ public Puzzle2Restraint(String roomId) {
     this.chestExamined = false;
     this.chestOpened = false;
     this.coinPlaced = false;
-    this.baitCoin = new Potion("I-11", "Bait Coin", "A dull coin.", false, 0);
+    this.baitCoin = new QuestItems("I-11", "Bait Coin", "A dull coin.", "RS-02", false);
 }
 
 public boolean isMimicTriggered() { return mimicTriggered; }
@@ -41,7 +41,7 @@ public String handleCommand(Player player, String command) {
 
     if (cmd.equals("take coin")) {
         if (coinTaken) return "Coin already taken.";
-        player.addItem(baitCoin);
+        player.takeItem(baitCoin);
         coinTaken = true;
         return "You took the Bait Coin.";
     }

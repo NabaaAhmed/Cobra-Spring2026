@@ -14,18 +14,10 @@ public class GameController {
     }
 
     public void startGame() {
-        view.displayMessage("======================================");
-        view.displayMessage("         DUNGEON OF TRIALS");
-        view.displayMessage("======================================");
-        view.displayMessage("You stand in a strange dungeon built to test those who enter.");
-        view.displayMessage("Each path leads to a trial. Each trial tests your choices.");
-        view.displayMessage("Only those who understand the trials can reach the end. Good luck.");
-        view.displayMessage("Type 'help' for commands.");
-        view.displayMessage("");
+        view.displayIntro();
         view.displayMessage(model.lookRoom().getMessage());
 
         while (isRunning) {
-            view.displayMessage("");
             view.displayMessage("Enter command:");
             System.out.print("> ");
 
@@ -171,7 +163,7 @@ public class GameController {
 
         if (result.isPuzzleFinished()) {
             Puzzle finishedPuzzle = result.getPuzzle();
-            boolean completedTrial = finishedPuzzle != null && finishedPuzzle.isTrialComplete();
+            boolean completedTrial = finishedPuzzle != null && finishedPuzzle.isSolved();
 
             if (completedTrial) {
                 model.markTrialCompletedForPuzzle(finishedPuzzle);
@@ -209,15 +201,15 @@ public class GameController {
         }
 
         if (!combat.isMonsterAlive()) {
-            Item reward = monster.dropReward();
+            Item reward = monster.dropLoot();
             if (reward != null) {
-                model.getPlayer().addItem(reward);
+                model.getPlayer().takeItem(reward);
                 view.displayMessage("Monster dropped: " + reward.getItemName());
             }
 
             if (activePuzzleBeforeCombat instanceof Puzzle2Restraint) {
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                model.getPlayer().setCurrentRoomId("EZ-01");
+                model.getPlayer().setCurrentRoomID("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed the Trial of Restraint, and you need to return to the entrance zone! (No Reward)");
@@ -226,7 +218,7 @@ public class GameController {
 
             if (activePuzzleBeforeCombat instanceof Puzzle3Trust) {
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                model.getPlayer().setCurrentRoomId("EZ-01");
+                model.getPlayer().setCurrentRoomID("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed Trial of Trust (No Reward)");
@@ -235,7 +227,7 @@ public class GameController {
 
             if (activePuzzleBeforeCombat instanceof Puzzle4Sacrifice) {
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                model.getPlayer().setCurrentRoomId("EZ-01");
+                model.getPlayer().setCurrentRoomID("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed Trial of Sacrifice (No Reward)");
@@ -250,7 +242,7 @@ public class GameController {
             }
         }
 
-        model.getRoomManager().setRoom(model.getPlayer().getCurrentRoomId());
+        model.getRoomManager().setRoom(model.getPlayer().getCurrentRoomID());
     }
 
     private void displayResult(GameResult result) {
@@ -347,7 +339,7 @@ public class GameController {
             return;
         }
 
-        if (puzzle instanceof Puzzle7AwarenessTrap) {
+        if (puzzle instanceof Puzzle7Trap) {
             view.displayMessage("inspect room");
             view.displayMessage("take rubble");
             view.displayMessage("take red gem");

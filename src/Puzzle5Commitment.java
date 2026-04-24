@@ -27,33 +27,33 @@ public class Puzzle5Commitment extends Puzzle {
 
         String cmd = command.trim().toLowerCase();
 
-        if (cmd.equals("move forward")) {
-            forwardMoves++;
-            if (forwardMoves >= 6) {
-                setSolved(true);
-                setFinished(true);
-                completePuzzle(player);
-                return "You stayed the course!\nTrial of Commitment Complete!\n+1 Max HP, Token, Full Heal!";
+        switch (cmd) {
+            case "move forward" -> {
+                forwardMoves++;
+                if (forwardMoves >= 6) {
+                    setSolved(true);
+                    setFinished(true);
+                    completePuzzle(player);
+                    return "You stayed the course!\nTrial of Commitment Complete!\n+1 Max HP, Token, Full Heal!";
+                }
+                return "You move forward. Progress: " + forwardMoves + "/6";
             }
-            return "You move forward. Progress: " + forwardMoves + "/6";
-        }
-
-        if (cmd.equals("examine item") || cmd.equals("inspect item")) {
-            player.takeDamage(1);
-            player.setCurrentRoomID("EZ-01");
-            setFinished(true);
-            return "Too slow! The Pursuer caught you! You lose 1 HP. Trial failed.";
-        }
-
-        if (cmd.equals("take item")) {
-            takeCount++;
-            if (takeCount >= 2) {
+            case "examine item", "inspect item" -> {
                 player.takeDamage(1);
                 player.setCurrentRoomID("EZ-01");
                 setFinished(true);
                 return "Too slow! The Pursuer caught you! You lose 1 HP. Trial failed.";
             }
-            return "You take an item. The Pursuer gets closer!";
+            case "take item" -> {
+                takeCount++;
+                if (takeCount >= 2) {
+                    player.takeDamage(1);
+                    player.setCurrentRoomID("EZ-01");
+                    setFinished(true);
+                    return "Too slow! The Pursuer caught you! You lose 1 HP. Trial failed.";
+                }
+                return "You take an item. The Pursuer gets closer!";
+            }
         }
 
         return "Invalid command. Try: move forward, take item, examine item";

@@ -45,7 +45,8 @@ public class Puzzle3Trust extends Puzzle {
         if (cmd.equals("open chest")) {
             if (!chestAppeared) return "No chest here.";
             player.takeDamage(1);
-            Monster guardian = new Monster("Guardian", 2, 1, false);
+
+            Monster guardian = new Monster("M-02", "Guardiaan", 2, 1, true);
             failPuzzle(player, guardian);
             return "Guardian reforms! You lose 1 HP! Combat begins!";
         }

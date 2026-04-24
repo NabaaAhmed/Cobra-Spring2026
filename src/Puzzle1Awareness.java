@@ -5,16 +5,16 @@ public class Puzzle1Awareness extends Puzzle {
     private boolean gemTaken;
     private boolean rubbleTaken;
 
-    public Puzzle1Awareness(String roomId) {
-        super("PZ-01", "Awareness", roomId,
+    public Puzzle1Awareness() {
+        super("PZ-01", "Awareness", "AW-02",
                 "You see an unstable teleporter, a glowing red gem, and some rubble.",
                 "throw gem", "Try throwing the glowing gem at the teleporter");
 
         this.explosionTriggered = false;
         this.gemTaken = false;
         this.rubbleTaken = false;
-        this.glowingRedGem = new Potion("I-09", "Glowing Red Gem", "A radiant gem.", false, 0);
-        this.rubble = new Potion("I-10", "Rubble", "Broken stone.", false, 0);
+        this.glowingRedGem = new QuestItems("I-09", "Glowing Red Gem", "A radiant gem.", "AW-02", false);
+        this.rubble = new QuestItems("I-10", "Rubble", "Broken stone.", "AW-02", false);
     }
 
     public boolean isExplosionTriggered() { return explosionTriggered; }
@@ -45,14 +45,14 @@ public class Puzzle1Awareness extends Puzzle {
 
         if (cmd.equals("take gem")) {
             if (gemTaken) return "Gem already taken.";
-            player.addItem(glowingRedGem);
+            player.takeItem(glowingRedGem);
             gemTaken = true;
             return "You took the Glowing Red Gem.";
         }
 
         if (cmd.equals("take rubble")) {
             if (rubbleTaken) return "Rubble already taken.";
-            player.addItem(rubble);
+            player.takeItem(rubble);
             rubbleTaken = true;
             return "You took the rubble.";
         }

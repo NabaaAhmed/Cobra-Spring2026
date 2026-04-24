@@ -56,7 +56,6 @@ public class Player {
 
     public void setCurrentRoomID(String currentRoomID) {
         this.currentRoomID = currentRoomID;
-        setCurrentRoomID(currentRoomID);
     }
 
     public void setAttackPower(int attackPower) {
@@ -76,7 +75,7 @@ public class Player {
     }
 
     //Inventory methods -Mai
-    public void takeItem(Item item, Room currentRoomObj) {
+    public void takeItem(Item item) {
         item.moveToInventory();
         inventory.add(item);
     }

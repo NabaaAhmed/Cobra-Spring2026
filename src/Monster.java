@@ -7,7 +7,7 @@ public class Monster {
     private int hp;
     private int attackValue;
     private boolean canAmbush;
-    private List<Item> rewards;
+    private Item reward;
     private boolean isAlive;
 
     public Monster(String id, String name, int hp, int attackValue, boolean canAmbush) {
@@ -16,7 +16,7 @@ public class Monster {
         this.hp = hp;
         this.attackValue = attackValue;
         this.canAmbush = canAmbush;
-        this.rewards = new ArrayList<>();
+        this.reward = reward;
         this.isAlive = true;
     }
 
@@ -38,6 +38,10 @@ public class Monster {
 
     public boolean isAlive() {
         return isAlive && hp > 0;
+    }
+
+    public boolean isCanAmbush() {
+        return canAmbush;
     }
 
     public void takeDamage(int amount) {
@@ -67,9 +71,9 @@ public class Monster {
         }
     }
 
-    public List<Item> dropLoot() {
-        List<Item> dropped = new ArrayList<>(rewards);
-        rewards.clear();
+    public Item dropLoot() {
+        Item dropped = reward;
+        reward = null;
         return dropped;
     }
 }

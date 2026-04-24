@@ -46,7 +46,7 @@ public class GameView {
             System.out.println("Inventory is empty.");
         } else {
             player.getInventory().forEach(item ->
-                    System.out.println("- " + item.getitemName())
+                    System.out.println("- " + item.getItemName())
             );
         }
     }
@@ -92,7 +92,7 @@ public class GameView {
     }
 
     //Mai
-    public static void displayIntro() {
+    public void displayIntro() {
         System.out.println("     /\\      /\\      /\\      /\\      /\\      /\\      /\\");
         System.out.println("    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\");
         System.out.println("    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /");
@@ -103,6 +103,7 @@ public class GameView {
         System.out.println("The dungeon tests character across five themed trials.");
         System.out.println("A detached Teleport Trap Room serves as a penalty zone for incorrect puzzle actions.");
         System.out.println("Good Luck!");
+        System.out.println("Type 'help' for commands.");
     }
 
     //Nabaa
