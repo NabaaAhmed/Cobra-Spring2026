@@ -1,61 +1,90 @@
-public class Puzzle5Commitment extends Puzzle {
-    private int forwardMoves;
-    private int takeCount;
+public class Puzzle4Sacrifice extends Puzzle {
+    private boolean swordTaken;
+    private boolean reachedBridge;
+    private boolean swordThrown;
 
-    public Puzzle5Commitment() {
-        super("PZ-05", "Commitment", "CM-05",
-                "A long corridor with tempting items. Footsteps echo behind you.",
-                "move forward six times",
-                "Keep moving forward. Don't stop to take or examine items.");
+    public Puzzle4Sacrifice() {
+        super("PZ-04", "Sacrifice", "SC-04",
+                "A powerful sword rests on a pedestal before a long bridge.\n" +
+                        "The bridge seems unstable. Carrying the sword across might be dangerous.",
+                "take sword then move bridge then throw sword then move forward",
+                "You must give up the sword to proceed safely. Take the sword, move to the bridge, throw it away, then move forward.");
 
-        this.forwardMoves = 0;
-        this.takeCount = 0;
+        this.swordTaken = false;
+        this.reachedBridge = false;
+        this.swordThrown = false;
     }
 
     @Override
     public String startPuzzle() {
-        String result = "\n===== Trial of Commitment =====\n";
-        result += "Footsteps echo behind you. Keep moving!\n";
-        result += "Hint: " + getHint();
-        return result;
+        return "=== Welcome to the Trial of Sacrifice ===\n" +
+                "A powerful sword rests before you... but not everything is meant to be kept.\n" +
+                "A bridge lies ahead... something waits at the end.\n" +
+                "Hint: Not all strength should be carried forward.";
     }
 
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) return "Invalid command.";
-        if (isFinished()) return "Trial already complete.";
+        if (finished) return "This puzzle is already finished.";
 
         String cmd = command.trim().toLowerCase();
 
+        if (cmd.equals("take sword")) {
+            if (swordTaken) return "You already took the sword.";
+            swordTaken = true;
+            Sword trialSword = new Sword("TRIAL-SWORD", "Trial Sword",
+                    "A powerful sword used in the Trial of Sacrifice.", false, 3, 3);
+            player.addItem(trialSword);
+            return "You took the sword.";
+        }
+
+        if (cmd.equals("move bridge")) {
+            if (!swordTaken) return "You need to take the sword first.";
+            reachedBridge = true;
+            return "You move onto the bridge.";
+        }
+
+        if (cmd.equals("throw sword")) {
+            if (!reachedBridge) return "You need to reach the bridge first.";
+            if (swordThrown) return "You already threw the sword.";
+            Item sword = player.findItem("Trial Sword");
+            if (sword != null) player.removeItem(sword);
+            swordThrown = true;
+            return "You throw the sword away before reaching the end.";
+        }
+
+        if (cmd.equals("inspect bridge") || cmd.equals("examine bridge")) {
+            if (!reachedBridge) return "You are not at the bridge yet.";
+            if (!swordThrown) return "The bridge feels unsafe while you still carry the sword.";
+            return "The bridge seems calm now.";
+        }
+
         if (cmd.equals("move forward")) {
-            forwardMoves++;
-            if (forwardMoves >= 6) {
-                setSolved(true);
-                setFinished(true);
+            if (!swordTaken) return "You need to take the sword first.";
+            if (!reachedBridge) return "You need to move to the bridge first.";
+            if (swordThrown) {
+                solved = true;
+                finished = true;
                 completePuzzle(player);
-                return "You stayed the course!\nTrial of Commitment Complete!\n+1 Max HP, Token, Full Heal!";
+                return "You chose to let go of power and were spared.\n" +
+                        "You have completed the Trial of Sacrifice!\n" +
+                        "You get +1 Max HP, Trial Token, full HP restore!\n" +
+                        "You are teleported back to the Entrance Zone.";
             }
-            return "You move forward. Progress: " + forwardMoves + "/6";
+            Item sword = player.findItem("Trial Sword");
+            if (sword != null) player.removeItem(sword);
+            Monster wraith = new Monster("M-SAC", "Wraith", 2, 1, false);
+            failPuzzle(player, wraith);
+            return "The power you held has betrayed you.\n" +
+                    "You are attacked by the Wraith!\n" +
+                    "Combat begins!";
         }
 
-        if (cmd.equals("examine item") || cmd.equals("inspect item")) {
-            player.takeDamage(1);
-            player.setCurrentRoomID("EZ-01");
-            setFinished(true);
-            return "Too slow! The Pursuer caught you! You lose 1 HP. Trial failed.";
+        if (cmd.equals("hint")) {
+            return hint;
         }
 
-        if (cmd.equals("take item")) {
-            takeCount++;
-            if (takeCount >= 2) {
-                player.takeDamage(1);
-                player.setCurrentRoomID("EZ-01");
-                setFinished(true);
-                return "Too slow! The Pursuer caught you! You lose 1 HP. Trial failed.";
-            }
-            return "You take an item. The Pursuer gets closer!";
-        }
-
-        return "Invalid command. Try: move forward, take item, examine item";
+        return "Nothing important happens. Try: take sword, move bridge, throw sword, move forward";
     }
 }
