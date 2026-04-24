@@ -217,7 +217,7 @@ public class GameController {
 
             if (activePuzzleBeforeCombat instanceof Puzzle2Restraint) {
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                model.getPlayer().setCurrentRoomID("EZ-01");
+                model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed the Trial of Restraint, and you need to return to the entrance zone! (No Reward)");
@@ -226,7 +226,7 @@ public class GameController {
 
             if (activePuzzleBeforeCombat instanceof Puzzle3Trust) {
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                model.getPlayer().setCurrentRoomID("EZ-01");
+                model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed Trial of Trust (No Reward)");
@@ -235,7 +235,7 @@ public class GameController {
 
             if (activePuzzleBeforeCombat instanceof Puzzle4Sacrifice) {
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                model.getPlayer().setCurrentRoomID("EZ-01");
+                model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed Trial of Sacrifice (No Reward)");
@@ -250,7 +250,7 @@ public class GameController {
             }
         }
 
-        model.getRoomManager().setRoom(model.getPlayer().getCurrentRoomID());
+        model.getRoomManager().setRoom(model.getPlayer().getCurrentRoomId());
     }
 
     private void displayResult(GameResult result) {

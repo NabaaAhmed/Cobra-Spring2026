@@ -58,6 +58,10 @@ public class Room {
         return id;
     }
 
+    public String getRoomID() {
+        return getRoomId();
+    }
+
     public String getRoomName() {
         return name;
     }

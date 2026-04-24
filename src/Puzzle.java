@@ -1,32 +1,40 @@
 public abstract class Puzzle {
-    protected String puzzleID;
+    protected String puzzleId;
     protected String trialName;
-    protected String roomID;
+    protected String roomId;
     protected boolean isSolved;
     protected boolean isFinished;
     protected boolean trialComplete;
     protected boolean rewardEarned;
 
-    public Puzzle(String puzzleID, String trialName, String roomID) {
-        this.puzzleID = puzzleID;
+    public Puzzle(String puzzleId, String trialName, String roomId) {
+        this.puzzleId = puzzleId;
         this.trialName = trialName;
-        this.roomID = roomID;
+        this.roomId = roomId;
         this.isSolved = false;
         this.isFinished = false;
         this.trialComplete = false;
         this.rewardEarned = false;
     }
 
+    public String getPuzzleId() {
+        return puzzleId;
+    }
+
     public String getPuzzleID() {
-        return puzzleID;
+        return getPuzzleId();
     }
 
     public String getTrialName() {
         return trialName;
     }
 
+    public String getRoomId() {
+        return roomId;
+    }
+
     public String getRoomID() {
-        return roomID;
+        return getRoomId();
     }
 
     public boolean isSolved() {
@@ -49,7 +57,7 @@ public abstract class Puzzle {
         player.modifyMaxHP(1);
         player.heal(player.getMaxHP());
         player.addTrialToken();
-        player.setCurrentRoomID("EZ-01");
+        player.setCurrentRoomId("EZ-01");
         isSolved = true;
         isFinished = true;
         trialComplete = true;
@@ -61,7 +69,7 @@ public abstract class Puzzle {
     }
 
     protected String completeNoReward(Player player, String completionMessage) {
-        player.setCurrentRoomID("EZ-01");
+        player.setCurrentRoomId("EZ-01");
         isFinished = true;
         trialComplete = true;
         rewardEarned = false;

@@ -82,7 +82,7 @@ public class Puzzle6FinalTrial extends Puzzle {
 
         if (awaitingChoice) {
             if (cmd.equals("yes") || cmd.equals("no")) {
-                player.setCurrentRoomID("END-01");
+                player.setCurrentRoomId("END-01");
                 isSolved = true;
                 isFinished = true;
                 trialComplete = true;
@@ -238,7 +238,7 @@ public class Puzzle6FinalTrial extends Puzzle {
                 awaitingChoice = true;
                 return "The teleporter is ready. Would you like to go through the teleporter? Yes or no";
             }
-            player.setCurrentRoomID("TP-TRAP-01");
+            player.setCurrentRoomId("TP-TRAP-01");
             isFinished = true;
             return "You are pulled into a distorted space...\nYou are sent to the Trap Room.";
         }

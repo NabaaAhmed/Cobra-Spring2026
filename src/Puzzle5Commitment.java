@@ -50,7 +50,7 @@ public class Puzzle5Commitment extends Puzzle {
 
         if (cmd.equals("examine item") || cmd.equals("inspect item")) {
             player.takeDamage(1);
-            player.setCurrentRoomID("EZ-01");
+            player.setCurrentRoomId("EZ-01");
             isFinished = true;
             trialComplete = false;
             rewardEarned = false;
@@ -63,7 +63,7 @@ public class Puzzle5Commitment extends Puzzle {
 
             if (takeCount >= 2) {
                 player.takeDamage(1);
-                player.setCurrentRoomID("EZ-01");
+                player.setCurrentRoomId("EZ-01");
                 isFinished = true;
                 trialComplete = false;
                 rewardEarned = false;

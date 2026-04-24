@@ -104,7 +104,7 @@ public class GameModel {
             }
 
             roomManager.move(index);
-            player.setCurrentRoomID(roomManager.getRoomId());
+            player.setCurrentRoomId(roomManager.getRoomId());
 
             return new GameResult("You moved to " + roomManager.getCurrentRoom().getRoomName());
         } catch (NumberFormatException e) {
@@ -238,7 +238,7 @@ public class GameModel {
 
     public GameResult showStatus() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Current Room: ").append(player.getCurrentRoomID());
+        sb.append("Current Room: ").append(player.getCurrentRoomId());
         sb.append("\nCurrent HP: ").append(player.getCurrentHP());
         sb.append("\nMax HP: ").append(player.getMaxHP());
         sb.append("\nAttack Power: ").append(player.getAttackPower());
@@ -262,24 +262,24 @@ public class GameModel {
         }
 
         this.player = loaded;
-        roomManager.setRoom(player.getCurrentRoomID());
+        roomManager.setRoom(player.getCurrentRoomId());
         activePuzzle = null;
         return new GameResult("Game loaded.");
     }
 
     public GameResult autoStartPuzzleIfPresent() {
-        String roomID = player.getCurrentRoomID();
-        String trialKey = getTrialKeyForRoom(roomID);
+        String roomId = player.getCurrentRoomId();
+        String trialKey = getTrialKeyForRoom(roomId);
 
         if (trialKey != null && player.hasCompletedTrial(trialKey)) {
             return null;
         }
 
-        if (!puzzleRoomMap.containsKey(roomID)) {
+        if (!puzzleRoomMap.containsKey(roomId)) {
             return null;
         }
 
-        String puzzleID = puzzleRoomMap.get(roomID);
+        String puzzleID = puzzleRoomMap.get(roomId);
         Puzzle puzzle = createPuzzleById(puzzleID);
 
         if (puzzle == null) {
@@ -314,7 +314,7 @@ public class GameModel {
             result.setPuzzleFinished(true);
         }
 
-        roomManager.setRoom(player.getCurrentRoomID());
+        roomManager.setRoom(player.getCurrentRoomId());
         return result;
     }
 
@@ -343,15 +343,15 @@ public class GameModel {
             return;
         }
 
-        if (puzzle instanceof Puzzle1Awareness && player.getCurrentRoomID().equals("TP-TRAP-01")) {
+        if (puzzle instanceof Puzzle1Awareness && player.getCurrentRoomId().equals("TP-TRAP-01")) {
             return;
         }
 
         player.markTrialCompleted(key);
     }
 
-    private String getTrialKeyForRoom(String roomID) {
-        switch (roomID) {
+    private String getTrialKeyForRoom(String roomId) {
+        switch (roomId) {
             case "AW-02":
             case "TP-TRAP-01":
                 return "AWARENESS";
@@ -433,14 +433,14 @@ public class GameModel {
             }
 
             String puzzleID = parts[0].trim();
-            String roomID = parts[2].trim();
+            String roomId = parts[2].trim();
 
-            puzzleRoomMap.put(roomID, puzzleID);
+            puzzleRoomMap.put(roomId, puzzleID);
         }
     }
 
     private Monster getMonsterForCurrentRoom() {
-        if ("TP-TRAP-01".equals(player.getCurrentRoomID())) {
+        if ("TP-TRAP-01".equals(player.getCurrentRoomId())) {
             return copyMonster("M-07");
         }
         return null;

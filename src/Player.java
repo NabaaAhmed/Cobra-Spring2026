@@ -3,7 +3,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Player {
-    private String currentRoomID;
+    private String currentRoomId;
     private int maxHP;
     private int currentHP;
     private ArrayList<Item> inventory;
@@ -11,8 +11,8 @@ public class Player {
     private int trialTokens;
     private HashSet<String> completedTrials;
 
-    public Player(String startingRoomID) {
-        this.currentRoomID = startingRoomID;
+    public Player(String startingRoomId) {
+        this.currentRoomId = startingRoomId;
         this.maxHP = 5;
         this.currentHP = 5;
         this.inventory = new ArrayList<>();
@@ -21,8 +21,12 @@ public class Player {
         this.completedTrials = new HashSet<>();
     }
 
+    public String getCurrentRoomId() {
+        return currentRoomId;
+    }
+
     public String getCurrentRoomID() {
-        return currentRoomID;
+        return getCurrentRoomId();
     }
 
     public int getCurrentHP() {
@@ -53,16 +57,20 @@ public class Player {
         return completedTrials;
     }
 
-    public void setCurrentRoomID(String currentRoomID) {
-        this.currentRoomID = currentRoomID;
+    public void setCurrentRoomId(String currentRoomId) {
+        this.currentRoomId = currentRoomId;
+    }
+
+    public void setCurrentRoomID(String currentRoomId) {
+        setCurrentRoomId(currentRoomId);
     }
 
     public void setAttackPower(int attackPower) {
         this.attackPower = attackPower;
     }
 
-    public void moveToRoom(String roomID) {
-        this.currentRoomID = roomID;
+    public void moveToRoom(String roomId) {
+        this.currentRoomId = roomId;
     }
 
     public void addItem(Item item) {

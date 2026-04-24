@@ -41,7 +41,7 @@ public class GameView {
 
     public void displayStatus(Player player) {
         System.out.println("=== Player Status ===");
-        System.out.println("Current Room: " + player.getCurrentRoomID());
+        System.out.println("Current Room: " + player.getCurrentRoomId());
         System.out.println("HP: " + player.getCurrentHP() + "/" + player.getMaxHP());
         System.out.println("Attack Power: " + player.getAttackPower());
         System.out.println("Trial Tokens: " + player.getTrialTokens());

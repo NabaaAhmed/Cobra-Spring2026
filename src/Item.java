@@ -2,15 +2,15 @@ public abstract class Item {
     private String itemId;
     private String itemName;
     private String description;
-    private String roomID;
+    private String roomId;
     private Boolean stackable;
     private boolean inPlayerInventory;
 
-    public Item(String itemId, String itemName, String description, String roomID, Boolean stackable) {
+    public Item(String itemId, String itemName, String description, String roomId, Boolean stackable) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.description = description;
-        this.roomID = roomID;
+        this.roomId = roomId;
         this.stackable = stackable;
         this.inPlayerInventory = false;
     }
@@ -40,7 +40,7 @@ public abstract class Item {
     }
 
     public void setRoomID(String roomID) {
-        this.roomID = roomID;
+        this.roomId = roomId;
     }
 
     public Boolean getStackable() {
@@ -57,12 +57,12 @@ public abstract class Item {
 
     public void moveToInventory() {
         this.inPlayerInventory = true;
-        this.roomID = null;
+        this.roomId = null;
     }
 
     public void moveToRoom(String roomID) {
         this.inPlayerInventory = false;
-        this.roomID = roomID;
+        this.roomId = roomId;
     }
 
     public abstract void use(Player player);
