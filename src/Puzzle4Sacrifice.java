@@ -25,8 +25,8 @@ public class Puzzle4Sacrifice extends Puzzle {
     @Override
     public String startPuzzle() {
         return "=== Welcome to the Trial of Sacrifice ===\n"
-                + "A powerful sword rests before you... but not everything is meant to be kept.\n"
-                + "A bridge lies ahead... something waits at the end.";
+                + "A powerful sword rests before you, but not everything is meant to be kept.\n"
+                + "A bridge lies ahead, and something waits beyond it.";
     }
 
     @Override
@@ -37,7 +37,7 @@ public class Puzzle4Sacrifice extends Puzzle {
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) {
-            return "Invalid command";
+            return "Invalid command.";
         }
 
         String cmd = command.trim().toLowerCase();
@@ -59,7 +59,7 @@ public class Puzzle4Sacrifice extends Puzzle {
             );
 
             player.addItem(sword);
-            return "You took the sword.";
+            return "You take the sword.";
         }
 
         if (cmd.equals("move bridge")) {
@@ -68,7 +68,7 @@ public class Puzzle4Sacrifice extends Puzzle {
             }
 
             reachedBridge = true;
-            return "You move onto the bridge.";
+            return "You step onto the bridge.";
         }
 
         if (cmd.equals("inspect bridge")) {
@@ -101,7 +101,7 @@ public class Puzzle4Sacrifice extends Puzzle {
             }
 
             swordThrown = true;
-            return "You throw the sword away before reaching the end.";
+            return "You throw the sword away before reaching the end of the bridge.";
         }
 
         if (cmd.equals("move forward")) {
@@ -121,10 +121,13 @@ public class Puzzle4Sacrifice extends Puzzle {
             failureMonster = new Monster("M-04", "Wraith", 2, 1, null);
             combatTriggered = true;
             isFinished = true;
+            trialComplete = true;
+            rewardEarned = false;
 
-            return "The power you held has betrayed you.\nYou are attacked by the Wraith!";
+            return "The power you held has betrayed you.\n"
+                    + "The Wraith attacks!";
         }
 
-        return "Invalid command";
+        return "Invalid command.";
     }
 }

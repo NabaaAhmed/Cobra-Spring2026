@@ -13,7 +13,7 @@ public class Puzzle5Commitment extends Puzzle {
     @Override
     public String startPuzzle() {
         return "==== Welcome to the Trial of Commitment =====\n"
-                + "You hear heavy footsteps echoing from the entrance... Commit to your path. Do not linger.";
+                + "Heavy footsteps echo from behind you. Commit to your path and do not linger.";
     }
 
     @Override
@@ -24,7 +24,7 @@ public class Puzzle5Commitment extends Puzzle {
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) {
-            return "Invalid command";
+            return "Invalid command.";
         }
 
         String cmd = command.trim().toLowerCase();
@@ -34,7 +34,7 @@ public class Puzzle5Commitment extends Puzzle {
                 return completeWithReward(player,
                         "You stayed the course. Commitment proven.");
             }
-            return "Type yes or no.";
+            return "Please answer yes or no.";
         }
 
         if (cmd.equals("move forward")) {
@@ -42,7 +42,7 @@ public class Puzzle5Commitment extends Puzzle {
 
             if (forwardMoves >= 6) {
                 awaitingChoice = true;
-                return "Would you like to go through teleporter? Yes or no";
+                return "You reach the teleporter.\nWould you like to go through it? Yes or no";
             }
 
             return "You move forward.\nProgress: " + forwardMoves + "/6";
@@ -54,7 +54,7 @@ public class Puzzle5Commitment extends Puzzle {
             isFinished = true;
             trialComplete = false;
             rewardEarned = false;
-            return "You're too slow. The Pursuer has caught you! You lose 1 HP.\n"
+            return "You hesitated for too long. The Pursuer catches you and you lose 1 HP.\n"
                     + "You have failed the Trial of Commitment. You must try again.";
         }
 
@@ -67,20 +67,20 @@ public class Puzzle5Commitment extends Puzzle {
                 isFinished = true;
                 trialComplete = false;
                 rewardEarned = false;
-                return "You're too slow. The Pursuer has caught you! You lose 1 HP.\n"
+                return "You slowed down for too long. The Pursuer catches you and you lose 1 HP.\n"
                         + "You have failed the Trial of Commitment. You must try again.";
             }
 
-            return "The Pursuer gets closer!";
+            return "You stop to take an item. The Pursuer gets closer.";
         }
 
         if (cmd.equals("kill pursuer")) {
             player.takeDamage(1);
             return completeNoReward(player,
-                    "You killed the Pursuer. BOOM! The Pursuer implodes, destroying the path forward and you lose 1 HP.\n"
-                            + "You have completed Trial of Commitment (No Reward).");
+                    "You kill the Pursuer. BOOM! It implodes, destroys the path behind you, and you lose 1 HP.\n"
+                            + "You have completed the Trial of Commitment. (No Reward)");
         }
 
-        return "Invalid command";
+        return "Invalid command.";
     }
 }

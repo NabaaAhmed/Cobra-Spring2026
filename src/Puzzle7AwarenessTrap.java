@@ -13,7 +13,7 @@ public class Puzzle7AwarenessTrap extends Puzzle {
     @Override
     public String startPuzzle() {
         return "==== Welcome to the Trap =====\n"
-                + "This is your second chance. You must find something to stabilize the teleporter.";
+                + "This is your second chance. You must find the correct way to stabilize the teleporter.";
     }
 
     @Override
@@ -24,7 +24,7 @@ public class Puzzle7AwarenessTrap extends Puzzle {
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) {
-            return "Invalid command";
+            return "Invalid command.";
         }
 
         String cmd = command.trim().toLowerCase();
@@ -35,8 +35,9 @@ public class Puzzle7AwarenessTrap extends Puzzle {
                         "The teleporter stabilizes and carries you safely away.");
             } else if (cmd.equals("no")) {
                 return completeWithReward(player,
-                        "You completed the trap trial and return to the entrance zone.");
+                        "The teleporter remains stable, waiting for you to return to the entrance zone.");
             }
+            return "Please answer yes or no.";
         }
 
         if (cmd.equals("inspect room")) {
@@ -46,7 +47,7 @@ public class Puzzle7AwarenessTrap extends Puzzle {
 
         if (cmd.equals("take rubble")) {
             if (rubbleTaken) {
-                return "You already took the rubble.";
+                return "You already picked up the rubble.";
             }
             rubbleTaken = true;
             return "You picked up the rubble.";
@@ -54,7 +55,7 @@ public class Puzzle7AwarenessTrap extends Puzzle {
 
         if (cmd.equals("take red gem") || cmd.equals("take glowing red gem")) {
             if (redGemTaken) {
-                return "You already took the glowing red gem.";
+                return "You already picked up the glowing red gem.";
             }
             redGemTaken = true;
             return "You picked up the glowing red gem.";
@@ -76,14 +77,14 @@ public class Puzzle7AwarenessTrap extends Puzzle {
 
             player.takeDamage(1);
             return completeNoReward(player,
-                    "BOOM! You caused an explosion, and you lose 1 HP.\n"
+                    "BOOM! The teleporter erupts and you lose 1 HP.\n"
                             + "You have completed the Trap. (No Reward)");
         }
 
         if (cmd.equals("enter teleporter")) {
-            return "The teleporter is unstable. Try stabilizing it first.";
+            return "The teleporter is still unstable. Try stabilizing it first.";
         }
 
-        return "Invalid command";
+        return "Invalid command.";
     }
 }

@@ -13,19 +13,20 @@ public class Puzzle1Awareness extends Puzzle {
     @Override
     public String startPuzzle() {
         return "==== Welcome to the Trial of Awareness =====\n"
-                + "You must find something to stabilize the teleporter.";
+                + "A damaged teleporter crackles in front of you.\n"
+                + "You must find the correct item to stabilize it.";
     }
 
     @Override
     public String getHint() {
         return "Hint: The teleporter's core is shifting toward a deep crimson.\n"
-                + "The teleporter's erratic pulse matches the hue of the item you need.";
+                + "Its unstable pulse matches the color of the item you need.";
     }
 
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) {
-            return "Invalid command";
+            return "Invalid command.";
         }
 
         String cmd = command.trim().toLowerCase();
@@ -35,13 +36,13 @@ public class Puzzle1Awareness extends Puzzle {
                 return completeWithReward(player,
                         "The teleporter stabilizes and carries you safely away.");
             } else if (cmd.equals("no")) {
-                return "The teleporter hums in front of you. Type 'enter' when ready.";
+                return "The teleporter hums steadily in front of you. Type 'enter' when you are ready.";
             }
         }
 
         if (cmd.equals("take red gem") || cmd.equals("take glowing red gem")) {
             if (redGemTaken) {
-                return "You already took the red gem.";
+                return "You already picked up the glowing red gem.";
             }
             redGemTaken = true;
             return "You picked up the glowing red gem.";
@@ -49,7 +50,7 @@ public class Puzzle1Awareness extends Puzzle {
 
         if (cmd.equals("take rubble")) {
             if (rubbleTaken) {
-                return "You already took the rubble.";
+                return "You already picked up the rubble.";
             }
             rubbleTaken = true;
             return "You picked up the rubble.";
@@ -57,11 +58,12 @@ public class Puzzle1Awareness extends Puzzle {
 
         if (cmd.equals("throw red gem") || cmd.equals("throw glowing red gem")) {
             if (!redGemTaken) {
-                return "You need to take the red gem first.";
+                return "You need to take the glowing red gem first.";
             }
 
             awaitingEnterChoice = true;
-            return "The teleporter is stabilizing.\nEnter to return to the entrance zone. Type <enter>.";
+            return "The teleporter begins to stabilize.\n"
+                    + "Enter to return to the entrance zone. Type <enter>.";
         }
 
         if (cmd.equals("throw rubble")) {
@@ -70,17 +72,19 @@ public class Puzzle1Awareness extends Puzzle {
             }
 
             player.takeDamage(1);
-            player.setCurrentRoomID("TP-TRAP-01");
+            player.setCurrentRoomId("TP-TRAP-01");
             isFinished = true;
+            trialComplete = true;
+            rewardEarned = false;
 
-            return "BOOM! You caused an explosion, and you lose 1 HP.\n"
+            return "BOOM! The teleporter erupts and you lose 1 HP.\n"
                     + "You have completed the Trial of Awareness. (No Reward)";
         }
 
         if (cmd.equals("inspect teleporter")) {
-            return "The teleporter crackles violently. It needs the correct item.";
+            return "The teleporter crackles violently. It looks unstable and seems to need the correct item.";
         }
 
-        return "Invalid command";
+        return "Invalid command.";
     }
 }

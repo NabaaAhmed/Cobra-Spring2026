@@ -23,7 +23,7 @@ public class Puzzle2Restraint extends Puzzle {
     @Override
     public String startPuzzle() {
         return "====== Welcome to the Trial of Restraint =====\n"
-                + "A chest is in the center of the room with a coin nearby.";
+                + "A chest rests in the center of the room, with a single coin lying nearby.";
     }
 
     @Override
@@ -34,7 +34,7 @@ public class Puzzle2Restraint extends Puzzle {
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) {
-            return "Invalid command";
+            return "Invalid command.";
         }
 
         String cmd = command.trim().toLowerCase();
@@ -44,6 +44,7 @@ public class Puzzle2Restraint extends Puzzle {
                 return completeWithReward(player,
                         "You resisted greed and interacted with the chest safely.");
             }
+            return "Please answer yes or no.";
         }
 
         if (cmd.equals("take coin") || cmd.equals("take bait coin")) {
@@ -60,17 +61,20 @@ public class Puzzle2Restraint extends Puzzle {
                 failureMonster = new Monster("M-01", "Mimic", 2, 1, null);
                 combatTriggered = true;
                 isFinished = true;
-                return "The Mimic ambushes and attacks you! You lose 1 HP!";
+                trialComplete = true;
+                rewardEarned = false;
+                return "The Mimic ambushes you as you approach the chest!\n"
+                        + "You lose 1 HP.";
             }
 
             awaitingChoice = true;
-            return "The chest is safe.\nWould you like to leave the room? Yes or no";
+            return "The chest remains still.\nWould you like to leave the room? Yes or no";
         }
 
         if (cmd.equals("inspect coin")) {
-            return "A dull coin lies nearby.";
+            return "A dull coin lies nearby. It looks tempting, but unimportant.";
         }
 
-        return "Invalid command";
+        return "Invalid command.";
     }
 }

@@ -25,7 +25,7 @@ public class Puzzle3Trust extends Puzzle {
     @Override
     public String startPuzzle() {
         return "==== Welcome to the Trial of Trust =====\n"
-                + "You stand before a guardian statue... it watches your every move.";
+                + "You stand before a guardian statue. It seems to watch your every move.";
     }
 
     @Override
@@ -37,7 +37,7 @@ public class Puzzle3Trust extends Puzzle {
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) {
-            return "Invalid command";
+            return "Invalid command.";
         }
 
         String cmd = command.trim().toLowerCase();
@@ -47,6 +47,7 @@ public class Puzzle3Trust extends Puzzle {
                 return completeWithReward(player,
                         "You saw through the illusion and made the right choice.");
             }
+            return "Please answer yes or no.";
         }
 
         if (cmd.equals("attack guardian") || cmd.equals("attack guardian statue")) {
@@ -56,14 +57,14 @@ public class Puzzle3Trust extends Puzzle {
 
             guardianBroken = true;
             chestAppeared = true;
-            return "The guardian breaks.\nA chest appears.";
+            return "The guardian shatters.\nA chest appears.";
         }
 
         if (cmd.equals("inspect chest")) {
             if (!chestAppeared) {
                 return "There is no chest here yet.";
             }
-            return "The chest looks tempting, but something feels wrong about it.";
+            return "The chest looks tempting, but something about it feels wrong.";
         }
 
         if (cmd.equals("destroy chest")) {
@@ -72,7 +73,8 @@ public class Puzzle3Trust extends Puzzle {
             }
 
             awaitingChoice = true;
-            return "You saw through the illusion and made the right choice.\nWould you like to leave the room? Yes or no";
+            return "You saw through the illusion and made the right choice.\n"
+                    + "Would you like to leave the room? Yes or no";
         }
 
         if (cmd.equals("open chest")) {
@@ -84,10 +86,13 @@ public class Puzzle3Trust extends Puzzle {
             failureMonster = new Monster("M-02", "Guardian", 2, 1, "Silver Sigil/Emerald Fragment");
             combatTriggered = true;
             isFinished = true;
+            trialComplete = true;
+            rewardEarned = false;
 
-            return "The guardian reforms and attacks you! You lose 1 HP!";
+            return "The guardian reforms and attacks you!\n"
+                    + "You lose 1 HP.";
         }
 
-        return "Invalid command";
+        return "Invalid command.";
     }
 }

@@ -62,7 +62,7 @@ public class Puzzle6FinalTrial extends Puzzle {
     public String startPuzzle() {
         return "==== Welcome to the Final Trial =====\n"
                 + "Everything you have learned will now be tested.\n"
-                + "A chest burns before you... a statue looms nearby... the floor beneath you feels unstable.";
+                + "A chest, a looming statue, a cracked floor symbol, and an unstable teleporter pad stand before you.";
     }
 
     @Override
@@ -75,7 +75,7 @@ public class Puzzle6FinalTrial extends Puzzle {
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) {
-            return "Invalid command";
+            return "Invalid command.";
         }
 
         String cmd = command.trim().toLowerCase();
@@ -87,10 +87,10 @@ public class Puzzle6FinalTrial extends Puzzle {
                 isFinished = true;
                 trialComplete = true;
                 rewardEarned = false;
-                return "You have completed the Final Trial and have been teleported to the end room!\n"
+                return "You have completed the Final Trial and reached the end room!\n"
                         + "You obtain the Catalyst... You Win!";
             }
-            return "Type yes or no.";
+            return "Please answer yes or no.";
         }
 
         if (cmd.equals("burn chest")) {
@@ -100,7 +100,7 @@ public class Puzzle6FinalTrial extends Puzzle {
 
             chestBurned = true;
             actionsSinceBurn = 1;
-            return "The chest burns.\nThe room grows hotter. Keep going in the correct order.";
+            return "The chest catches fire.\nThe room grows hotter. Keep moving in the correct order.";
         }
 
         if (cmd.equals("extinguish fire")) {
@@ -115,7 +115,7 @@ public class Puzzle6FinalTrial extends Puzzle {
             stalkerPathRequired = true;
             failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1, null);
             combatTriggered = true;
-            return "The trial cannot progress... something is missing.\n"
+            return "The trial can no longer proceed normally.\n"
                     + "The Stalker appears!";
         }
 
@@ -137,15 +137,10 @@ public class Puzzle6FinalTrial extends Puzzle {
         }
 
         if (cmd.equals("insert explosive device")) {
-            if (!chestBurned) {
+            if (!chestBurned || fireExtinguished) {
                 player.takeDamage(player.getCurrentHP());
                 isFinished = true;
-                return "The chamber collapses around you!\nYou died.";
-            }
-            if (fireExtinguished) {
-                player.takeDamage(player.getCurrentHP());
-                isFinished = true;
-                return "The chamber collapses around you!\nYou died.";
+                return "The chamber collapses around you.\nYou died.";
             }
             if (statueBroken) {
                 return "The statue has already been shattered.";
@@ -170,7 +165,7 @@ public class Puzzle6FinalTrial extends Puzzle {
 
             advanceBurnCounter();
             corePlaced = true;
-            String message = "The teleporter activates, but it is unstable.";
+            String message = "The teleporter activates, but it remains unstable.";
             if (crackedSymbolAppeared) {
                 message += "\nA cracked floor symbol is now visible.";
             }
@@ -178,15 +173,10 @@ public class Puzzle6FinalTrial extends Puzzle {
         }
 
         if (cmd.equals("step symbol")) {
-            if (!crackedSymbolAppeared) {
+            if (!crackedSymbolAppeared || !corePlaced) {
                 player.takeDamage(player.getCurrentHP());
                 isFinished = true;
-                return "The chamber collapses around you!\nYou died.";
-            }
-            if (!corePlaced) {
-                player.takeDamage(player.getCurrentHP());
-                isFinished = true;
-                return "The chamber collapses around you!\nYou died.";
+                return "The chamber collapses around you.\nYou died.";
             }
             if (finalJewelAppeared) {
                 return "The floor has already collapsed.";
@@ -200,7 +190,7 @@ public class Puzzle6FinalTrial extends Puzzle {
             if (!finalJewelAppeared) {
                 player.takeDamage(player.getCurrentHP());
                 isFinished = true;
-                return "The teleporter destabilizes violently!\nYou died.";
+                return "The teleporter destabilizes violently.\nYou died.";
             }
             if (stalkerPathRequired && !stalkerDefeated) {
                 return "The teleporter still rejects the jewel. The Stalker must be dealt with first.";
@@ -212,7 +202,7 @@ public class Puzzle6FinalTrial extends Puzzle {
                 stalkerPathRequired = true;
                 failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1, null);
                 combatTriggered = true;
-                return "The teleporter rejects your progress. The Stalker appears!";
+                return "The teleporter rejects your progress.\nThe Stalker appears!";
             }
 
             teleporterStabilized = true;
@@ -230,7 +220,8 @@ public class Puzzle6FinalTrial extends Puzzle {
 
             teleporterStabilized = true;
             awaitingChoice = true;
-            return "The teleporter stabilizes using the Stalker's remains.\nWould you like to go through the teleporter? Yes or no";
+            return "The teleporter stabilizes using the Stalker's remains.\n"
+                    + "Would you like to go through the teleporter? Yes or no";
         }
 
         if (cmd.equals("enter unstable teleporter")) {
@@ -243,6 +234,6 @@ public class Puzzle6FinalTrial extends Puzzle {
             return "You are pulled into a distorted space...\nYou are sent to the Trap Room.";
         }
 
-        return "Invalid command";
+        return "Invalid command.";
     }
 }
