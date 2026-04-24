@@ -1,145 +1,77 @@
-import java.util.Scanner;
-
-public class Puzzle7Trap {
-    private boolean completed;
-    private boolean solved;
+public class Puzzle7Trap extends Puzzle{
     private boolean explosionTriggered;
-    private String roomId;
-
-    // Items needed
     private Item glowingRedGem;
     private Item rubble;
     private boolean gemTaken;
     private boolean rubbleTaken;
 
     public Puzzle7Trap(String roomId) {
-        this.completed = false;
-        this.solved = false;
+        super("PZ-07", "Trap", roomId,
+                "A dark room with rubble and a glowing red gem. The teleporter is broken.",
+                "throw rubble", "Throw the rubble at the teleporter.");
+
         this.explosionTriggered = false;
-        this.roomId = roomId;
         this.gemTaken = false;
         this.rubbleTaken = false;
-
-        // Create items for this puzzle
-        this.glowingRedGem = new Potion("I-09", "Glowing Red Gem",
-                "A radiant gem emitting visible heat and light.", false, 0);
-        this.rubble = new Potion("I-10", "Rubble",
-                "Broken stone fragments.", false, 0);
+        this.glowingRedGem = new Potion("I-09", "Glowing Red Gem", "A radiant gem.", false, 0);
+        this.rubble = new Potion("I-10", "Rubble", "Broken stone.", false, 0);
     }
 
-    public boolean isCompleted() { return completed; }
-    public boolean isSolved() { return solved; }
     public boolean isExplosionTriggered() { return explosionTriggered; }
-
     public Item getGlowingRedGem() { return glowingRedGem; }
     public Item getRubble() { return rubble; }
-
-    public void setGemTaken(boolean taken) { this.gemTaken = taken; }
-    public void setRubbleTaken(boolean taken) { this.rubbleTaken = taken; }
     public boolean isGemTaken() { return gemTaken; }
     public boolean isRubbleTaken() { return rubbleTaken; }
+    public void setGemTaken(boolean taken) { this.gemTaken = taken; }
+    public void setRubbleTaken(boolean taken) { this.rubbleTaken = taken; }
 
-    public void displayDescription(GameView view) {
-        view.displayMessage("\n===== Welcome to the Trap =====");
-        view.displayMessage("This is your second chance. You must find something to stabilize the teleporter.");
-        view.displayMessage("The teleporter crackles with unstable energy.");
-        view.displayMessage("");
-        view.displayMessage("Items in the room:");
-        if (!gemTaken) view.displayMessage("  - A Glowing Red Gem (radiating heat and light)");
-        if (!rubbleTaken) view.displayMessage("  - Rubble (broken stone fragments)");
-        view.displayMessage("");
-        view.displayMessage("The item you need might not be visually appealing.");
+    @Override
+    public String startPuzzle() {
+        String result = "\n===== Trap Room =====\n";
+        result += "The teleporter is broken. Items in the room:\n";
+        if (!gemTaken) result += "  - Glowing Red Gem\n";
+        if (!rubbleTaken) result += "  - Rubble\n";
+        return result;
     }
 
-    public void displayHint(GameView view) {
-        view.displayHint("The item you need might not be visually appealing.");
-    }
+    @Override
+    public String handleCommand(Player player, String command) {
+        if (command == null) return "Invalid command.";
+        if (isFinished()) return "You already escaped!";
 
-    //Process throw action for this puzzle
-    public int processThrow(String itemName, GameView view, Player player, Scanner scanner) {
-        if (completed) {
-            view.displayMessage("This trial is already complete.");
-            return 0;
+        String cmd = command.trim().toLowerCase();
+
+        if (cmd.equals("take gem")) {
+            if (gemTaken) return "Gem already taken.";
+            player.addItem(glowingRedGem);
+            gemTaken = true;
+            return "You took the Glowing Red Gem.";
         }
 
-        if (itemName.equalsIgnoreCase("rubble")) {
-            // WIN: Throwing rubble stabilizes the teleporter (inverse of Puzzle 1)
-            if (!rubbleTaken) {
-                view.displayMessage("You don't have the Rubble!");
-                return 0;
-            }
-
-            view.displayMessage("\nYou throw the rubble onto the teleporter...");
-            view.displayMessage("The teleporter hums and stabilizes! The crackling energy subsides.");
-            solved = true;
-            return 1; // Win
+        if (cmd.equals("take rubble")) {
+            if (rubbleTaken) return "Rubble already taken.";
+            player.addItem(rubble);
+            rubbleTaken = true;
+            return "You took the rubble.";
         }
 
-        if (itemName.equalsIgnoreCase("gem") || itemName.equalsIgnoreCase("glowing red gem")) {
-            // LOSE: Throwing gem causes explosion (inverse of Puzzle 1)
-            if (!gemTaken) {
-                view.displayMessage("You don't have the Glowing Red Gem!");
-                return 0;
-            }
+        if (cmd.equals("throw rubble")) {
+            if (!rubbleTaken) return "You don't have rubble!";
+            setSolved(true);
+            setFinished(true);
+            completePuzzle(player);
+            return "You throw the rubble! The teleporter stabilizes!\nYou escaped the Trap! +1 Max HP, Token, Full Heal!";
+        }
 
-            view.displayMessage("\nYou throw the Glowing Red Gem onto the teleporter...");
-            view.displayMessage("BOOM! You caused an explosion!");
-            view.displayMessage("You lose 1 HP!");
+        if (cmd.equals("throw gem")) {
+            if (!gemTaken) return "You don't have the gem!";
             player.takeDamage(1);
             explosionTriggered = true;
-            return -1; // Lose - explosion
+            setFinished(true);
+            player.setCurrentRoomID("EZ-01");
+            return "BOOM! Explosion! You lose 1 HP and are sent back to Entrance!";
         }
 
-        view.displayMessage("You can't throw that at the teleporter.");
-        return 0;
-    }
-
-
-    //Complete the puzzle and give rewards (win path)
-
-    public void completePuzzle(GameView view, Player player, RoomManager roomManager) {
-        if (completed) return;
-
-        completed = true;
-
-        if (solved) {
-            view.displayMessage("\nYou have completed the Trap!");
-            view.displayMessage("You get +1 Max HP, a Trial Token, and full HP restore!");
-
-            // CORRECT ORDER: Increase Max HP first, then heal
-            player.setMaxHP(player.getMaxHP() + 1);
-            player.heal(player.getMaxHP());
-
-            // Add Trial Token
-            Item token = new Potion("TKN-01", "Trial Token",
-                    "A small glowing token awarded for completing a trial.", false, 0);
-            player.addItem(token);
-
-            // Teleport to entrance on win
-            player.setCurrentRoomID("EZ-01");
-            view.displayMessage("\nYou are teleported back to the Entrance Zone.");
-        } else if (explosionTriggered) {
-            view.displayMessage("\nYou have completed the Trap. (No Reward)");
-            // Teleport to entrance on loss
-            player.setCurrentRoomID("EZ-01");
-            view.displayMessage("\nYou are teleported back to the Entrance Zone.");
-        }
-    }
-
-
-    //Handle penalty path
-
-    public void handlePenalty(GameView view, Player player, RoomManager roomManager) {
-        if (completed) return;
-
-        completed = true;
-        explosionTriggered = true;
-
-        view.displayMessage("\nThe unstable energy surges around you...");
-        view.displayMessage("You are pulled back to the Entrance Zone!");
-
-        // Send to Entrance
-        player.setCurrentRoomID("EZ-01");
-        view.displayMessage("\nYou wake up in the Main Hall.");
+        return "Invalid command. Try: take gem, take rubble, throw gem, throw rubble";
     }
 }

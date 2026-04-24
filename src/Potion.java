@@ -9,6 +9,7 @@ public class Potion extends Item {
 
     @Override
     public void use(Player player) {
-        int healed = player.heal(healAmount);
-        System.out.println("You drink the potion and recover " + healed + " HP.");    }
+        player.heal(healAmount);
+    }
 }
+

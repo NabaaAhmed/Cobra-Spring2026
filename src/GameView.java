@@ -17,16 +17,17 @@ public class GameView {
     //Nabaa and Danny
     public void displayRoom(Room room) {
         if (room == null) {
-            System.out.println("No room is currently loaded.");
+            System.out.println("No room loaded.");
             return;
         }
-        System.out.println("=== " + room.getRoomName() + " ===");
+
+        System.out.println("\n=== " + room.getRoomName() + " ===");
         System.out.println(room.getRoomDesc());
 
         if (!room.getItems().isEmpty()) {
             System.out.println("\nItems in room:");
             for (Item item : room.getItems()) {
-                System.out.println("- " + item.getitemName());
+                System.out.println("- " + item.getItemName());
             }
         }
 

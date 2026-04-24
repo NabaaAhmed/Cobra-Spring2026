@@ -10,7 +10,7 @@ public class Monster {
     private List<Item> rewards;
     private boolean isAlive;
 
-    public Monster(String name, int hp, int attackValue, boolean canAmbush) {
+    public Monster(String id, String name, int hp, int attackValue, boolean canAmbush) {
         this.id = id;
         this.name = name;
         this.hp = hp;
@@ -20,11 +20,25 @@ public class Monster {
         this.isAlive = true;
     }
 
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public int getHp() { return hp; }
-    public int getAttackValue() { return attackValue; }
-    public boolean isAlive() { return isAlive && hp > 0; }
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public int getAttackValue() {
+        return attackValue;
+    }
+
+    public boolean isAlive() {
+        return isAlive && hp > 0;
+    }
 
     public void takeDamage(int amount) {
         hp -= amount;
@@ -53,30 +67,9 @@ public class Monster {
         }
     }
 
-    public void addReward(Item item) {
-        if (item != null) {
-            rewards.add(item);
-        }
-    }
-
-    public void addRewards(List<Item> items) {
-        if (items != null) {
-            rewards.addAll(items);
-        }
-    }
-
     public List<Item> dropLoot() {
         List<Item> dropped = new ArrayList<>(rewards);
         rewards.clear();
         return dropped;
-    }
-
-    public void setRewards(List<Item> rewards) {
-        this.rewards = rewards != null ? rewards : new ArrayList<>();
-    }
-
-    public void reset() {
-        isAlive = true;
-        // Note: hp reset would need original HP stored
     }
 }

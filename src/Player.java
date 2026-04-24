@@ -1,5 +1,7 @@
 //Danny Class
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Player {
     private String currentRoomID;
@@ -8,6 +10,7 @@ public class Player {
     private ArrayList<Item> inventory;
     private int attackPower;
     private int trialTokens;
+    private HashSet<String> completedTrials;
 
     public Player(String startingRoomID) {
         this.currentRoomID = startingRoomID;
@@ -16,6 +19,7 @@ public class Player {
         this.inventory = new ArrayList<>();
         this.attackPower = 1;
         this.trialTokens = 0;
+        this.completedTrials = new HashSet<>();
     }
 
     public String getCurrentRoomID() {
@@ -46,8 +50,13 @@ public class Player {
         return trialTokens;
     }
 
+    public Set<String> getCompletedTrials() {
+        return completedTrials;
+    }
+
     public void setCurrentRoomID(String currentRoomID) {
         this.currentRoomID = currentRoomID;
+        setCurrentRoomID(currentRoomID);
     }
 
     public void setAttackPower(int attackPower) {
@@ -68,24 +77,8 @@ public class Player {
 
     //Inventory methods -Mai
     public void takeItem(Item item, Room currentRoomObj) {
-        if (item == null || item.getItemName() == null || currentRoomObj == null) {
-            System.out.println("Invalid pickup request.");
-            return;
-        }
-
-        if (!item.isInRoom(currentRoomObj.getRoomID())) {
-            System.out.println("This item is not available in the current room.");
-            return;
-        }
-
-        if (inventory.contains(item)) {
-            System.out.println(item.getItemName() + " is already in your inventory.");
-            return;
-        }
-
         item.moveToInventory();
         inventory.add(item);
-        System.out.println(item.getItemName() + " was picked up and added to inventory.");
     }
 
     public void removeItem(Item item) {
@@ -186,8 +179,11 @@ public class Player {
         }
     }
 
-    public void attack(Monster monster) {
-        if (monster == null) return;
-        monster.takeDamage(attackPower);
+    public boolean hasCompletedTrial(String trialKey) {
+        return completedTrials.contains(trialKey);
+    }
+
+    public void markTrialCompleted(String trialKey) {
+        completedTrials.add(trialKey);
     }
 }
