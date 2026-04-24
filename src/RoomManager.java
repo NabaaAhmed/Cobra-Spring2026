@@ -7,7 +7,7 @@ public class RoomManager {
 
     public RoomManager() {
         rooms = new HashMap<>();
-        loadRooms("Rooms.txt");
+        loadRooms("rooms.txt");
         loadItems("item.txt");
     }
 
@@ -189,7 +189,7 @@ public class RoomManager {
                 description.append(result.get(i));
             }
 
-            return new String[] {
+            return new String[]{
                     itemId,
                     itemName,
                     description.toString().trim(),
