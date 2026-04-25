@@ -1,4 +1,5 @@
 //team
+//team
 import java.util.HashMap;
 
 public class GameModel {
@@ -94,7 +95,7 @@ public class GameModel {
             }
 
             if (index < 0 || index >= current.getConnections().size()) {
-                GameResult result = new GameResult("Invalid room connection.");
+                GameResult result = new GameResult("No current room loaded.");
                 result.setSuccess(false);
                 return result;
             }
@@ -449,7 +450,7 @@ public class GameModel {
 
         for (int i = 1; i < lines.length; i++) {
             String line = lines[i].trim();
-            if (line.isEmpty()) {
+            if (line.isEmpty() ||line.startsWith("//")) {
                 continue;
             }
 
@@ -472,14 +473,14 @@ public class GameModel {
         String fileData = FileManager.load(filename);
         String[] lines = fileData.split("\n");
 
-        for (int i = 1; i < lines.length; i++) {
+        for (int i = 0; i < lines.length; i++) {
             String line = lines[i].trim();
-            if (line.isEmpty()) {
+            if (line.isEmpty()||line.startsWith("//")) {
                 continue;
             }
 
             String[] parts = line.split(",");
-            if (parts.length < 4) {
+            if (parts.length < 3) {
                 continue;
             }
 
