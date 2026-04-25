@@ -326,7 +326,6 @@ public class GameController {
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed the Trial of Restraint. (No Reward)");
-                view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
 
                 view.displayMessage("");
@@ -340,7 +339,6 @@ public class GameController {
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed the Trial of Trust. (No Reward)");
-                view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
                 view.displayMessage("");
                 view.displayMessage(model.lookRoom().getMessage());
@@ -353,7 +351,6 @@ public class GameController {
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed the Trial of Sacrifice. (No Reward)");
-                view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
                 view.displayMessage("");
                 view.displayMessage(model.lookRoom().getMessage());
@@ -363,7 +360,6 @@ public class GameController {
             if (activePuzzleBeforeCombat instanceof Puzzle5Commitment) {
                 Puzzle5Commitment commitment = (Puzzle5Commitment) activePuzzleBeforeCombat;
                 view.displayMessage(commitment.finishAfterPursuerDefeated(model.getPlayer()));
-                view.displayMessage("You have been teleported back to the Main Hall.");
 
                 if (model.getPlayer().isAlive()) {
                     model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);

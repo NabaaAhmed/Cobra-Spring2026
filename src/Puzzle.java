@@ -58,7 +58,6 @@ public abstract class Puzzle {
         player.modifyMaxHP(1);
         player.heal(player.getMaxHP());
         player.addTrialToken();
-        player.setCurrentRoomId("EZ-01");
         isSolved = true;
         isFinished = true;
         trialComplete = true;
@@ -66,12 +65,10 @@ public abstract class Puzzle {
 
         return completionMessage
                 + "\nYou have completed the " + trialName + "!"
-                + "\nYou have been teleported back to the Main Hall."
                 + "\nYou get +1 Max HP, Trial Token, full HP restore.";
     }
 
     protected String completeNoReward(Player player, String completionMessage) {
-        player.setCurrentRoomId("EZ-01");
         isFinished = true;
         trialComplete = true;
         rewardEarned = false;
