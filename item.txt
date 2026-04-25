@@ -1,20 +1,19 @@
-//String id,String name,String description,boolean stackable
+/String id,String name,String description, String roomid, String monsterid boolean stackable
 //Team
 I-01,Broken Torch Handle,A cracked wooden torch shaft found at the dungeon entrance.,EZ-01, 0, false
 I-02,Strong Trial Sword,A glowing blade filled with unstable power.,SC-01, 0, false
 I-03,Explosive Device,A compact cylindrical bomb, half the size of a hand.,EZ-02, 0, false
 I-04,Core Fragment,A glowing shard from the shattered monster statue.,FN-02, 0, false
 I-05,Wall Jewel,A gem embedded in the EZ-01 entrance wall, connected to the trial teleporters by glowing lines.,EZ-01, 0, false
-I-06,Potion,A small vial of restorative red liquid.,RS-03;TR-02;SC-02;CM-03;CM-05;TP-TRAP-01, 0, true
+I-06,Potion,A small vial of restorative red liquid.,RS-03;TR-02;SC-02;CM-03;CM-05, M-07, true
 I-07,Glowing Red Gem,A glowing red gem used in the Trial of Awareness.,AW-02, 0, false
 I-08,Rubble,Broken stone fragments.,AW-02, 0, false
 I-09,Bait Coin,A dull coin.,RS-02, 0, false
 I-10,Small Ruby,A small red gemstone., RS-03, 0, false
 I-11,Silver Sigil,A shiny silver sigil dropped by the Guardian., 0, M-02, false
-I-12,Gold Chain,A gold chain dropped by the Golem.,0 , M-03, false
+I-12,Gold Chain,A gold chain dropped by the Golem.,SC-01 , false
 I-13,Jeweled Dagger,A decorative dagger set with gemstones.,CM-02, 0, false
 I-14,Ornate Chalice,A gold ritual cup engraved with symbols.,CM-03, 0, false
 I-15,Crystal Lens,A translucent optical lens.,CM-04, 0, false
 I-16,Ancient Map,A worn parchment marked with faded paths.,CM-06, 0, false
 I-17,Final Jewel,A jewel revealed beneath the cracked floor symbol.,FN-02, 0, false
-I-18,Monster potion,A potion dropped by the Warden.,0, M-07, false

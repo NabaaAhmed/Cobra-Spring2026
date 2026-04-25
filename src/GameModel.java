@@ -1,5 +1,4 @@
-//team
-//team
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GameModel {
@@ -9,6 +8,7 @@ public class GameModel {
 
     private HashMap<String, Monster> monsterTemplates;
     private HashMap<String, String> puzzleRoomMap;
+    private static HashMap<String, Item> pendingRewards = new HashMap<>();
 
     public GameModel(Player player, RoomManager roomManager) {
         this.player = player;
@@ -59,15 +59,80 @@ public class GameModel {
             }
         }
 
+        sb.append("\n\nConnections:");
         if (!room.getConnections().isEmpty()) {
-            sb.append("\n\nConnections:");
             for (int i = 0; i < room.getConnections().size(); i++) {
+                Room connectedRoom = room.getConnections().get(i);
                 sb.append("\n").append(i).append(": ")
-                        .append(room.getConnections().get(i).getRoomName());
+                        .append(connectedRoom.getRoomName())
+                        .append(" (")
+                        .append(connectedRoom.getRoomId())
+                        .append(")");
             }
+        } else {
+            sb.append("\n- No exits from this room.");
         }
 
         return new GameResult(sb.toString());
+    }
+
+    public GameResult showMap() {
+        ArrayList<Room> rooms = roomManager.getAllRooms();
+
+        rooms.sort((room1, room2) -> room1.getRoomId().compareTo(room2.getRoomId()));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== Full Dungeon Map ===\n");
+        sb.append("Total rooms loaded: ").append(roomManager.getRoomCount()).append("\n");
+
+        int count = 1;
+        for (Room room : rooms) {
+            sb.append("\n").append(count).append(". ")
+                    .append(room.getRoomId())
+                    .append(" - ")
+                    .append(room.getRoomName());
+
+            if (!room.getConnections().isEmpty()) {
+                sb.append("\n   Exits: ");
+                for (int i = 0; i < room.getConnections().size(); i++) {
+                    if (i > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(room.getConnections().get(i).getRoomId());
+                }
+            } else {
+                sb.append("\n   Exits: none");
+            }
+
+            count++;
+        }
+
+        sb.append("\n\nNormal movement: use move [number] from the current room.");
+        sb.append("\nDemo/testing movement: use goto [roomID]. Example: goto CM-07");
+
+        return new GameResult(sb.toString());
+    }
+
+    public GameResult goToRoomById(String command) {
+        if (command == null || command.trim().length() <= 5) {
+            GameResult result = new GameResult("Use: goto [roomID]. Example: goto AW-02");
+            result.setSuccess(false);
+            return result;
+        }
+
+        String roomId = command.substring(5).trim().toUpperCase();
+
+        if (!roomManager.hasRoom(roomId)) {
+            GameResult result = new GameResult("Room not found: " + roomId);
+            result.setSuccess(false);
+            return result;
+        }
+
+        roomManager.setRoom(roomId);
+        player.setCurrentRoomId(roomId);
+        activePuzzle = null;
+
+        return new GameResult("You moved to " + roomManager.getCurrentRoom().getRoomName() + " (" + roomId + ")");
     }
 
     public GameResult move(String command) {
@@ -88,18 +153,42 @@ public class GameModel {
             int index = Integer.parseInt(parts[1]);
             Room current = roomManager.getCurrentRoom();
 
-            if (index < 0 || index >= current.getConnections().size()) {
+            if (current == null) {
                 GameResult result = new GameResult("No current room loaded.");
                 result.setSuccess(false);
                 return result;
             }
 
+            if (index < 0 || index >= current.getConnections().size()) {
+                GameResult result = new GameResult("Invalid room connection. Use one of the numbers shown under Connections.");
+                result.setSuccess(false);
+                return result;
+            }
+
             Room destination = current.getConnections().get(index);
-            String destinationTrial = getTrialKeyForRoom(destination.getRoomId());
+            String destinationId = destination.getRoomId();
+
+            // Final Trial and Hidden Bomb Room unlock after all five main trials are completed,
+            // regardless of how many tokens the player earned.
+            if ((destinationId.equals("FN-01") || destinationId.equals("FN-02") || destinationId.equals("EZ-02"))
+                    && !allMainTrialsCompleted()) {
+                GameResult result = new GameResult("That area is locked. Complete all 5 trials first.");
+                result.setSuccess(false);
+                return result;
+            }
+
+            if (destinationId.equals("TP-TRAP-01")) {
+                GameResult result = new GameResult("That area is locked. You only go there through a trap or failed trial action.");
+                result.setSuccess(false);
+                return result;
+            }
+
+            String destinationTrial = getTrialKeyForRoom(destinationId);
+
             if (destinationTrial != null
                     && player.hasCompletedTrial(destinationTrial)
-                    && !destination.getRoomId().equals("TP-TRAP-01")
-                    && !destination.getRoomId().equals("END-01")) {
+                    && !destinationId.equals("TP-TRAP-01")
+                    && !destinationId.equals("END-01")) {
                 GameResult result = new GameResult("That trial has already been completed.");
                 result.setSuccess(false);
                 return result;
@@ -125,6 +214,13 @@ public class GameModel {
 
         String itemName = command.substring(5).trim();
         Room room = roomManager.getCurrentRoom();
+
+        if (room == null) {
+            GameResult result = new GameResult("No room loaded.");
+            result.setSuccess(false);
+            return result;
+        }
+
         Item item = room.takeItemByName(itemName);
 
         if (item == null) {
@@ -264,6 +360,12 @@ public class GameModel {
     }
 
     public GameResult saveGame() {
+        if (hasActivePuzzle()) {
+            GameResult result = new GameResult("You cannot save in the middle of a puzzle. Finish or fail the puzzle first.");
+            result.setSuccess(false);
+            return result;
+        }
+
         FileManager.savePlayer("save.txt", player);
         return new GameResult("Game progress has been saved!");
     }
@@ -280,6 +382,7 @@ public class GameModel {
         this.player = loaded;
         roomManager.setRoom(player.getCurrentRoomId());
         activePuzzle = null;
+
         return new GameResult("Game loaded.");
     }
 
@@ -359,35 +462,55 @@ public class GameModel {
             return;
         }
 
-        if (puzzle instanceof Puzzle1Awareness && player.getCurrentRoomId().equals("TP-TRAP-01")) {
-            return;
-        }
-
         player.markTrialCompleted(key);
     }
 
+    private boolean allMainTrialsCompleted() {
+        return player.hasCompletedTrial("AWARENESS")
+                && player.hasCompletedTrial("RESTRAINT")
+                && player.hasCompletedTrial("TRUST")
+                && player.hasCompletedTrial("SACRIFICE")
+                && player.hasCompletedTrial("COMMITMENT");
+    }
+
     private String getTrialKeyForRoom(String roomId) {
-        switch (roomId) {
-            case "AW-02":
-            case "TP-TRAP-01":
-                return "AWARENESS";
-            case "RS-02":
-                return "RESTRAINT";
-            case "TR-02":
-                return "TRUST";
-            case "SC-01":
-                return "SACRIFICE";
-            case "CM-01":
-                return "COMMITMENT";
-            case "FN-02":
-                return "FINAL";
-            default:
-                return null;
+        if (roomId == null) {
+            return null;
         }
+
+        if (roomId.startsWith("AW-")) {
+            return "AWARENESS";
+        }
+
+        if (roomId.startsWith("RS-")) {
+            return "RESTRAINT";
+        }
+
+        if (roomId.startsWith("TR-")) {
+            return "TRUST";
+        }
+
+        if (roomId.startsWith("SC-")) {
+            return "SACRIFICE";
+        }
+
+        if (roomId.startsWith("CM-")) {
+            return "COMMITMENT";
+        }
+
+        if (roomId.equals("TP-TRAP-01")) {
+            return "TRAP";
+        }
+
+        if (roomId.startsWith("FN-")) {
+            return "FINAL";
+        }
+
+        return null;
     }
 
     private String getTrialKeyForPuzzle(Puzzle puzzle) {
-        if (puzzle instanceof Puzzle1Awareness || puzzle instanceof Puzzle7AwarenessTrap) {
+        if (puzzle instanceof Puzzle1Awareness) {
             return "AWARENESS";
         }
         if (puzzle instanceof Puzzle2Restraint) {
@@ -402,24 +525,32 @@ public class GameModel {
         if (puzzle instanceof Puzzle5Commitment) {
             return "COMMITMENT";
         }
+        if (puzzle instanceof Puzzle7AwarenessTrap) {
+            return "TRAP";
+        }
         if (puzzle instanceof Puzzle6FinalTrial) {
             return "FINAL";
         }
         return null;
     }
 
+    public static void registerMonsterReward(String monsterId, Item item) {
+        pendingRewards.put(monsterId, item);
+    }
+
     private void loadMonsters(String filename) {
         String fileData = FileManager.load(filename);
         String[] lines = fileData.split("\n");
 
-        for (int i = 1; i < lines.length; i++) {
+        for (int i = 0; i < lines.length; i++) {
             String line = lines[i].trim();
-            if (line.isEmpty() ||line.startsWith("//")) {
+
+            if (line.isEmpty() || line.startsWith("//") || line.toLowerCase().startsWith("monsterid")) {
                 continue;
             }
 
             String[] parts = line.split(",");
-            if (parts.length < 5) {
+            if (parts.length < 4) {
                 continue;
             }
 
@@ -427,9 +558,15 @@ public class GameModel {
             String name = parts[1].trim();
             int hp = Integer.parseInt(parts[2].trim());
             int atkValue = Integer.parseInt(parts[3].trim());
-            String reward = parts[4].trim();
 
-            monsterTemplates.put(monsterID, new Monster(monsterID, name, hp, atkValue, reward));
+            Monster monster = new Monster(monsterID, name, hp, atkValue);
+
+            if (pendingRewards.containsKey(monsterID)) {
+                Item reward = pendingRewards.get(monsterID);
+                monster.setRewardItemName(reward.getItemName());
+            }
+
+            monsterTemplates.put(monsterID, monster);
         }
     }
 
@@ -439,7 +576,8 @@ public class GameModel {
 
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i].trim();
-            if (line.isEmpty()||line.startsWith("//")) {
+
+            if (line.isEmpty() || line.startsWith("//") || line.toLowerCase().startsWith("puzzleid")) {
                 continue;
             }
 
@@ -459,6 +597,7 @@ public class GameModel {
         if ("TP-TRAP-01".equals(player.getCurrentRoomId())) {
             return copyMonster("M-07");
         }
+
         return null;
     }
 
@@ -468,15 +607,19 @@ public class GameModel {
             return null;
         }
 
-        String rewardName = template.dropReward() == null ? "null" : template.dropReward().getItemName();
-
-        return new Monster(
+        Monster copy = new Monster(
                 template.getMonsterID(),
                 template.getName(),
                 template.getHp(),
-                template.getAttackValue(),
-                rewardName
+                template.getAttackValue()
         );
+
+        Item reward = template.dropReward();
+        if (reward != null) {
+            copy.setRewardItemName(reward.getItemName());
+        }
+
+        return copy;
     }
 
     private Puzzle createPuzzleById(String puzzleID) {
@@ -519,6 +662,24 @@ public class GameModel {
             Puzzle4Sacrifice p = (Puzzle4Sacrifice) puzzle;
             if (p.isCombatTriggered()) {
                 return p.getFailureMonster();
+            }
+        }
+
+        if (puzzle instanceof Puzzle5Commitment) {
+            Puzzle5Commitment p = (Puzzle5Commitment) puzzle;
+            if (p.isCombatTriggered()) {
+                Monster monster = p.getPursuerMonster();
+                p.clearCombatTrigger();
+                return monster;
+            }
+        }
+
+        if (puzzle instanceof Puzzle7AwarenessTrap) {
+            Puzzle7AwarenessTrap p = (Puzzle7AwarenessTrap) puzzle;
+            if (p.isCombatTriggered()) {
+                Monster monster = p.getFailureMonster();
+                p.clearCombatTrigger();
+                return monster;
             }
         }
 

@@ -77,7 +77,6 @@ public class GameView {
         System.out.println("unequip [item]");
         System.out.println("inventory     - view inventory");
         System.out.println("status        - view player status");
-        System.out.println("fight         - start combat if a monster is present");
         System.out.println("save          - save the game");
         System.out.println("load          - load the game");
         System.out.println("exit          - quit the game");

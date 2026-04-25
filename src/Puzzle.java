@@ -65,7 +65,8 @@ public abstract class Puzzle {
         rewardEarned = true;
 
         return completionMessage
-                + "\nYou have completed the " + trialName + " and have been teleported to the entrance zone!"
+                + "\nYou have completed the " + trialName + "!"
+                + "\nYou have been teleported back to the Main Hall."
                 + "\nYou get +1 Max HP, Trial Token, full HP restore.";
     }
 

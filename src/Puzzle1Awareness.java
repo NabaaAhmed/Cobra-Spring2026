@@ -33,7 +33,7 @@ public class Puzzle1Awareness extends Puzzle {
         String cmd = command.trim().toLowerCase();
 
         if (awaitingEnterChoice) {
-            if (cmd.equals("enter") || cmd.equals("yes")) {
+            if (cmd.equals("enter") || cmd.equals("yes") || cmd.equals("enter teleporter")) {
                 return completeWithReward(player,
                         "The teleporter stabilizes and carries you safely away.");
             } else if (cmd.equals("no")) {
@@ -45,6 +45,7 @@ public class Puzzle1Awareness extends Puzzle {
             if (redGemTaken) {
                 return "You already picked up the glowing red gem.";
             }
+
             redGemTaken = true;
             return "You picked up the glowing red gem.";
         }
@@ -53,14 +54,16 @@ public class Puzzle1Awareness extends Puzzle {
             if (rubbleTaken) {
                 return "You already picked up the rubble.";
             }
+
             rubbleTaken = true;
             return "You picked up the rubble.";
         }
 
         if (cmd.equals("throw red gem") || cmd.equals("throw glowing red gem")) {
-            if (redGemTaken) {
+            if (!redGemTaken) {
                 return "You need to take the glowing red gem first.";
             }
+
             awaitingEnterChoice = true;
             return "The teleporter begins to stabilize.\n"
                     + "Enter to return to the entrance zone. Type <enter>.";
@@ -83,6 +86,17 @@ public class Puzzle1Awareness extends Puzzle {
 
         if (cmd.equals("inspect teleporter")) {
             return "The teleporter crackles violently. It looks unstable and seems to need the correct item.";
+        }
+
+        if (cmd.equals("enter") || cmd.equals("enter teleporter")) {
+            player.setCurrentRoomId("TP-TRAP-01");
+            isFinished = true;
+            trialComplete = true;
+            rewardEarned = false;
+
+            return "You enter the unstable teleporter before stabilizing it.\n"
+                    + "The dungeon twists around you and throws you into the trap room.\n"
+                    + "You have completed the Trial of Awareness. (No Reward)";
         }
 
         return "Invalid command.";
