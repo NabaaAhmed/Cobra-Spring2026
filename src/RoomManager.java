@@ -18,7 +18,7 @@ public class RoomManager {
 
         ArrayList<String[]> rawData = new ArrayList<>();
 
-        for (int i = 1; i < lines.length; i++) {
+        for (int i = 0; i < lines.length; i++) {
             String line = lines[i].trim();
             if (line.isEmpty()||line.startsWith("//")) {
                 continue;
