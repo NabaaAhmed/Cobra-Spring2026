@@ -1,3 +1,4 @@
+//danny
 public class Puzzle4Sacrifice extends Puzzle {
     private boolean swordTaken;
     private boolean reachedBridge;

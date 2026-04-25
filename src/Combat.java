@@ -1,3 +1,4 @@
+//nabaa
 import java.util.Scanner;
 
 public class Combat {

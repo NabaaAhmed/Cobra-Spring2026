@@ -1,3 +1,4 @@
+//nabaa
 public class Puzzle6FinalTrial extends Puzzle {
     private boolean chestBurned;
     private boolean fireExtinguished;

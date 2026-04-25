@@ -1,3 +1,4 @@
+
 public class Puzzle3Trust extends Puzzle {
     private boolean guardianBroken;
     private boolean chestAppeared;

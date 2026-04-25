@@ -1,3 +1,4 @@
+//team
 import java.util.HashMap;
 
 public class GameModel {
@@ -87,7 +88,7 @@ public class GameModel {
             Room current = roomManager.getCurrentRoom();
 
             if (index < 0 || index >= current.getConnections().size()) {
-                GameResult result = new GameResult("Invalid room connection.");
+                GameResult result = new GameResult("No current room loaded.");
                 result.setSuccess(false);
                 return result;
             }

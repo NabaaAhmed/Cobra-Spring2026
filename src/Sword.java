@@ -1,3 +1,4 @@
+//mai
 public class Sword extends Item {
     private int damageBonus;
     private boolean equipped;
