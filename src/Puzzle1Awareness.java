@@ -58,10 +58,9 @@ public class Puzzle1Awareness extends Puzzle {
         }
 
         if (cmd.equals("throw red gem") || cmd.equals("throw glowing red gem")) {
-            if (!redGemTaken) {
+            if (redGemTaken) {
                 return "You need to take the glowing red gem first.";
             }
-
             awaitingEnterChoice = true;
             return "The teleporter begins to stabilize.\n"
                     + "Enter to return to the entrance zone. Type <enter>.";

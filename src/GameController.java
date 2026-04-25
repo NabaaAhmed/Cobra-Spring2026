@@ -120,10 +120,10 @@ public class GameController {
                 return;
 
             case "save":
-                view.displayError("You cannot save in the middle of a puzzle. Finish or fail the puzzle first.");                return;
+                displayResult(model.saveGame());
+                return;
 
             case "load":
-                model.clearActivePuzzle();
                 displayResult(model.loadGame());
                 view.displayMessage("");
                 view.displayMessage(model.lookRoom().getMessage());
@@ -365,9 +365,9 @@ public class GameController {
         view.displayMessage("load");
 
         if (puzzle instanceof Puzzle1Awareness) {
-            view.displayMessage("take red gem");
+            view.displayMessage("take glowing red gem");
             view.displayMessage("take rubble");
-            view.displayMessage("throw red gem");
+            view.displayMessage("throw glowing red gem");
             view.displayMessage("throw rubble");
             view.displayMessage("inspect teleporter");
             view.displayMessage("enter");
@@ -418,7 +418,6 @@ public class GameController {
             view.displayMessage("place core fragment");
             view.displayMessage("step symbol");
             view.displayMessage("throw final jewel");
-            view.displayMessage("throw stalker corpse");
             view.displayMessage("enter unstable teleporter");
             view.displayMessage("yes / no");
             return;

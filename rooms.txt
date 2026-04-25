@@ -1,26 +1,27 @@
 //id,name,description,exits/connections
 //Team
-EZ-01,Main Hall,"Large cracked hall. 5 teleporters in arc, each connected by a glowing line to a jewel embedded in the far wall. Jewel is immovable while any trial remains active.",EZ-02;AW-01;RS-01;TR-01;SC-01;CM-01;TP-TRAP-01;FN-01
-EZ-02,Hidden Bomb Room,"Small stone chamber accessed only after all 5 trials complete, by removing the wall jewel from EZ-01. Single pedestal. Heavy dust.",EZ-01
-AW-01,Awareness Antechamber,"Quiet entry room. Broken teleporter parts scattered. Wall inscription: 'Some exits are not given. They are rebuilt.' Examinables: broken crystal lens, burned wiring, stone manual fragments.",AW-02
-AW-02,Awareness Trial Room,"A strange teleporter sits in the room. A glowing red gem and rubble lie nearby.",EZ-01
-RS-01,Restraint Antechamber,"Dark chamber. Next chamber visible through iron bars, showing the chest within. Loose torch bracket.",RS-02
-RS-02,Restraint Trial Chamber,"Circular room. Normal golden chest in center. A coin visible on the floor nearby.",RS-03
-RS-03,Restraint Exit Corridor,"Plain corridor with a cracked wall and loose floor tiles.",EZ-01
-TR-01,Trust Antechamber,"Entry chamber. Guardian statue with faintly glowing eyes. Floor inscription: 'Trust the unguarded.'",TR-02
-TR-02,Guardian Chamber,"Guardian statue pointing toward a pedestal. A chest is hidden here.",TR-03
-TR-03,Trust Exit Hall,"Narrow hallway. Small alcove with nothing but dust.",EZ-01
-SC-01,Sacrifice Antechamber,"Valuable-looking sword with a faint glow on a pedestal.",SC-02
-SC-02,Long Bridge,"Windy stone bridge. A Golem is present here if not yet defeated.",SC-03
-SC-03,Wraith End,"End of the bridge. Broken lantern, carved pillar and loose stone tiles.",EZ-01
-CM-01,Commitment Entry,"Entry room. Inscription: 'Forward is safety.' Broken shelf. Smoke Bomb available on shelf.",CM-02
-CM-02,Dagger Chamber,"Pedestal with Jeweled Dagger.",CM-03
-CM-03,Chalice Hall,"Ornate Chalice on display. Side alcove with a Potion behind debris.",CM-04
-CM-04,Lens Storage,"Crystal Lens on display. Hanging tapestry and cracked walls.",CM-05
-CM-05,Idol Room,"Decorative Idol present. Breakable crate containing a Potion.",CM-06
-CM-06,Map Corridor,"Ancient Map on shelf. Loose bricks and broken statue.",CM-07
-CM-07,Commitment Exit,"Clean stone chamber. Safe.",EZ-01
-TP-TRAP-01,Trap Arena,"but teleporter appears calm and stable. Gem is dull with no glow. Rubble is neatly stacked. Room appears completely clean and safe.",EZ-01
-FN-01,Final Antechamber,"Minimal chamber. A statue of the Stalker stands near the entrance as a warning. Dust. Long silence. No items.",FN-02
-FN-02,The Last Mechanism,"A large chamber styled as a reward room. A chest, statue, cracked floor area, and unstable teleporter pad are here.",END-01,TP-TRAP-01
+id,name,description,exits/connections
+EZ-01,Main Hall,"Large cracked hall. Five teleporters stand in an arc, each connected by a glowing line to a jewel embedded in the far wall. The Final Trial path remains sealed until all five trials are complete.",EZ-02,AW-01,RS-01,TR-01,SC-01,CM-01,TP-TRAP-01,FN-01
+EZ-02,Hidden Bomb Room,"Small stone chamber accessed only after all five trials are complete. A single dusty pedestal holds an explosive device for the Final Trial.",EZ-01
+AW-01,Awareness Antechamber,"Quiet entry room. Broken teleporter parts are scattered across the floor. A wall inscription reads: 'Some exits are not given. They are rebuilt.'",EZ-01,AW-02
+AW-02,Awareness Trial Room,"A strange teleporter sits in the room. A glowing red gem and rubble lie nearby.",AW-01,EZ-01
+RS-01,Restraint Antechamber,"Dark chamber. The next chamber is visible through iron bars, showing the chest within. A loose torch bracket hangs from the wall.",EZ-01,RS-02
+RS-02,Restraint Trial Chamber,"Circular room. A normal golden chest sits in the center. A coin is visible on the floor nearby.",RS-01,RS-03
+RS-03,Restraint Exit Corridor,"Plain corridor with a cracked wall and loose floor tiles. It leads back toward the entrance zone.",RS-02,EZ-01
+TR-01,Trust Antechamber,"Entry chamber. A guardian statue with faintly glowing eyes watches the path ahead. The floor inscription reads: 'Trust the unguarded.'",EZ-01,TR-02
+TR-02,Guardian Chamber,"A guardian statue points toward a pedestal. A hidden chest waits here.",TR-01,TR-03
+TR-03,Trust Exit Hall,"Narrow hallway. A small alcove holds nothing but dust. The path leads back to the entrance zone.",TR-02,EZ-01
+SC-01,Sacrifice Antechamber,"A valuable-looking sword with a faint glow rests on a pedestal. The bridge ahead feels dangerous.",EZ-01,SC-02
+SC-02,Long Bridge,"A windy stone bridge stretches across a dark gap. The air feels heavier with each step.",SC-01,SC-03
+SC-03,Wraith End,"The end of the bridge. A broken lantern, carved pillar, and loose stone tiles mark the far side.",SC-02,EZ-01
+CM-01,Commitment Entry,"Entry room. An inscription reads: 'Forward is safety.' The corridor ahead feels urgent.",EZ-01,CM-02
+CM-02,Dagger Chamber,"A jeweled dagger rests on a pedestal. It looks valuable, but stopping here feels risky.",CM-01,CM-03
+CM-03,Chalice Hall,"An ornate chalice is displayed in the center of the room. Footsteps seem to echo from behind.",CM-02,CM-04
+CM-04,Lens Storage,"A crystal lens glows faintly on a shelf. The path ahead continues into darkness.",CM-03,CM-05
+CM-05,Idol Room,"A decorative idol rests near a cracked wall. The footsteps behind you sound closer.",CM-04,CM-06
+CM-06,Map Corridor,"An ancient map hangs from the wall. The exit is close, but hesitation feels dangerous.",CM-05,CM-07
+CM-07,Commitment Exit,"Clean stone chamber. Safe and quiet. The entrance zone is visible ahead.",CM-06,EZ-01
+TP-TRAP-01,Trap Trial,"A ruined chamber littered with debris and broken stone. An unstable teleporter frame offers a second chance.",EZ-01
+FN-01,Final Antechamber,"Minimal chamber. A statue of the Stalker stands near the entrance as a warning. Dust hangs in the silent air.",EZ-01,FN-02
+FN-02,The Last Mechanism,"A large chamber styled as a reward room. A chest, statue, cracked floor area, and unstable teleporter pad are here.",FN-01,END-01,TP-TRAP-01
 END-01,Ascension Chamber,"Bright chamber. A glowing jewel floats above the center. A pedestal holds the Catalyst.",0
