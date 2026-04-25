@@ -34,10 +34,13 @@ public class Puzzle7AwarenessTrap extends Puzzle {
             if (cmd.equals("yes") || cmd.equals("enter") || cmd.equals("enter teleporter")) {
                 return completeWithReward(player,
                         "The teleporter stabilizes and carries you safely away.");
-            } else if (cmd.equals("no")) {
-                return completeWithReward(player,
-                        "The teleporter remains stable, waiting for you to return to the entrance zone.");
             }
+
+            if (cmd.equals("no")) {
+                return completeWithReward(player,
+                        "The teleporter remains stable, and you return to the entrance zone to receive your reward.");
+            }
+
             return "Please answer yes or no.";
         }
 
@@ -50,6 +53,7 @@ public class Puzzle7AwarenessTrap extends Puzzle {
             if (rubbleTaken) {
                 return "You already picked up the rubble.";
             }
+
             rubbleTaken = true;
             return "You picked up the rubble.";
         }
@@ -58,6 +62,7 @@ public class Puzzle7AwarenessTrap extends Puzzle {
             if (redGemTaken) {
                 return "You already picked up the glowing red gem.";
             }
+
             redGemTaken = true;
             return "You picked up the glowing red gem.";
         }
