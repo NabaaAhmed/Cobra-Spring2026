@@ -20,6 +20,7 @@ public class GameController {
         view.displayMessage(model.lookRoom().getMessage());
 
         while (isRunning) {
+            //command prompt
             view.displayMessage("");
             view.displayMessage("Enter command:");
             System.out.print("> ");

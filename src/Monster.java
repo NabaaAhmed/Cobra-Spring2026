@@ -43,10 +43,6 @@ public class Monster {
         this.rewardItemName = rewardItemName;
     }
 
-    public void setRewardItemName(String rewardItemName) {
-        this.rewardItemName = rewardItemName;
-    }
-
     public void attack(Player player) {
         player.takeDamage(attackValue);
     }
@@ -67,12 +63,12 @@ public class Monster {
 
         if (rewardItemName.equalsIgnoreCase("Potion")) {
             return new Potion("DROP-POTION", "Potion",
-                    "A small vial of restorative red liquid.", "0", true, 2);
+                    "A small vial of restorative red liquid.", "0", true, 9);
         }
 
         if (rewardItemName.toLowerCase().contains("sword")) {
             return new Sword("DROP-SWORD", rewardItemName,
-                    rewardItemName, "0", false, 2);
+                    rewardItemName, "0", false, 1);
         }
 
         return new QuestItems(
