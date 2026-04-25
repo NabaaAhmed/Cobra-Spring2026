@@ -1,4 +1,3 @@
-
 public class Puzzle3Trust extends Puzzle {
     private boolean guardianBroken;
     private boolean chestAppeared;
@@ -35,6 +34,24 @@ public class Puzzle3Trust extends Puzzle {
                 + "Sometimes trust must be placed in action, not reward.";
     }
 
+    private String completeTrustWithRewardToExitHall(Player player, String completionMessage) {
+        player.modifyMaxHP(1);
+        player.heal(player.getMaxHP());
+        player.addTrialToken();
+
+        player.setCurrentRoomId("TR-03");
+
+        isSolved = true;
+        isFinished = true;
+        trialComplete = true;
+        rewardEarned = true;
+
+        return completionMessage
+                + "\nYou have completed the Trial of Trust!"
+                + "\nYou get +1 Max HP, Trial Token, full HP restore."
+                + "\nA safe path opens into the Trust Exit Hall.";
+    }
+
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) {
@@ -44,10 +61,16 @@ public class Puzzle3Trust extends Puzzle {
         String cmd = command.trim().toLowerCase();
 
         if (awaitingChoice) {
-            if (cmd.equals("yes") || cmd.equals("no")) {
-                return completeWithReward(player,
+            if (cmd.equals("yes") || cmd.equals("enter") || cmd.equals("enter teleporter")) {
+                return completeTrustWithRewardToExitHall(player,
                         "You saw through the illusion and made the right choice.");
             }
+
+            if (cmd.equals("no")) {
+                return completeTrustWithRewardToExitHall(player,
+                        "You choose not to leave immediately, but the trial has accepted your decision.");
+            }
+
             return "Please answer yes or no.";
         }
 
@@ -65,6 +88,7 @@ public class Puzzle3Trust extends Puzzle {
             if (!chestAppeared) {
                 return "There is no chest here yet.";
             }
+
             return "The chest looks tempting, but something about it feels wrong.";
         }
 
@@ -84,8 +108,10 @@ public class Puzzle3Trust extends Puzzle {
             }
 
             player.takeDamage(1);
+
             failureMonster = new Monster("M-02", "Guardian", 2, 1);
             failureMonster.setRewardItemName("Silver Sigil");
+
             combatTriggered = true;
             isFinished = true;
             trialComplete = true;
