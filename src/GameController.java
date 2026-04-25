@@ -67,17 +67,7 @@ public class GameController {
 
                 if (result.isSuccess()) {
                     view.displayMessage(model.lookRoom().getMessage());
-
-                    if (!model.getPlayer().isAlive()) {
-                        return;
-                    }
-
-                    GameResult puzzleResult = model.autoStartPuzzleIfPresent();
-                    if (puzzleResult != null && puzzleResult.isPuzzleStarted()) {
-                        view.displayMessage("");
-                        view.displayMessage(puzzleResult.getMessage());
-                        printPuzzleHelp(puzzleResult.getPuzzle());
-                    }
+                    autoStartPuzzleAfterMove();
                 }
                 return;
 
@@ -125,8 +115,6 @@ public class GameController {
 
             case "load":
                 displayResult(model.loadGame());
-                view.displayMessage("");
-                view.displayMessage(model.lookRoom().getMessage());
                 return;
 
             case "exit":
@@ -172,8 +160,50 @@ public class GameController {
             return;
         }
 
-        // Allow normal item commands even while a puzzle is active.
-        // This lets the player pick up potions, consume potions, equip swords, etc.
+        if (command.equalsIgnoreCase("save")) {
+            displayResult(model.saveGame());
+            return;
+        }
+
+        if (command.equalsIgnoreCase("load")) {
+            displayResult(model.loadGame());
+            return;
+        }
+
+        if (command.equalsIgnoreCase("exit")) {
+            view.displayMessage("Exiting game.");
+            isRunning = false;
+            return;
+        }
+
+        if (command.equalsIgnoreCase("fight") || command.equalsIgnoreCase("startcombat")) {
+            GameResult fightResult = model.startCombatForCurrentRoom();
+            displayResult(fightResult);
+
+            if (fightResult.isCombatStarted()) {
+                runCombat(fightResult.getMonster());
+            }
+            return;
+        }
+
+        if (isNumberMoveCommand(command)) {
+            GameResult moveResult = model.move(command);
+            displayResult(moveResult);
+
+            if (moveResult.isSuccess()) {
+                view.displayMessage(model.lookRoom().getMessage());
+                autoStartPuzzleAfterMove();
+            }
+            return;
+        }
+
+        GameResult puzzleResult = model.handlePuzzleCommand(command);
+
+        if (!puzzleResult.getMessage().equalsIgnoreCase("Invalid command.")) {
+            handlePuzzleResult(puzzleResult);
+            return;
+        }
+
         if (action.equals("take")) {
             displayResult(model.takeItem(command));
             return;
@@ -189,44 +219,38 @@ public class GameController {
             return;
         }
 
-        if (command.equalsIgnoreCase("save")) {
-            view.displayError("You cannot save in the middle of a puzzle. Finish or fail the puzzle first.");
-            return;
+        displayResult(puzzleResult);
+    }
+
+    private boolean isNumberMoveCommand(String command) {
+        String[] parts = command.trim().split(" ");
+
+        if (parts.length != 2) {
+            return false;
         }
 
-        if (command.equalsIgnoreCase("load")) {
-            model.clearActivePuzzle();
-            displayResult(model.loadGame());
-            view.displayMessage("");
-            view.displayMessage(model.lookRoom().getMessage());
-            return;
+        if (!parts[0].equalsIgnoreCase("move")) {
+            return false;
         }
 
-        if (command.equalsIgnoreCase("fight") || command.equalsIgnoreCase("startcombat")) {
-            GameResult fightResult = model.startCombatForCurrentRoom();
-            displayResult(fightResult);
-
-            if (fightResult.isCombatStarted()) {
-                runCombat(fightResult.getMonster());
-            }
-            return;
+        try {
+            Integer.parseInt(parts[1]);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
+    }
 
-        if (command.equalsIgnoreCase("exit")) {
-            view.displayMessage("Exiting game.");
-            isRunning = false;
-            return;
-        }
-
-        GameResult result = model.handlePuzzleCommand(command);
-        displayResult(result);
-
+    private void handlePuzzleResult(GameResult result) {
         if (result.isCombatStarted()) {
+            view.displayMessage(result.getMessage());
             runCombat(result.getMonster());
 
             if (model.getActivePuzzle() == null || !model.getPlayer().isAlive()) {
                 return;
             }
+        } else {
+            displayResult(result);
         }
 
         if (result.isPuzzleFinished()) {
@@ -243,24 +267,27 @@ public class GameController {
                 return;
             }
 
-            view.displayMessage("");
-
             if (completedTrial) {
-                view.displayMessage("Puzzle complete.");
-            } else {
-                view.displayMessage("Puzzle ended.");
-            }
-
-            view.displayMessage(model.showStatus().getMessage());
-            view.displayMessage("");
-            view.displayMessage(model.lookRoom().getMessage());
-
-            GameResult nextPuzzle = model.autoStartPuzzleIfPresent();
-            if (nextPuzzle != null && nextPuzzle.isPuzzleStarted()) {
                 view.displayMessage("");
-                view.displayMessage(nextPuzzle.getMessage());
-                printPuzzleHelp(nextPuzzle.getPuzzle());
+                view.displayMessage("Puzzle complete.");
+                view.displayMessage(model.showStatus().getMessage());
             }
+
+            autoStartPuzzleAfterMove();
+        }
+    }
+
+    private void autoStartPuzzleAfterMove() {
+        if (!model.getPlayer().isAlive()) {
+            return;
+        }
+
+        GameResult puzzleResult = model.autoStartPuzzleIfPresent();
+
+        if (puzzleResult != null && puzzleResult.isPuzzleStarted()) {
+            view.displayMessage("");
+            view.displayMessage(puzzleResult.getMessage());
+            printPuzzleHelp(puzzleResult.getPuzzle());
         }
     }
 
@@ -286,12 +313,7 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
-
                 view.displayMessage("You have completed the Trial of Restraint and returned to the entrance zone. (No Reward)");
-                view.displayMessage("");
-                view.displayMessage(model.showStatus().getMessage());
-                view.displayMessage("");
-                view.displayMessage(model.lookRoom().getMessage());
                 return;
             }
 
@@ -300,12 +322,7 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
-
                 view.displayMessage("You have completed the Trial of Trust. (No Reward)");
-                view.displayMessage("");
-                view.displayMessage(model.showStatus().getMessage());
-                view.displayMessage("");
-                view.displayMessage(model.lookRoom().getMessage());
                 return;
             }
 
@@ -314,12 +331,20 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
-
                 view.displayMessage("You have completed the Trial of Sacrifice. (No Reward)");
-                view.displayMessage("");
-                view.displayMessage(model.showStatus().getMessage());
-                view.displayMessage("");
-                view.displayMessage(model.lookRoom().getMessage());
+                return;
+            }
+
+            if (activePuzzleBeforeCombat instanceof Puzzle5Commitment) {
+                Puzzle5Commitment commitment = (Puzzle5Commitment) activePuzzleBeforeCombat;
+                view.displayMessage(commitment.finishAfterPursuerDefeated(model.getPlayer()));
+
+                if (model.getPlayer().isAlive()) {
+                    model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
+                    model.getPlayer().setCurrentRoomId("EZ-01");
+                    model.getRoomManager().setRoom("EZ-01");
+                    model.clearActivePuzzle();
+                }
                 return;
             }
 
@@ -361,6 +386,7 @@ public class GameController {
         view.displayMessage("consume [item]");
         view.displayMessage("equip [item]");
         view.displayMessage("unequip [item]");
+        view.displayMessage("move [number]");
         view.displayMessage("save");
         view.displayMessage("load");
 
@@ -388,6 +414,7 @@ public class GameController {
             view.displayMessage("inspect chest");
             view.displayMessage("destroy chest");
             view.displayMessage("open chest");
+            view.displayMessage("yes / no");
             return;
         }
 
@@ -418,6 +445,7 @@ public class GameController {
             view.displayMessage("place core fragment");
             view.displayMessage("step symbol");
             view.displayMessage("throw final jewel");
+            view.displayMessage("throw stalker corpse");
             view.displayMessage("enter unstable teleporter");
             view.displayMessage("yes / no");
             return;

@@ -36,6 +36,11 @@ public class Monster {
     public void takeDamage(int dmg) {
         hp -= dmg;
         if (hp < 0) hp = 0;
+
+    }
+
+    public void setRewardItemName(String rewardItemName) {
+        this.rewardItemName = rewardItemName;
     }
 
     public void setRewardItemName(String rewardItemName) {

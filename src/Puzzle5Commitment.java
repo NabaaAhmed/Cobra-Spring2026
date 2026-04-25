@@ -3,12 +3,37 @@ public class Puzzle5Commitment extends Puzzle {
     private int forwardMoves;
     private int takeCount;
     private boolean awaitingChoice;
+    private boolean combatTriggered;
+    private Monster pursuerMonster;
 
     public Puzzle5Commitment() {
         super("PZ-05", "Trial of Commitment", "CM-01");
         this.forwardMoves = 0;
         this.takeCount = 0;
         this.awaitingChoice = false;
+        this.combatTriggered = false;
+        this.pursuerMonster = null;
+    }
+
+    public boolean isCombatTriggered() {
+        return combatTriggered;
+    }
+
+    public Monster getPursuerMonster() {
+        return pursuerMonster;
+    }
+
+    public void clearCombatTrigger() {
+        combatTriggered = false;
+        pursuerMonster = null;
+    }
+
+    public String finishAfterPursuerDefeated(Player player) {
+        player.takeDamage(1);
+        return completeNoReward(player,
+                "You killed the Pursuer, but it implodes and destroys the path forward.\n"
+                        + "You lose 1 HP.\n"
+                        + "You have completed the Trial of Commitment. (No Reward)");
     }
 
     @Override
@@ -31,10 +56,11 @@ public class Puzzle5Commitment extends Puzzle {
         String cmd = command.trim().toLowerCase();
 
         if (awaitingChoice) {
-            if (cmd.equals("yes") || cmd.equals("no")) {
+            if (cmd.equals("yes") || cmd.equals("no") || cmd.equals("enter") || cmd.equals("enter teleporter")) {
                 return completeWithReward(player,
                         "You stayed the course. Commitment proven.");
             }
+
             return "Please answer yes or no.";
         }
 
@@ -51,12 +77,12 @@ public class Puzzle5Commitment extends Puzzle {
 
         if (cmd.equals("examine item") || cmd.equals("inspect item")) {
             player.takeDamage(1);
-            player.setCurrentRoomId("EZ-01");
-            isFinished = true;
-            trialComplete = false;
-            rewardEarned = false;
-            return "You hesitated for too long. The Pursuer catches you and you lose 1 HP.\n"
-                    + "You have failed the Trial of Commitment. You must try again.";
+            pursuerMonster = new Monster("M-05", "Pursuer", 2, 1);
+            combatTriggered = true;
+
+            return "You hesitated for too long. The Pursuer catches you!\n"
+                    + "You lose 1 HP.\n"
+                    + "It charges at you with relentless fury.";
         }
 
         if (cmd.equals("take item")) {
@@ -64,22 +90,23 @@ public class Puzzle5Commitment extends Puzzle {
 
             if (takeCount >= 2) {
                 player.takeDamage(1);
-                player.setCurrentRoomId("EZ-01");
-                isFinished = true;
-                trialComplete = false;
-                rewardEarned = false;
-                return "You slowed down for too long. The Pursuer catches you and you lose 1 HP.\n"
-                        + "You have failed the Trial of Commitment. You must try again.";
+                pursuerMonster = new Monster("M-05", "Pursuer", 2, 1);
+                combatTriggered = true;
+
+                return "You slowed down for too long. The Pursuer catches you!\n"
+                        + "You lose 1 HP.\n"
+                        + "It charges at you with relentless fury.";
             }
 
             return "You stop to take an item. The Pursuer gets closer.";
         }
 
-        if (cmd.equals("kill pursuer")) {
-            player.takeDamage(1);
-            return completeNoReward(player,
-                    "You kill the Pursuer. BOOM! It implodes, destroys the path behind you, and you lose 1 HP.\n"
-                            + "You have completed the Trial of Commitment. (No Reward)");
+        if (cmd.equals("kill pursuer") || cmd.equals("attack pursuer")) {
+            pursuerMonster = new Monster("M-05", "Pursuer", 2, 1);
+            combatTriggered = true;
+
+            return "You turn to face the Pursuer!\n"
+                    + "It charges at you with relentless fury.";
         }
 
         return "Invalid command.";

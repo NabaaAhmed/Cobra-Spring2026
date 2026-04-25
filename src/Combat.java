@@ -72,6 +72,9 @@ public class Combat {
         enemy.onEncounter(player);
         view.displayCombat("A " + enemy.getName() + " appears!");
 
+        // CHANGE #1: Track if sword was used during combat
+        boolean swordWasUsed = false;
+
         while (!isBattleOver()) {
             view.displayCombat("Turn " + turnCount);
             view.displayCombat("Type: attack, or consume potion");
@@ -79,12 +82,33 @@ public class Combat {
             String command = input.nextLine().trim();
             String result = action(command);
             view.displayCombat(result);
+
+            // CHANGE #2: Check if sword was used to kill the monster
+            if (result.contains("sword cuts through")) {
+                swordWasUsed = true;
+            }
         }
 
         if (!player.isAlive()) {
             view.displayCombat("You died.");
         } else {
             view.displayCombat("Monster defeated!");
+
+            // CHANGE #3: Remove sword after combat if it was used (durability = 1)
+            if (swordWasUsed) {
+                Item swordToRemove = null;
+                for (Item item : player.getInventory()) {
+                    if (item.getItemName() != null &&
+                            item.getItemName().toLowerCase().contains("sword")) {
+                        swordToRemove = item;
+                        break;
+                    }
+                }
+                if (swordToRemove != null) {
+                    player.removeItem(swordToRemove);
+                    view.displayCombat("The sword crumbles after its powerful strike.");
+                }
+            }
         }
     }
 }
