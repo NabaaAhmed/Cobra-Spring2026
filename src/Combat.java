@@ -37,7 +37,7 @@ public class Combat {
                 result += "You and " + enemy.getName() + " clash.\n";
                 result += "Both of you take damage in the struggle.\n";
             }
-        } else if (command.equalsIgnoreCase("use potion") || command.equalsIgnoreCase("consume potion")) {
+        } else if (command.equalsIgnoreCase("consume potion")) {
             Item potion = player.findItemByName("Potion");
             if (potion == null) {
                 return "You do not have a potion.\n";
@@ -74,7 +74,7 @@ public class Combat {
 
         while (!isBattleOver()) {
             view.displayCombat("Turn " + turnCount);
-            view.displayCombat("Type: attack, use potion, or consume potion");
+            view.displayCombat("Type: attack, or consume potion");
 
             String command = input.nextLine().trim();
             String result = action(command);
