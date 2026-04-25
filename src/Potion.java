@@ -7,7 +7,7 @@ public class Potion extends Item {
     }
 
     public Potion(String itemId, String itemName, String description, boolean stackable, int healAmount) {
-        super(itemId, itemName, description, stackable);
+        super(itemId, itemName, description, "0", stackable);
         this.healAmount = healAmount;
     }
 

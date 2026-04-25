@@ -132,6 +132,10 @@ public class Player {
         return currentHP - before;
     }
 
+    public void fullHeal() {
+        this.currentHP = this.maxHP;
+    }
+
     public void modifyMaxHP(int amount) {
         maxHP += amount;
 

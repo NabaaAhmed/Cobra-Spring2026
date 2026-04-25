@@ -15,6 +15,10 @@ public abstract class Item {
         this.inPlayerInventory = false;
     }
 
+    public Item(String itemId, String itemName, String description, Boolean stackable) {
+        this(itemId, itemName, description, null, stackable);
+    }
+
     public String getItemId() {
         return itemId;
     }
