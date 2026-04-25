@@ -1,78 +1,70 @@
+//Mai
 public abstract class Item {
     private String itemId;
     private String itemName;
     private String description;
-    private String roomId;
-    private Boolean stackable;
+    private String roomID;
+    private boolean stackable;
     private boolean inPlayerInventory;
 
-    public Item(String itemId, String itemName, String description, String roomId, Boolean stackable) {
+    // Item constructor
+    public Item(String itemId, String itemName, String description, String roomID, boolean stackable) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.description = description;
-        this.roomId = roomId;
+        this.roomID = roomID;
         this.stackable = stackable;
         this.inPlayerInventory = false;
     }
 
-    public Item(String itemId, String itemName, String description, Boolean stackable) {
-        this(itemId, itemName, description, null, stackable);
-    }
-
+    // Getter for itemId
     public String getItemId() {
         return itemId;
     }
 
+    // Getter and setter for name
     public String getItemName() {
         return itemName;
     }
 
-    public void setItemName(String name) {
-        this.itemName = name;
+    public boolean matchesName(String candidate) {
+        if (candidate == null || itemName == null) {
+            return false;
+        }
+        return itemName.equalsIgnoreCase(candidate.trim());
     }
 
+    // Getter for description
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+
+    public boolean isInRoom(String roomId) {
+        if (roomId == null || roomID == null) {
+            return false;
+        }
+        return !inPlayerInventory && roomID.equalsIgnoreCase(roomId.trim());
     }
 
-    public String getRoomID() {
-        return roomId;
-    }
-
-    public void setRoomID(String roomID) {
-        this.roomId = roomID;
-    }
-
-    public Boolean getStackable() {
-        return stackable;
-    }
-
-    public void setStackable(Boolean stackable) {
-        this.stackable = stackable;
-    }
-
-    public boolean isInPlayerInventory() {
-        return inPlayerInventory;
-    }
-
+    // Method to move item to inventory
     public void moveToInventory() {
         this.inPlayerInventory = true;
-        this.roomId = null;
+        this.roomID = null;
     }
 
+    // Method to move item to a room
     public void moveToRoom(String roomID) {
         this.inPlayerInventory = false;
-        this.roomId = roomID;
+        this.roomID = roomID;
     }
 
-    public abstract void use(Player player);
+    public abstract void use(Player player); // Abstract method to be implemented by specific item types
 
+
+    //toString method
     @Override
     public String toString() {
-        return itemName + ": " + description;
+        return getItemName() + ": " + description;
     }
 }

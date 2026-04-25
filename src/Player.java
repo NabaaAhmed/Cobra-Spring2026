@@ -1,32 +1,25 @@
+//Danny Class
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Player {
-    private String currentRoomId;
+    private String currentRoomID;
     private int maxHP;
     private int currentHP;
     private ArrayList<Item> inventory;
     private int attackPower;
     private int trialTokens;
-    private HashSet<String> completedTrials;
 
-    public Player(String startingRoomId) {
-        this.currentRoomId = startingRoomId;
+    public Player(String startingRoomID) {
+        this.currentRoomID = startingRoomID;
         this.maxHP = 5;
         this.currentHP = 5;
         this.inventory = new ArrayList<>();
         this.attackPower = 1;
         this.trialTokens = 0;
-        this.completedTrials = new HashSet<>();
-    }
-
-    public String getCurrentRoomId() {
-        return currentRoomId;
     }
 
     public String getCurrentRoomID() {
-        return getCurrentRoomId();
+        return currentRoomID;
     }
 
     public int getCurrentHP() {
@@ -53,30 +46,42 @@ public class Player {
         return trialTokens;
     }
 
-    public Set<String> getCompletedTrials() {
-        return completedTrials;
-    }
-
-    public void setCurrentRoomId(String currentRoomId) {
-        this.currentRoomId = currentRoomId;
-    }
-
-    public void setCurrentRoomID(String currentRoomId) {
-        setCurrentRoomId(currentRoomId);
+    public void setCurrentRoomID(String currentRoomID) {
+        this.currentRoomID = currentRoomID;
     }
 
     public void setAttackPower(int attackPower) {
         this.attackPower = attackPower;
     }
 
-    public void moveToRoom(String roomId) {
-        this.currentRoomId = roomId;
+    public void setMaxHP(int MaxHP){
+        this.maxHP = maxHP;
     }
 
-    public void addItem(Item item) {
-        if (item == null) return;
-        inventory.add(item);
-        item.moveToInventory();
+    public void setCurrentHP(int currentHP) {
+        this.currentHP = currentHP;
+    }
+
+    public void moveToRoom(String newRoomID) {
+        this.currentRoomID = newRoomID;
+    }
+
+    //Inventory methods -Mai
+    public void takeItem(Item item, Room currentRoomObj) {
+        if (item.getItemName() == null || currentRoomObj == null) {
+            System.out.println("Invalid pickup request.");
+            return;
+        }
+
+        Item itemToPick = currentRoomObj.findItemInRoom(item.values(), itemName);
+
+        if (itemToPick == null) {
+            System.out.println("This item is not available in the current room.");
+            return;
+        }
+
+        currentRoomObj.addItem(itemToPick);
+        System.out.println(itemToPick.getItemName() + " was picked up and added to inventory.");
     }
 
     public void removeItem(Item item) {
@@ -84,6 +89,14 @@ public class Player {
         inventory.remove(item);
     }
 
+    public boolean dropItem(Item item, Room room) {
+        if (item == null || room == null || !inventory.contains(item)) {
+            return false;
+        }
+        inventory.remove(item);
+        item.moveToRoom(room.getRoomID());
+        return true;
+    }
     public Item findItemByName(String itemName) {
         if (itemName == null) return null;
 
@@ -96,29 +109,13 @@ public class Player {
         return null;
     }
 
+    //Using methods -Mai
     public boolean useItem(String itemName) {
         Item item = findItemByName(itemName);
         if (item == null) return false;
 
         item.use(this);
         return true;
-    }
-
-    public boolean hasSword() {
-        for (Item item : inventory) {
-            if (item.getItemName() != null &&
-                    item.getItemName().toLowerCase().contains("sword")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void takeDamage(int damage) {
-        currentHP -= damage;
-        if (currentHP < 0) {
-            currentHP = 0;
-        }
     }
 
     public int heal(int amount) {
@@ -132,19 +129,38 @@ public class Player {
         return currentHP - before;
     }
 
-    public void fullHeal() {
-        this.currentHP = this.maxHP;
+    public boolean hasSword() {
+        for (Item item : inventory) {
+            if (item.getItemName() != null &&
+                    item.getItemName().toLowerCase().contains("sword")) {
+                return true;
+            }
+        }
+        return false;
     }
+
+    public boolean unequipWeapon(String itemName) {
+        Item item = findItemByName(itemName);
+        if (item instanceof Sword) {
+            ((Sword) item).unequip(this);
+            return true;
+        }
+        return false;
+    }
+
+    public void takeDamage(int damage) {
+        currentHP -= damage;
+        if (currentHP < 0) {
+            currentHP = 0;
+        }
+    }
+
 
     public void modifyMaxHP(int amount) {
         maxHP += amount;
 
         if (maxHP < 1) {
             maxHP = 1;
-        }
-
-        if (maxHP > 10) {
-            maxHP = 10;
         }
 
         if (currentHP > maxHP) {
@@ -157,9 +173,7 @@ public class Player {
     }
 
     public void addTrialToken() {
-        if (trialTokens < 5) {
-            trialTokens++;
-        }
+        trialTokens++;
     }
 
     public void removeTrialToken() {
@@ -168,11 +182,8 @@ public class Player {
         }
     }
 
-    public boolean hasCompletedTrial(String trialKey) {
-        return completedTrials.contains(trialKey);
-    }
-
-    public void markTrialCompleted(String trialKey) {
-        completedTrials.add(trialKey);
+    public void attack(Monster monster) {
+        if (monster == null) return;
+        monster.takeDamage(attackPower);
     }
 }

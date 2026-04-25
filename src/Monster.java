@@ -1,77 +1,82 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Monster {
-    private String monsterID;
+    private String id;
     private String name;
     private int hp;
     private int attackValue;
-    private String rewardItemName;
+    private boolean canAmbush;
+    private List<Item> rewards;
+    private boolean isAlive;
 
-    public Monster(String monsterID, String name, int hp, int attackValue, String rewardItemName) {
-        this.monsterID = monsterID;
+    public Monster(String name, int hp, int attackValue, boolean canAmbush) {
+        this.id = id;
         this.name = name;
         this.hp = hp;
         this.attackValue = attackValue;
-        this.rewardItemName = rewardItemName;
+        this.canAmbush = canAmbush;
+        this.rewards = new ArrayList<>();
+        this.isAlive = true;
     }
 
-    public String getMonsterID() {
-        return monsterID;
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public int getHp() { return hp; }
+    public int getAttackValue() { return attackValue; }
+    public boolean isAlive() { return isAlive && hp > 0; }
+
+    public void takeDamage(int amount) {
+        hp -= amount;
+        if (hp <= 0) {
+            isAlive = false;
+            hp = 0;
+        }
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getHp() {
-        return hp;
-    }
-
-    public int getAttackValue() {
-        return attackValue;
-    }
-
-    public boolean isAlive() {
-        return hp > 0;
-    }
-
-    public void takeDamage(int dmg) {
-        hp -= dmg;
-        if (hp < 0) hp = 0;
-    }
-
-    public void attack(Player player) {
-        player.takeDamage(attackValue);
-    }
-
+    /**
+     * Clash combat - both player and monster take damage
+     */
     public void clash(Player player) {
+        // Monster damages player
         player.takeDamage(attackValue);
-        this.takeDamage(1);
+        // Player damages monster
+        this.takeDamage(player.getAttackPower());
     }
 
+    /**
+     * Pre-emptive ambush attack before combat begins when player encounters monster
+     */
     public void onEncounter(Player player) {
-        // kept empty on purpose
+        if (canAmbush) {
+            player.takeDamage(attackValue);
+        }
     }
 
-    public Item dropReward() {
-        if (rewardItemName == null || rewardItemName.equalsIgnoreCase("null")) {
-            return null;
+    public void addReward(Item item) {
+        if (item != null) {
+            rewards.add(item);
         }
+    }
 
-        if (rewardItemName.equalsIgnoreCase("Potion")) {
-            return new Potion("DROP-POTION", "Potion",
-                    "A small vial of restorative red liquid.", "0", true, 2);
+    public void addRewards(List<Item> items) {
+        if (items != null) {
+            rewards.addAll(items);
         }
+    }
 
-        if (rewardItemName.toLowerCase().contains("sword")) {
-            return new Sword("DROP-SWORD", rewardItemName,
-                    rewardItemName, "0", false, 2);
-        }
+    public List<Item> dropLoot() {
+        List<Item> dropped = new ArrayList<>(rewards);
+        rewards.clear();
+        return dropped;
+    }
 
-        return new QuestItems(
-                "DROP-" + rewardItemName.toUpperCase().replace(" ", "_"),
-                rewardItemName,
-                rewardItemName,
-                "0",
-                false
-        );
+    public void setRewards(List<Item> rewards) {
+        this.rewards = rewards != null ? rewards : new ArrayList<>();
+    }
+
+    public void reset() {
+        isAlive = true;
+        // Note: hp reset would need original HP stored
     }
 }
