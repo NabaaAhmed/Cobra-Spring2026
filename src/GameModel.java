@@ -186,7 +186,9 @@ public class GameModel {
             if (destinationTrial != null
                     && player.hasCompletedTrial(destinationTrial)
                     && !destinationId.equals("TP-TRAP-01")
-                    && !destinationId.equals("END-01")) {
+                    && !destinationId.equals("END-01")
+                    && !destinationId.equals("FN-01")
+                    && !destinationId.equals("FN-02")) {
                 GameResult result = new GameResult("That trial has already been completed.");
                 result.setSuccess(false);
                 return result;
@@ -535,12 +537,12 @@ public class GameModel {
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i].trim();
 
-            if (line.isEmpty() || line.startsWith("//") || line.toLowerCase().startsWith("monsterid")) {
+            if (line.isEmpty() || line.startsWith("//") || line.toLowerCase().startsWith("id,")) {
                 continue;
             }
 
             String[] parts = line.split(",");
-            if (parts.length < 4) {
+            if (parts.length < 5) {
                 continue;
             }
 
@@ -550,13 +552,16 @@ public class GameModel {
             int atkValue = Integer.parseInt(parts[3].trim());
 
             Monster monster = new Monster(monsterID, name, hp, atkValue);
+            monsterTemplates.put(monsterID,monster);
 
-            if (pendingRewards.containsKey(monsterID)) {
+            if(pendingRewards.containsKey(monsterID))
+
+            {
                 Item reward = pendingRewards.get(monsterID);
                 monster.setRewardItemName(reward.getItemName());
             }
 
-            monsterTemplates.put(monsterID, monster);
+            monsterTemplates.put(monsterID,monster);
         }
     }
 
@@ -596,20 +601,19 @@ public class GameModel {
         if (template == null) {
             return null;
         }
-
-        Monster copy = new Monster(
+        return new Monster(
                 template.getMonsterID(),
                 template.getName(),
                 template.getHp(),
                 template.getAttackValue()
         );
 
-        Item reward = template.dropReward();
-        if (reward != null) {
-            copy.setRewardItemName(reward.getItemName());
+        Item templateReward = template.dropReward();
+        if (templateReward != null) {
+            combatMonster.setRewardItemName(templateReward.getItemName());
         }
 
-        return copy;
+        return combatMonster;
     }
 
     private Puzzle createPuzzleById(String puzzleID) {
@@ -659,15 +663,6 @@ public class GameModel {
             Puzzle5Commitment p = (Puzzle5Commitment) puzzle;
             if (p.isCombatTriggered()) {
                 Monster monster = p.getPursuerMonster();
-                p.clearCombatTrigger();
-                return monster;
-            }
-        }
-
-        if (puzzle instanceof Puzzle7AwarenessTrap) {
-            Puzzle7AwarenessTrap p = (Puzzle7AwarenessTrap) puzzle;
-            if (p.isCombatTriggered()) {
-                Monster monster = p.getFailureMonster();
                 p.clearCombatTrigger();
                 return monster;
             }
