@@ -41,10 +41,6 @@ public class Combat {
             Item potion = player.findItemByName("Potion");
 
             if (potion == null) {
-                potion = player.findItemByName("Monster potion");
-            }
-
-            if (potion == null) {
                 return "You do not have a potion.\n";
             }
 

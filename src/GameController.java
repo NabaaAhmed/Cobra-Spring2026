@@ -170,13 +170,24 @@ public class GameController {
         }
 
         if (isNumberMoveCommand(command)) {
-            GameResult moveResult = model.move(command);
-            displayResult(moveResult);
+            if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
+                GameResult moveResult = model.move(command);
+                displayResult(moveResult);
 
-            if (moveResult.isSuccess()) {
-                view.displayMessage(model.lookRoom().getMessage());
-                autoStartPuzzleAfterMove();
+                if (moveResult.isSuccess()) {
+                    view.displayMessage(model.lookRoom().getMessage());
+
+                    Puzzle5Commitment commitment = (Puzzle5Commitment) model.getActivePuzzle();
+                    String movementResult = commitment.handleRoomMovement(model.getPlayer());
+
+                    if (movementResult != null && !movementResult.isEmpty()) {
+                        view.displayMessage(movementResult);
+                    }
+                }
+                return;
             }
+
+            view.displayError("Finish the active puzzle before using numbered movement.");
             return;
         }
 
@@ -186,8 +197,19 @@ public class GameController {
             handlePuzzleResult(puzzleResult);
             return;
         }
-
         if (action.equals("take")) {
+            if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
+                GameResult takeResult = model.takeItem(command);
+                displayResult(takeResult);
+
+                if (takeResult.isSuccess()) {
+                    GameResult takePuzzleResult = model.handlePuzzleCommand("take item");
+                    handlePuzzleResult(takePuzzleResult);
+                }
+
+                return;
+            }
+
             displayResult(model.takeItem(command));
             return;
         }
@@ -303,8 +325,10 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
-                view.displayMessage("You have completed the Trial of Restraint and returned to the entrance zone. (No Reward)");
+                view.displayMessage("You have completed the Trial of Restraint. (No Reward)");
+                view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
+
                 view.displayMessage("");
                 view.displayMessage(model.lookRoom().getMessage());
                 return;
@@ -316,6 +340,7 @@ public class GameController {
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed the Trial of Trust. (No Reward)");
+                view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
                 view.displayMessage("");
                 view.displayMessage(model.lookRoom().getMessage());
@@ -328,6 +353,7 @@ public class GameController {
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
                 view.displayMessage("You have completed the Trial of Sacrifice. (No Reward)");
+                view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
                 view.displayMessage("");
                 view.displayMessage(model.lookRoom().getMessage());
@@ -337,6 +363,7 @@ public class GameController {
             if (activePuzzleBeforeCombat instanceof Puzzle5Commitment) {
                 Puzzle5Commitment commitment = (Puzzle5Commitment) activePuzzleBeforeCombat;
                 view.displayMessage(commitment.finishAfterPursuerDefeated(model.getPlayer()));
+                view.displayMessage("You have been teleported back to the Main Hall.");
 
                 if (model.getPlayer().isAlive()) {
                     model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
@@ -361,6 +388,7 @@ public class GameController {
             if (activePuzzleBeforeCombat instanceof Puzzle7AwarenessTrap) {
                 Puzzle7AwarenessTrap trap = (Puzzle7AwarenessTrap) activePuzzleBeforeCombat;
                 view.displayMessage(trap.finishAfterWardenDefeated(model.getPlayer()));
+                view.displayMessage("You have been teleported back to the Main Hall.");
 
                 if (model.getPlayer().isAlive()) {
                     model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);

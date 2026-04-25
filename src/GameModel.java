@@ -168,8 +168,10 @@ public class GameModel {
             Room destination = current.getConnections().get(index);
             String destinationId = destination.getRoomId();
 
+            // Final Trial and Hidden Bomb Room unlock after all five main trials are completed,
+            // regardless of how many tokens the player earned.
             if ((destinationId.equals("FN-01") || destinationId.equals("FN-02") || destinationId.equals("EZ-02"))
-                    && player.getTrialTokens() < 5) {
+                    && !allMainTrialsCompleted()) {
                 GameResult result = new GameResult("That area is locked. Complete all 5 trials first.");
                 result.setSuccess(false);
                 return result;
@@ -461,6 +463,14 @@ public class GameModel {
         }
 
         player.markTrialCompleted(key);
+    }
+
+    private boolean allMainTrialsCompleted() {
+        return player.hasCompletedTrial("AWARENESS")
+                && player.hasCompletedTrial("RESTRAINT")
+                && player.hasCompletedTrial("TRUST")
+                && player.hasCompletedTrial("SACRIFICE")
+                && player.hasCompletedTrial("COMMITMENT");
     }
 
     private String getTrialKeyForRoom(String roomId) {

@@ -36,6 +36,39 @@ public class Puzzle5Commitment extends Puzzle {
                         + "You have completed the Trial of Commitment. (No Reward)");
     }
 
+    public String handleRoomMovement(Player player) {
+        String currentRoom = player.getCurrentRoomId();
+
+        if (currentRoom.equals("CM-07")) {
+            awaitingChoice = true;
+            return "You reach the teleporter.\nWould you like to go through it? Yes or no";
+        }
+
+        if (currentRoom.startsWith("CM-")) {
+            forwardMoves++;
+            return "You continue through the Commitment trial.\n"
+                    + "Keep moving. Do not linger.";
+        }
+
+        return "";
+    }
+
+    public String punishItemTaking(Player player) {
+        takeCount++;
+
+        if (takeCount >= 1) {
+            player.takeDamage(1);
+            pursuerMonster = new Monster("M-05", "Pursuer", 2, 1);
+            combatTriggered = true;
+
+            return "You stopped to take an item. The Pursuer catches you!\n"
+                    + "You lose 1 HP.\n"
+                    + "It charges at you with relentless fury.";
+        }
+
+        return "You stop to take an item. The Pursuer gets closer.";
+    }
+
     @Override
     public String startPuzzle() {
         return "==== Welcome to the Trial of Commitment =====\n"
@@ -44,7 +77,7 @@ public class Puzzle5Commitment extends Puzzle {
 
     @Override
     public String getHint() {
-        return "Hint: The Pursuer is two rooms behind you. Every time you stop to examine or take an item, it gets closer.";
+        return "Hint: Move through the rooms without stopping to examine or take items.";
     }
 
     @Override
@@ -86,19 +119,7 @@ public class Puzzle5Commitment extends Puzzle {
         }
 
         if (cmd.equals("take item")) {
-            takeCount++;
-
-            if (takeCount >= 2) {
-                player.takeDamage(1);
-                pursuerMonster = new Monster("M-05", "Pursuer", 2, 1);
-                combatTriggered = true;
-
-                return "You slowed down for too long. The Pursuer catches you!\n"
-                        + "You lose 1 HP.\n"
-                        + "It charges at you with relentless fury.";
-            }
-
-            return "You stop to take an item. The Pursuer gets closer.";
+            return punishItemTaking(player);
         }
 
         if (cmd.equals("kill pursuer") || cmd.equals("attack pursuer")) {

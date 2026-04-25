@@ -1,4 +1,6 @@
 //nabaa
+import java.util.Random;
+
 public class Puzzle6FinalTrial extends Puzzle {
     private boolean chestBurned;
     private boolean fireExtinguished;
@@ -15,6 +17,10 @@ public class Puzzle6FinalTrial extends Puzzle {
     private boolean combatTriggered;
     private Monster failureMonster;
 
+    private boolean bossChanceRolled;
+    private int wrongActionCount;
+    private final Random random;
+
     public Puzzle6FinalTrial() {
         super("PZ-06", "Final Trial", "FN-02");
         this.chestBurned = false;
@@ -30,6 +36,10 @@ public class Puzzle6FinalTrial extends Puzzle {
         this.stalkerPathRequired = false;
         this.combatTriggered = false;
         this.failureMonster = null;
+
+        this.bossChanceRolled = false;
+        this.wrongActionCount = 0;
+        this.random = new Random();
     }
 
     public boolean isCombatTriggered() {
@@ -59,6 +69,62 @@ public class Puzzle6FinalTrial extends Puzzle {
                 crackedSymbolAppeared = true;
             }
         }
+    }
+
+    private boolean shouldBossAppearByTokenChance(Player player) {
+        int tokens = player.getTrialTokens();
+
+        if (tokens <= 0) {
+            return true;
+        }
+
+        if (tokens >= 5) {
+            return false;
+        }
+
+        // 1-4 tokens: 50% chance boss appears.
+        return random.nextBoolean();
+    }
+
+    private String triggerStalker(Player player, String reasonMessage, boolean ambushDamage) {
+        stalkerPathRequired = true;
+        failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1);
+        combatTriggered = true;
+
+        String message = reasonMessage;
+
+        if (ambushDamage) {
+            player.takeDamage(1);
+            message += "\nThe Stalker ambushes you and you lose 1 HP.";
+        }
+
+        message += "\nThe Stalker appears!";
+        return message;
+    }
+
+    private String countWrongAction(Player player, String wrongMessage) {
+        int tokens = player.getTrialTokens();
+
+        // 5 tokens means no Stalker from wrong-action rule.
+        if (tokens >= 5) {
+            return wrongMessage;
+        }
+
+        wrongActionCount++;
+
+        if (tokens >= 1 && tokens <= 4 && wrongActionCount >= 2 && !stalkerDefeated) {
+            return triggerStalker(player,
+                    wrongMessage + "\nYou have made too many mistakes in the Final Trial.",
+                    true);
+        }
+
+        if (tokens <= 0 && !stalkerDefeated) {
+            return triggerStalker(player,
+                    wrongMessage + "\nYou have no Trial Tokens to protect you.",
+                    true);
+        }
+
+        return wrongMessage + "\nMistakes made in this trial: " + wrongActionCount + "/2";
     }
 
     @Override
@@ -111,7 +177,7 @@ public class Puzzle6FinalTrial extends Puzzle {
 
         if (cmd.equals("burn chest")) {
             if (chestBurned) {
-                return "The chest is already burning.";
+                return countWrongAction(player, "The chest is already burning.");
             }
 
             chestBurned = true;
@@ -121,20 +187,22 @@ public class Puzzle6FinalTrial extends Puzzle {
 
         if (cmd.equals("extinguish fire")) {
             if (!chestBurned) {
-                return "There is no fire to extinguish yet.";
+                return countWrongAction(player, "There is no fire to extinguish yet.");
             }
 
             if (fireExtinguished) {
-                return "The fire is already out.";
+                return countWrongAction(player, "The fire is already out.");
             }
 
             fireExtinguished = true;
-            stalkerPathRequired = true;
-            failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1);
-            combatTriggered = true;
 
-            return "The trial can no longer proceed normally.\n"
-                    + "The Stalker appears!";
+            if (player.getTrialTokens() >= 5) {
+                return "The fire goes out.\nThe trial can no longer proceed normally, but no monster appears because you have all 5 Trial Tokens.";
+            }
+
+            return triggerStalker(player,
+                    "The trial can no longer proceed normally.",
+                    true);
         }
 
         if (cmd.equals("open chest")) {
@@ -143,27 +211,31 @@ public class Puzzle6FinalTrial extends Puzzle {
 
             if (!player.isAlive()) {
                 isFinished = true;
+                trialComplete = true;
+                rewardEarned = false;
                 return "A trap is triggered!\nYou lose 5 HP and 5 Max HP.\nYou died during the Final Trial.";
             }
 
-            stalkerPathRequired = true;
-            failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1);
-            combatTriggered = true;
+            if (player.getTrialTokens() >= 5) {
+                return "A trap is triggered!\n"
+                        + "You lose 5 HP and 5 Max HP.\n"
+                        + "No monster appears because you have all 5 Trial Tokens.";
+            }
 
-            return "A trap is triggered!\n"
-                    + "You lose 5 HP and 5 Max HP.\n"
-                    + "The Stalker appears!";
+            // No extra -1 ambush here because open chest already punishes heavily.
+            return triggerStalker(player,
+                    "A trap is triggered!\nYou lose 5 HP and 5 Max HP.",
+                    false);
         }
 
         if (cmd.equals("insert explosive device")) {
             if (!chestBurned || fireExtinguished) {
-                player.takeDamage(player.getCurrentHP());
-                isFinished = true;
-                return "The chamber collapses around you.\nYou died.";
+                return countWrongAction(player,
+                        "The explosive device cannot be used correctly right now.");
             }
 
             if (statueBroken) {
-                return "The statue has already been shattered.";
+                return countWrongAction(player, "The statue has already been shattered.");
             }
 
             advanceBurnCounter();
@@ -179,11 +251,11 @@ public class Puzzle6FinalTrial extends Puzzle {
 
         if (cmd.equals("place core fragment")) {
             if (!statueBroken) {
-                return "You do not have the Core Fragment yet.";
+                return countWrongAction(player, "You do not have the Core Fragment yet.");
             }
 
             if (corePlaced) {
-                return "The Core Fragment is already placed.";
+                return countWrongAction(player, "The Core Fragment is already placed.");
             }
 
             advanceBurnCounter();
@@ -199,13 +271,12 @@ public class Puzzle6FinalTrial extends Puzzle {
 
         if (cmd.equals("step symbol")) {
             if (!crackedSymbolAppeared || !corePlaced) {
-                player.takeDamage(player.getCurrentHP());
-                isFinished = true;
-                return "The chamber collapses around you.\nYou died.";
+                return countWrongAction(player,
+                        "The cracked floor symbol is not ready yet.");
             }
 
             if (finalJewelAppeared) {
-                return "The floor has already collapsed.";
+                return countWrongAction(player, "The floor has already collapsed.");
             }
 
             finalJewelAppeared = true;
@@ -214,9 +285,8 @@ public class Puzzle6FinalTrial extends Puzzle {
 
         if (cmd.equals("throw final jewel")) {
             if (!finalJewelAppeared) {
-                player.takeDamage(player.getCurrentHP());
-                isFinished = true;
-                return "The teleporter destabilizes violently.\nYou died.";
+                return countWrongAction(player,
+                        "The teleporter destabilizes violently because the Final Jewel has not appeared yet.");
             }
 
             if (stalkerPathRequired && !stalkerDefeated) {
@@ -224,19 +294,33 @@ public class Puzzle6FinalTrial extends Puzzle {
             }
 
             if (teleporterStabilized) {
-                return "The teleporter is already stabilized.";
+                return countWrongAction(player, "The teleporter is already stabilized.");
             }
 
-            if (player.getTrialTokens() < 5 && !stalkerDefeated) {
-                stalkerPathRequired = true;
-                failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1);
-                combatTriggered = true;
+            if (!bossChanceRolled) {
+                bossChanceRolled = true;
 
-                return "The teleporter rejects your progress.\nThe Stalker appears!";
+                if (shouldBossAppearByTokenChance(player) && !stalkerDefeated) {
+                    if (player.getTrialTokens() <= 0) {
+                        return triggerStalker(player,
+                                "You have no Trial Tokens.\nThe teleporter rejects your progress.",
+                                true);
+                    }
+
+                    return triggerStalker(player,
+                            "Your Trial Tokens flicker uncertainly.\nThe teleporter resists your progress.",
+                            true);
+                }
             }
 
             teleporterStabilized = true;
             awaitingChoice = true;
+
+            if (player.getTrialTokens() >= 5) {
+                return "Your five Trial Tokens shine brightly.\n"
+                        + "The teleporter stabilizes without resistance.\n"
+                        + "Would you like to go through the teleporter? Yes or no";
+            }
 
             return "The teleporter stabilizes.\nWould you like to go through the teleporter? Yes or no";
         }
@@ -255,6 +339,6 @@ public class Puzzle6FinalTrial extends Puzzle {
             return "You are pulled into a distorted space...\nYou are sent to the Trap Room.";
         }
 
-        return "Invalid command.";
+        return countWrongAction(player, "Invalid command.");
     }
 }

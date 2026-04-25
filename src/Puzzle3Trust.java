@@ -85,6 +85,7 @@ public class Puzzle3Trust extends Puzzle {
 
             player.takeDamage(1);
             failureMonster = new Monster("M-02", "Guardian", 2, 1);
+            failureMonster.setRewardItemName("Silver Sigil");
             combatTriggered = true;
             isFinished = true;
             trialComplete = true;

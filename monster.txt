@@ -1,11 +1,10 @@
-//Team
+/Team
 //monsterID,name,HP,atkValue
 M-01,Mimic,2,1
 M-02,Guardian,2,1
-M-03,Golem,2,1
-M-04,Wraith,2,1
-M-05,Pursuer,2,1
-M-06,Shade Boss,2,1
-M-07,Warden,2,1
-M-08,Watcher,2,1
-M-09,Final Trial Stalker,5,1
+M-03,Wraith,2,1
+M-04,Pursuer,2,1
+M-05,Shade Boss,2,1
+M-06,Warden,2,1
+M-07,Watcher,2,1
+M-08,Final Trial Stalker,6,1
