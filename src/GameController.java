@@ -68,11 +68,13 @@ public class GameController {
                 if (result.isSuccess()) {
                     view.displayMessage(model.lookRoom().getMessage());
                     autoStartPuzzleAfterMove();
+                    checkPuzzleRoomTrigger();
                 }
                 return;
 
             case "take":
                 displayResult(model.takeItem(command));
+                checkPuzzleRoomTrigger();
                 return;
 
             case "drop":
@@ -169,30 +171,26 @@ public class GameController {
             return;
         }
 
-        /*
-         * Puzzle 5 is the only active puzzle where normal numbered movement
-         * should be allowed, because Commitment is a multiroom trial.
-         */
+        // Allow numbered movement for ALL puzzles
         if (isNumberMoveCommand(command)) {
-            if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
-                GameResult moveResult = model.move(command);
-                displayResult(moveResult);
+            GameResult moveResult = model.move(command);
+            displayResult(moveResult);
 
-                if (moveResult.isSuccess()) {
-                    view.displayMessage(model.lookRoom().getMessage());
+            if (moveResult.isSuccess()) {
+                view.displayMessage(model.lookRoom().getMessage());
 
+                // Handle Puzzle5Commitment specific room movement
+                if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
                     Puzzle5Commitment commitment = (Puzzle5Commitment) model.getActivePuzzle();
                     String movementResult = commitment.handleRoomMovement(model.getPlayer());
-
                     if (movementResult != null && !movementResult.isEmpty()) {
                         view.displayMessage(movementResult);
                     }
                 }
 
-                return;
+                // Check for room triggers (for Puzzle4Sacrifice SC-03)
+                checkPuzzleRoomTrigger();
             }
-
-            view.displayError("Finish the active puzzle before using numbered movement.");
             return;
         }
 
@@ -212,11 +210,11 @@ public class GameController {
                     GameResult takePuzzleResult = model.handlePuzzleCommand("take item");
                     handlePuzzleResult(takePuzzleResult);
                 }
-
                 return;
             }
 
             displayResult(model.takeItem(command));
+            checkPuzzleRoomTrigger();
             return;
         }
 
@@ -238,22 +236,58 @@ public class GameController {
         displayResult(puzzleResult);
     }
 
+    // FIXED: This is the only method that changed
     private boolean isNumberMoveCommand(String command) {
-        String[] parts = command.trim().split(" ");
+        if (command == null) return false;
 
-        if (parts.length != 2) {
+        String trimmed = command.trim().toLowerCase();
+
+        // Must start with "move "
+        if (!trimmed.startsWith("move ")) {
             return false;
         }
 
-        if (!parts[0].equalsIgnoreCase("move")) {
+        // Get the part after "move "
+        String numberPart = trimmed.substring(5).trim();
+
+        // Check if it's empty
+        if (numberPart.isEmpty()) {
             return false;
         }
 
+        // Try to parse as integer
         try {
-            Integer.parseInt(parts[1]);
+            Integer.parseInt(numberPart);
             return true;
         } catch (NumberFormatException e) {
             return false;
+        }
+    }
+
+    private void checkPuzzleRoomTrigger() {
+        if (!model.hasActivePuzzle()) {
+            return;
+        }
+
+        Puzzle activePuzzle = model.getActivePuzzle();
+        String currentRoom = model.getPlayer().getCurrentRoomId();
+
+        // Check for Puzzle4Sacrifice - when entering SC-03 (end of bridge)
+        if (activePuzzle instanceof Puzzle4Sacrifice && currentRoom.equals("SC-03")) {
+            // Call handleCommand with special trigger
+            GameResult result = model.handlePuzzleCommand("check_room_trigger");
+            if (result.isCombatStarted()) {
+                view.displayMessage(result.getMessage());
+                runCombat(result.getMonster());
+                if (model.getActivePuzzle() != null && model.getPlayer().isAlive()) {
+                    if (activePuzzle.isFinished()) {
+                        handlePuzzleFinish(activePuzzle);
+                    }
+                }
+            } else if (result.isPuzzleFinished()) {
+                view.displayMessage(result.getMessage());
+                handlePuzzleFinish(activePuzzle);
+            }
         }
     }
 
@@ -270,29 +304,34 @@ public class GameController {
         }
 
         if (result.isPuzzleFinished()) {
-            Puzzle finishedPuzzle = result.getPuzzle();
-            boolean completedTrial = finishedPuzzle != null && finishedPuzzle.isTrialComplete();
-
-            if (completedTrial) {
-                model.markTrialCompletedForPuzzle(finishedPuzzle);
-            }
-
-            model.clearActivePuzzle();
-
-            if (!model.getPlayer().isAlive()) {
-                return;
-            }
-
-            if (completedTrial) {
-                view.displayMessage("");
-                view.displayMessage("Puzzle complete.");
-                view.displayMessage(model.showStatus().getMessage());
-                view.displayMessage("");
-                view.displayMessage(model.lookRoom().getMessage());
-            }
-
-            autoStartPuzzleAfterMove();
+            handlePuzzleFinish(result.getPuzzle());
         }
+    }
+
+    private void handlePuzzleFinish(Puzzle finishedPuzzle) {
+        if (finishedPuzzle == null) return;
+
+        boolean completedTrial = finishedPuzzle != null && finishedPuzzle.isTrialComplete();
+
+        if (completedTrial) {
+            model.markTrialCompletedForPuzzle(finishedPuzzle);
+        }
+
+        model.clearActivePuzzle();
+
+        if (!model.getPlayer().isAlive()) {
+            return;
+        }
+
+        if (completedTrial) {
+            view.displayMessage("");
+            view.displayMessage("Puzzle complete.");
+            view.displayMessage(model.showStatus().getMessage());
+            view.displayMessage("");
+            view.displayMessage(model.lookRoom().getMessage());
+        }
+
+        autoStartPuzzleAfterMove();
     }
 
     private void autoStartPuzzleAfterMove() {
@@ -478,11 +517,10 @@ public class GameController {
         }
 
         if (puzzle instanceof Puzzle4Sacrifice) {
-            view.displayMessage("take sword");
-            view.displayMessage("move bridge");
-            view.displayMessage("inspect bridge");
+            view.displayMessage("take strong trial sword");
+            view.displayMessage("move 1 (to bridge)");
             view.displayMessage("throw sword");
-            view.displayMessage("move forward");
+            view.displayMessage("move 1 (to end)");
             return;
         }
 
