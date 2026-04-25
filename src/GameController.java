@@ -169,6 +169,10 @@ public class GameController {
             return;
         }
 
+        /*
+         * Puzzle 5 is the only active puzzle where normal numbered movement
+         * should be allowed, because Commitment is a multiroom trial.
+         */
         if (isNumberMoveCommand(command)) {
             if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
                 GameResult moveResult = model.move(command);
@@ -184,6 +188,7 @@ public class GameController {
                         view.displayMessage(movementResult);
                     }
                 }
+
                 return;
             }
 
@@ -197,6 +202,7 @@ public class GameController {
             handlePuzzleResult(puzzleResult);
             return;
         }
+
         if (action.equals("take")) {
             if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
                 GameResult takeResult = model.takeItem(command);
@@ -315,6 +321,7 @@ public class GameController {
 
         if (!combat.isMonsterAlive()) {
             Item reward = monster.dropReward();
+
             if (reward != null) {
                 model.getPlayer().addItem(reward);
                 view.displayMessage("Monster dropped: " + reward.getItemName());
@@ -325,10 +332,10 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
+
                 view.displayMessage("You have completed the Trial of Restraint. (No Reward)");
                 view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
-
                 view.displayMessage("");
                 view.displayMessage(model.lookRoom().getMessage());
                 return;
@@ -339,6 +346,7 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
+
                 view.displayMessage("You have completed the Trial of Trust. (No Reward)");
                 view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
@@ -352,6 +360,7 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
+
                 view.displayMessage("You have completed the Trial of Sacrifice. (No Reward)");
                 view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
@@ -370,6 +379,7 @@ public class GameController {
                     model.getPlayer().setCurrentRoomId("EZ-01");
                     model.getRoomManager().setRoom("EZ-01");
                     model.clearActivePuzzle();
+
                     view.displayMessage(model.showStatus().getMessage());
                     view.displayMessage("");
                     view.displayMessage(model.lookRoom().getMessage());
@@ -380,6 +390,7 @@ public class GameController {
             if (activePuzzleBeforeCombat instanceof Puzzle6FinalTrial) {
                 Puzzle6FinalTrial finalTrial = (Puzzle6FinalTrial) activePuzzleBeforeCombat;
                 finalTrial.onStalkerDefeated();
+
                 view.displayMessage("The Stalker falls. The teleporter stabilizes.");
                 view.displayMessage("Would you like to go through the teleporter? Yes or no");
                 return;
@@ -395,6 +406,7 @@ public class GameController {
                     model.getPlayer().setCurrentRoomId("EZ-01");
                     model.getRoomManager().setRoom("EZ-01");
                     model.clearActivePuzzle();
+
                     view.displayMessage(model.showStatus().getMessage());
                     view.displayMessage("");
                     view.displayMessage(model.lookRoom().getMessage());
@@ -475,9 +487,9 @@ public class GameController {
         }
 
         if (puzzle instanceof Puzzle5Commitment) {
-            view.displayMessage("move forward");
+            view.displayMessage("move [number]");
             view.displayMessage("examine item");
-            view.displayMessage("take item");
+            view.displayMessage("take [item]");
             view.displayMessage("kill pursuer");
             view.displayMessage("yes / no");
             return;
