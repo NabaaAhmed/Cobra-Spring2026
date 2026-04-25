@@ -21,7 +21,7 @@ CM-04,Lens Storage,"A crystal lens glows faintly on a shelf. The path ahead cont
 CM-05,Idol Room,"A decorative idol rests near a cracked wall. The footsteps behind you sound closer.",CM-04,CM-06
 CM-06,Map Corridor,"An ancient map hangs from the wall. The exit is close, but hesitation feels dangerous.",CM-05,CM-07
 CM-07,Commitment Exit,"Clean stone chamber. Safe and quiet. The entrance zone is visible ahead.",CM-06,EZ-01
-TP-TRAP-01,Trap Room,"A ruined chamber littered with debris and broken stone. An unstable teleporter frame offers a second chance.",EZ-01
+TP-TRAP-01,Trap Trial,"A ruined chamber littered with debris and broken stone. An unstable teleporter frame offers a second chance.",EZ-01
 FN-01,Final Antechamber,"Minimal chamber. A statue of the Stalker stands near the entrance as a warning. Dust hangs in the silent air.",EZ-01,FN-02
 FN-02,The Last Mechanism,"A large chamber styled as a reward room. A chest, statue, cracked floor area, and unstable teleporter pad are here.",FN-01,END-01,TP-TRAP-01
 END-01,Ascension Chamber,"Bright chamber. A glowing jewel floats above the center. A pedestal holds the Catalyst.",0
