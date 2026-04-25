@@ -56,21 +56,23 @@ public class Puzzle5Commitment extends Puzzle {
         return "";
     }
 
-    /*
-     * This method is called by GameController when the player takes a real room item
-     * during the Commitment trial.
-     */
-    public String punishItemTaking(Player player) {
+    private String handleLingerAction(Player player, String actionType) {
         takeCount++;
 
-        player.takeDamage(1);
-        pursuerMonster = new Monster("M-05", "Pursuer", 2, 1);
-        combatTriggered = true;
+        if (takeCount < 2) {
+            return "You stop to " + actionType + ".\n"
+                    + "The footsteps behind you stop. The Pursuer is right outside the door!\n"
+                    + "Do not stop again.";
+        } else {
+            // [RED] Second strike: Combat and Damage
+            player.takeDamage(1);
+            pursuerMonster = new Monster("M-05", "Pursuer", 2, 1);
+            combatTriggered = true;
 
-        return "You stopped to take an item.\n"
-                + "You're too slow. The Pursuer has caught you!\n"
-                + "You lose 1 HP.\n"
-                + "It charges at you with relentless fury.";
+            return "You stopped to " + actionType + " again.\n"
+                    + "You're too slow! The Pursuer bursts into the room and catches you!\n"
+                    + "You lose 1 HP.";
+        }
     }
 
     @Override
@@ -108,18 +110,11 @@ public class Puzzle5Commitment extends Puzzle {
         }
 
         if (cmd.equals("examine item") || cmd.equals("inspect item")) {
-            player.takeDamage(1);
-            pursuerMonster = new Monster("M-05", "Pursuer", 2, 1);
-            combatTriggered = true;
-
-            return "You hesitated for too long.\n"
-                    + "You're too slow. The Pursuer has caught you!\n"
-                    + "You lose 1 HP.\n"
-                    + "It charges at you with relentless fury.";
+            return handleLingerAction(player, "inspect the item");
         }
 
         if (cmd.equals("take item")) {
-            return punishItemTaking(player);
+            return handleLingerAction(player, "take an item");
         }
 
         if (cmd.equals("kill pursuer") || cmd.equals("attack pursuer")) {
