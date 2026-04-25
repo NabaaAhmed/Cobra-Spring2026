@@ -3,12 +3,35 @@ public class Puzzle7AwarenessTrap extends Puzzle {
     private boolean rubbleTaken;
     private boolean redGemTaken;
     private boolean awaitingChoice;
+    private boolean combatTriggered;
+    private Monster failureMonster;
 
     public Puzzle7AwarenessTrap() {
         super("PZ-07", "Trap", "TP-TRAP-01");
         this.rubbleTaken = false;
         this.redGemTaken = false;
         this.awaitingChoice = false;
+        this.combatTriggered = false;
+        this.failureMonster = null;
+    }
+
+    public boolean isCombatTriggered() {
+        return combatTriggered;
+    }
+
+    public Monster getFailureMonster() {
+        return failureMonster;
+    }
+
+    public void clearCombatTrigger() {
+        combatTriggered = false;
+        failureMonster = null;
+    }
+
+    public String finishAfterWardenDefeated(Player player) {
+        return completeNoReward(player,
+                "You defeated the Warden and escaped the trap.\n"
+                        + "You have completed the Trap. (No Reward)");
     }
 
     @Override
@@ -82,9 +105,11 @@ public class Puzzle7AwarenessTrap extends Puzzle {
             }
 
             player.takeDamage(1);
-            return completeNoReward(player,
-                    "BOOM! The teleporter erupts and you lose 1 HP.\n"
-                            + "You have completed the Trap. (No Reward)");
+            failureMonster = new Monster("M-07", "Warden", 2, 1);
+            combatTriggered = true;
+
+            return "BOOM! The teleporter erupts and you lose 1 HP.\n"
+                    + "Wrong choice. You have to fight the Warden to leave.";
         }
 
         if (cmd.equals("enter teleporter")) {
