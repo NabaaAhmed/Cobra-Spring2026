@@ -67,21 +67,12 @@ public class GameController {
 
                 if (result.isSuccess()) {
                     view.displayMessage(model.lookRoom().getMessage());
-
-                    GameResult puzzleResult = model.autoStartPuzzleIfPresent();
-                    if (puzzleResult != null && puzzleResult.isPuzzleStarted()) {
-                        view.displayMessage("");
-                        view.displayMessage(puzzleResult.getMessage());
-                        printPuzzleHelp(puzzleResult.getPuzzle());
-                    }
-
-                    checkPuzzleRoomTrigger();
+                    autoStartPuzzleAfterMove();
                 }
                 return;
 
             case "take":
                 displayResult(model.takeItem(command));
-                checkPuzzleRoomTrigger();
                 return;
 
             case "drop":
@@ -178,31 +169,54 @@ public class GameController {
             return;
         }
 
-        // FIX: Let puzzle handle numbered moves first (like "move 1")
+        /*
+         * Puzzle 5 is the only active puzzle where normal numbered movement
+         * should be allowed, because Commitment is a multiroom trial.
+         */
         if (isNumberMoveCommand(command)) {
-            GameResult moveResult = model.move(command);
-            displayResult(moveResult);
+            if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
+                GameResult moveResult = model.move(command);
+                displayResult(moveResult);
 
-            if (moveResult.isSuccess()) {
-                view.displayMessage(model.lookRoom().getMessage());
-                checkPuzzleRoomTrigger();
+                if (moveResult.isSuccess()) {
+                    view.displayMessage(model.lookRoom().getMessage());
+
+                    Puzzle5Commitment commitment = (Puzzle5Commitment) model.getActivePuzzle();
+                    String movementResult = commitment.handleRoomMovement(model.getPlayer());
+
+                    if (movementResult != null && !movementResult.isEmpty()) {
+                        view.displayMessage(movementResult);
+                    }
+                }
+
+                return;
             }
+
+            view.displayError("Finish the active puzzle before using numbered movement.");
             return;
         }
 
-        // FIX: FIRST try to let the puzzle handle the command (for "take sword", etc.)
         GameResult puzzleResult = model.handlePuzzleCommand(command);
 
-        // If the puzzle recognized the command (not "Invalid command"), handle it
         if (!puzzleResult.getMessage().equalsIgnoreCase("Invalid command.")) {
             handlePuzzleResult(puzzleResult);
             return;
         }
 
-        // If puzzle didn't recognize it, try generic commands
         if (action.equals("take")) {
+            if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
+                GameResult takeResult = model.takeItem(command);
+                displayResult(takeResult);
+
+                if (takeResult.isSuccess()) {
+                    GameResult takePuzzleResult = model.handlePuzzleCommand("take item");
+                    handlePuzzleResult(takePuzzleResult);
+                }
+
+                return;
+            }
+
             displayResult(model.takeItem(command));
-            checkPuzzleRoomTrigger();
             return;
         }
 
@@ -221,7 +235,6 @@ public class GameController {
             return;
         }
 
-        // If nothing worked, show the invalid command message
         displayResult(puzzleResult);
     }
 
@@ -244,31 +257,6 @@ public class GameController {
         }
     }
 
-    private void checkPuzzleRoomTrigger() {
-        if (!model.hasActivePuzzle()) {
-            return;
-        }
-
-        Puzzle activePuzzle = model.getActivePuzzle();
-        String currentRoom = model.getPlayer().getCurrentRoomId();
-
-        if (activePuzzle instanceof Puzzle4Sacrifice && currentRoom.equals("SC-03")) {
-            GameResult result = model.handlePuzzleCommand("check room");
-            if (result.isCombatStarted()) {
-                view.displayMessage(result.getMessage());
-                runCombat(result.getMonster());
-                if (model.getActivePuzzle() != null && model.getPlayer().isAlive()) {
-                    if (activePuzzle.isFinished()) {
-                        handlePuzzleFinish(activePuzzle);
-                    }
-                }
-            } else if (result.isPuzzleFinished()) {
-                view.displayMessage(result.getMessage());
-                handlePuzzleFinish(activePuzzle);
-            }
-        }
-    }
-
     private void handlePuzzleResult(GameResult result) {
         if (result.isCombatStarted()) {
             view.displayMessage(result.getMessage());
@@ -282,34 +270,29 @@ public class GameController {
         }
 
         if (result.isPuzzleFinished()) {
-            handlePuzzleFinish(result.getPuzzle());
+            Puzzle finishedPuzzle = result.getPuzzle();
+            boolean completedTrial = finishedPuzzle != null && finishedPuzzle.isTrialComplete();
+
+            if (completedTrial) {
+                model.markTrialCompletedForPuzzle(finishedPuzzle);
+            }
+
+            model.clearActivePuzzle();
+
+            if (!model.getPlayer().isAlive()) {
+                return;
+            }
+
+            if (completedTrial) {
+                view.displayMessage("");
+                view.displayMessage("Puzzle complete.");
+                view.displayMessage(model.showStatus().getMessage());
+                view.displayMessage("");
+                view.displayMessage(model.lookRoom().getMessage());
+            }
+
+            autoStartPuzzleAfterMove();
         }
-    }
-
-    private void handlePuzzleFinish(Puzzle finishedPuzzle) {
-        if (finishedPuzzle == null) return;
-
-        boolean completedTrial = finishedPuzzle != null && finishedPuzzle.isTrialComplete();
-
-        if (completedTrial) {
-            model.markTrialCompletedForPuzzle(finishedPuzzle);
-        }
-
-        model.clearActivePuzzle();
-
-        if (!model.getPlayer().isAlive()) {
-            return;
-        }
-
-        if (completedTrial) {
-            view.displayMessage("");
-            view.displayMessage("Puzzle complete.");
-            view.displayMessage(model.showStatus().getMessage());
-            view.displayMessage("");
-            view.displayMessage(model.lookRoom().getMessage());
-        }
-
-        autoStartPuzzleAfterMove();
     }
 
     private void autoStartPuzzleAfterMove() {
@@ -338,6 +321,7 @@ public class GameController {
 
         if (!combat.isMonsterAlive()) {
             Item reward = monster.dropReward();
+
             if (reward != null) {
                 model.getPlayer().addItem(reward);
                 view.displayMessage("Monster dropped: " + reward.getItemName());
@@ -348,6 +332,7 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
+
                 view.displayMessage("You have completed the Trial of Restraint. (No Reward)");
                 view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
@@ -361,6 +346,7 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
+
                 view.displayMessage("You have completed the Trial of Trust. (No Reward)");
                 view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
@@ -374,6 +360,7 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
+
                 view.displayMessage("You have completed the Trial of Sacrifice. (No Reward)");
                 view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
@@ -392,6 +379,7 @@ public class GameController {
                     model.getPlayer().setCurrentRoomId("EZ-01");
                     model.getRoomManager().setRoom("EZ-01");
                     model.clearActivePuzzle();
+
                     view.displayMessage(model.showStatus().getMessage());
                     view.displayMessage("");
                     view.displayMessage(model.lookRoom().getMessage());
@@ -402,6 +390,7 @@ public class GameController {
             if (activePuzzleBeforeCombat instanceof Puzzle6FinalTrial) {
                 Puzzle6FinalTrial finalTrial = (Puzzle6FinalTrial) activePuzzleBeforeCombat;
                 finalTrial.onStalkerDefeated();
+
                 view.displayMessage("The Stalker falls. The teleporter stabilizes.");
                 view.displayMessage("Would you like to go through the teleporter? Yes or no");
                 return;
@@ -417,6 +406,7 @@ public class GameController {
                     model.getPlayer().setCurrentRoomId("EZ-01");
                     model.getRoomManager().setRoom("EZ-01");
                     model.clearActivePuzzle();
+
                     view.displayMessage(model.showStatus().getMessage());
                     view.displayMessage("");
                     view.displayMessage(model.lookRoom().getMessage());
@@ -489,16 +479,17 @@ public class GameController {
 
         if (puzzle instanceof Puzzle4Sacrifice) {
             view.displayMessage("take sword");
+            view.displayMessage("move bridge");
+            view.displayMessage("inspect bridge");
             view.displayMessage("throw sword");
-            view.displayMessage("move 1 (go to bridge)");
-            view.displayMessage("move 1 again (go to end)");
+            view.displayMessage("move forward");
             return;
         }
 
         if (puzzle instanceof Puzzle5Commitment) {
-            view.displayMessage("move forward");
+            view.displayMessage("move [number]");
             view.displayMessage("examine item");
-            view.displayMessage("take item");
+            view.displayMessage("take [item]");
             view.displayMessage("kill pursuer");
             view.displayMessage("yes / no");
             return;
