@@ -1,8 +1,9 @@
-String puzzleID, String trialName, String roomID, String description, String hint, boolean isSolved
-PZ-01,Awareness,AW-02, You must find something to stabilize the teleporter., The teleporter's core is shifting toward a deep crimson. The teleporter's erratic pulse matches the hue of the item you need., false
-PZ-02,Restraint,RS-02, A chest is in the center of the room with a coin nearby., The coin may not help you. Be careful how you interact with the chest., false
-PZ-03,Trust,TR-02,You stand before a guardian statue… it watches your every move., Not everything should be taken at face value. Sometimes trust must be placed in action... not reward,false
-PZ-04,Sacrifice,SC-01,A powerful sword rests before you… but not everything is meant to be kept. A bridge lies ahead… something waits at the end., Not all strength should be carried forward., false
-PZ-05,Commitment,CM-01,You hear heavy footsteps echoing from the entrance… Commit to your path. Do not linger., The Pursuer is two rooms behind you. Every time you stop to examine or take an item, it gets closer., false
-PZ-06,Final,FN-02, Everything you have learned will now be tested. A chest burns before you… a statue looms nearby… the floor beneath you feels unstable., Do not extinguish the fire. Timing and order matter. Some actions cannot be undone., false
-PZ-07,Trap,Tp-TRAP-01,false
+//Mai
+//puzzleID,trialName,roomID, puzzleDesc, hint, isSolved
+PZ-01, Trial of Awareness,AW-02, You must find something to stabilize the teleporter., The teleporter's core is shifting toward a deep crimson. The teleporter's erratic pulse matches the hue of the item you need., false
+PZ-02,Trial of Restraint,RS-02, A chest is in the center of the room with a coin nearby., The coin may not help you. Be careful how you interact with the chest., false
+PZ-03,Trial of Trust,TR-02,You stand before a guardian statue… it watches your every move., Not everything should be taken at face value. Sometimes trust must be placed in action... not reward,false
+PZ-04,Trial of Sacrifice,SC-01,A powerful sword rests before you… but not everything is meant to be kept. A bridge lies ahead… something waits at the end., Not all strength should be carried forward., false
+PZ-05,Trial of Commitment,CM-01,You hear heavy footsteps echoing from the entrance… Commit to your path. Do not linger., The Pursuer is two rooms behind you. Every time you stop to examine or take an item, it gets closer., false
+PZ-06,Final Trial,FN-02, Everything you have learned will now be tested. A chest burns before you… a statue looms nearby… the floor beneath you feels unstable., Do not extinguish the fire. Timing and order matter. Some actions cannot be undone., false
+PZ-07,Trap Trial,TP-TRAP-01,This is your second chance. You must find something to stabilize the teleporter., The item you need might not be visually appealing., false

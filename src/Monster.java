@@ -1,82 +1,77 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public class Monster {
-    private String id;
+    private String monsterID;
     private String name;
     private int hp;
     private int attackValue;
-    private boolean canAmbush;
-    private List<Item> rewards;
-    private boolean isAlive;
+    private String rewardItemName;
 
-    public Monster(String name, int hp, int attackValue, boolean canAmbush) {
-        this.id = id;
+    public Monster(String monsterID, String name, int hp, int attackValue, String rewardItemName) {
+        this.monsterID = monsterID;
         this.name = name;
         this.hp = hp;
         this.attackValue = attackValue;
-        this.canAmbush = canAmbush;
-        this.rewards = new ArrayList<>();
-        this.isAlive = true;
+        this.rewardItemName = rewardItemName;
     }
 
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public int getHp() { return hp; }
-    public int getAttackValue() { return attackValue; }
-    public boolean isAlive() { return isAlive && hp > 0; }
-
-    public void takeDamage(int amount) {
-        hp -= amount;
-        if (hp <= 0) {
-            isAlive = false;
-            hp = 0;
-        }
+    public String getMonsterID() {
+        return monsterID;
     }
 
-    /**
-     * Clash combat - both player and monster take damage
-     */
-    public void clash(Player player) {
-        // Monster damages player
+    public String getName() {
+        return name;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public int getAttackValue() {
+        return attackValue;
+    }
+
+    public boolean isAlive() {
+        return hp > 0;
+    }
+
+    public void takeDamage(int dmg) {
+        hp -= dmg;
+        if (hp < 0) hp = 0;
+    }
+
+    public void attack(Player player) {
         player.takeDamage(attackValue);
-        // Player damages monster
-        this.takeDamage(player.getAttackPower());
     }
 
-    /**
-     * Pre-emptive ambush attack before combat begins when player encounters monster
-     */
+    public void clash(Player player) {
+        player.takeDamage(attackValue);
+        this.takeDamage(1);
+    }
+
     public void onEncounter(Player player) {
-        if (canAmbush) {
-            player.takeDamage(attackValue);
+        // kept empty on purpose
+    }
+
+    public Item dropReward() {
+        if (rewardItemName == null || rewardItemName.equalsIgnoreCase("null")) {
+            return null;
         }
-    }
 
-    public void addReward(Item item) {
-        if (item != null) {
-            rewards.add(item);
+        if (rewardItemName.equalsIgnoreCase("Potion")) {
+            return new Potion("DROP-POTION", "Potion",
+                    "A small vial of restorative red liquid.", "0", true, 2);
         }
-    }
 
-    public void addRewards(List<Item> items) {
-        if (items != null) {
-            rewards.addAll(items);
+        if (rewardItemName.toLowerCase().contains("sword")) {
+            return new Sword("DROP-SWORD", rewardItemName,
+                    rewardItemName, "0", false, 2);
         }
-    }
 
-    public List<Item> dropLoot() {
-        List<Item> dropped = new ArrayList<>(rewards);
-        rewards.clear();
-        return dropped;
-    }
-
-    public void setRewards(List<Item> rewards) {
-        this.rewards = rewards != null ? rewards : new ArrayList<>();
-    }
-
-    public void reset() {
-        isAlive = true;
-        // Note: hp reset would need original HP stored
+        return new QuestItems(
+                "DROP-" + rewardItemName.toUpperCase().replace(" ", "_"),
+                rewardItemName,
+                rewardItemName,
+                "0",
+                false
+        );
     }
 }
