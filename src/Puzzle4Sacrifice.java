@@ -1,7 +1,6 @@
 //danny
 public class Puzzle4Sacrifice extends Puzzle {
     private boolean swordTaken;
-    private boolean reachedBridge;
     private boolean swordThrown;
     private boolean combatTriggered;
     private Monster failureMonster;
@@ -9,7 +8,6 @@ public class Puzzle4Sacrifice extends Puzzle {
     public Puzzle4Sacrifice() {
         super("PZ-04", "Trial of Sacrifice", "SC-01");
         this.swordTaken = false;
-        this.reachedBridge = false;
         this.swordThrown = false;
         this.combatTriggered = false;
         this.failureMonster = null;
@@ -42,8 +40,14 @@ public class Puzzle4Sacrifice extends Puzzle {
         }
 
         String cmd = command.trim().toLowerCase();
+        String currentRoom = player.getCurrentRoomId();
 
+        // Handle sword taking - only works in SC-01
         if (cmd.equals("take sword") || cmd.equals("take strong trial sword")) {
+            if (!currentRoom.equals("SC-01")) {
+                return "There is no sword here.";
+            }
+
             if (swordTaken) {
                 return "You already took the sword.";
             }
@@ -63,30 +67,14 @@ public class Puzzle4Sacrifice extends Puzzle {
             return "You take the sword.";
         }
 
-        if (cmd.equals("move bridge")) {
-            if (!swordTaken) {
-                return "You need to take the sword first.";
-            }
-
-            reachedBridge = true;
-            return "You step onto the bridge.";
-        }
-
-        if (cmd.equals("inspect bridge")) {
-            if (!reachedBridge) {
-                return "You are not at the bridge yet.";
-            }
-
-            if (swordThrown) {
-                return "The bridge seems calm now.";
-            }
-
-            return "The bridge feels unsafe while you still carry the sword.";
-        }
-
+        // Handle throw sword - works in SC-02 (bridge room)
         if (cmd.equals("throw sword") || cmd.equals("throw strong trial sword")) {
-            if (!reachedBridge) {
-                return "You need to reach the bridge first.";
+            if (!currentRoom.equals("SC-02")) {
+                return "You need to be on the bridge to throw the sword.";
+            }
+
+            if (!swordTaken) {
+                return "You don't have the sword to throw.";
             }
 
             if (swordThrown) {
@@ -102,31 +90,24 @@ public class Puzzle4Sacrifice extends Puzzle {
             }
 
             swordThrown = true;
-            return "You throw the sword away before reaching the end of the bridge.";
+            return "You throw the sword off the bridge into the darkness below.";
         }
 
-        if (cmd.equals("move forward")) {
-            if (!swordTaken) {
-                return "You need to take the sword first.";
-            }
-
-            if (!reachedBridge) {
-                return "You need to move to the bridge first.";
-            }
-
-            if (swordThrown) {
-                return completeWithReward(player,
-                        "You chose to let go of power and were spared.");
-            }
-
-            failureMonster = new Monster("M-04", "Wraith", 2, 1);
+        // Handle reaching the end of bridge - auto-triggered when entering SC-03
+        if (currentRoom.equals("SC-03") && swordTaken && !swordThrown && !combatTriggered) {
+            failureMonster = new Monster("M-03", "Wraith", 2, 1);
             combatTriggered = true;
             isFinished = true;
             trialComplete = true;
             rewardEarned = false;
-
             return "The power you held has betrayed you.\n"
                     + "The Wraith attacks!";
+        }
+
+        // Handle successful completion (threw sword before reaching SC-03)
+        if (currentRoom.equals("SC-03") && swordThrown && !combatTriggered) {
+            return completeWithReward(player,
+                    "You chose to let go of power and were spared.");
         }
 
         return "Invalid command.";
