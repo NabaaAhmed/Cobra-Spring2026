@@ -124,6 +124,8 @@ public class GameController {
 
             case "load":
                 displayResult(model.loadGame());
+                view.displayMessage("");
+                view.displayMessage(model.lookRoom().getMessage());
                 return;
 
             case "exit":
@@ -163,12 +165,15 @@ public class GameController {
         }
 
         if (command.equalsIgnoreCase("save")) {
-            displayResult(model.saveGame());
+            view.displayError("You cannot save in the middle of a puzzle. Finish or fail the puzzle first.");
             return;
         }
 
         if (command.equalsIgnoreCase("load")) {
+            model.clearActivePuzzle();
             displayResult(model.loadGame());
+            view.displayMessage("");
+            view.displayMessage(model.lookRoom().getMessage());
             return;
         }
 
@@ -213,11 +218,17 @@ public class GameController {
                 return;
             }
 
+            view.displayMessage("");
+
             if (completedTrial) {
-                view.displayMessage("");
                 view.displayMessage("Puzzle complete.");
-                view.displayMessage(model.showStatus().getMessage());
+            } else {
+                view.displayMessage("Puzzle ended.");
             }
+
+            view.displayMessage(model.showStatus().getMessage());
+            view.displayMessage("");
+            view.displayMessage(model.lookRoom().getMessage());
 
             GameResult nextPuzzle = model.autoStartPuzzleIfPresent();
             if (nextPuzzle != null && nextPuzzle.isPuzzleStarted()) {
@@ -250,7 +261,12 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
+
                 view.displayMessage("You have completed the Trial of Restraint and returned to the entrance zone. (No Reward)");
+                view.displayMessage("");
+                view.displayMessage(model.showStatus().getMessage());
+                view.displayMessage("");
+                view.displayMessage(model.lookRoom().getMessage());
                 return;
             }
 
@@ -259,7 +275,12 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
+
                 view.displayMessage("You have completed the Trial of Trust. (No Reward)");
+                view.displayMessage("");
+                view.displayMessage(model.showStatus().getMessage());
+                view.displayMessage("");
+                view.displayMessage(model.lookRoom().getMessage());
                 return;
             }
 
@@ -268,7 +289,12 @@ public class GameController {
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
+
                 view.displayMessage("You have completed the Trial of Sacrifice. (No Reward)");
+                view.displayMessage("");
+                view.displayMessage(model.showStatus().getMessage());
+                view.displayMessage("");
+                view.displayMessage(model.lookRoom().getMessage());
                 return;
             }
 
