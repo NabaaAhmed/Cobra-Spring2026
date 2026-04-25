@@ -178,21 +178,22 @@ public class GameModel {
             }
 
             if (destinationId.equals("TP-TRAP-01")) {
-                GameResult result = new GameResult("That area is locked. You only go there through a trap or failed trial action.");
+                GameResult result = new GameResult("That area is locked. You only go there through the awareness trial");
                 result.setSuccess(false);
                 return result;
             }
 
             String destinationTrial = getTrialKeyForRoom(destinationId);
 
-            if (destinationTrial != null
-                    && player.hasCompletedTrial(destinationTrial)
-                    && !destinationId.equals("TP-TRAP-01")
-                    && !destinationId.equals("END-01")) {
-                GameResult result = new GameResult("That trial has already been completed.");
-                result.setSuccess(false);
-                return result;
-            }
+            if (destinationTrial != null && player.hasCompletedTrial(destinationTrial)) {
+                    if (puzzleRoomMap.containsKey(destinationId) || destinationId.endsWith("-01")) {
+                        if (!destinationId.equals("EZ-01")) {
+                            GameResult result = new GameResult("The way is sealed. This trial has already been mastered.");
+                            result.setSuccess(false);
+                            return result;
+                        }
+                    }
+                }
 
             roomManager.move(index);
             player.setCurrentRoomId(roomManager.getRoomId());

@@ -41,11 +41,15 @@ public class Puzzle2Restraint extends Puzzle {
         String cmd = command.trim().toLowerCase();
 
         if (awaitingChoice) {
-            if (cmd.equals("yes") || cmd.equals("no")) {
+            if (cmd.equals("yes") || cmd.equals("enter") || cmd.equals("enter teleporter")) {
                 return completeWithReward(player,
                         "You resisted greed and interacted with the chest safely.");
             }
-            return "Please answer yes or no.";
+
+            if (cmd.equals("no")) {
+                return completeWithReward(player,
+                        "You choose not to leave immediately, but the trial has accepted your decision.");
+            }
         }
 
         if (cmd.equals("take coin") || cmd.equals("take bait coin")) {

@@ -34,23 +34,6 @@ public class Puzzle3Trust extends Puzzle {
                 + "Sometimes trust must be placed in action, not reward.";
     }
 
-    private String completeTrustWithRewardToExitHall(Player player, String completionMessage) {
-        player.modifyMaxHP(1);
-        player.heal(player.getMaxHP());
-        player.addTrialToken();
-
-        player.setCurrentRoomId("TR-03");
-
-        isSolved = true;
-        isFinished = true;
-        trialComplete = true;
-        rewardEarned = true;
-
-        return completionMessage
-                + "\nYou have completed the Trial of Trust!"
-                + "\nYou get +1 Max HP, Trial Token, full HP restore."
-                + "\nA safe path opens into the Trust Exit Hall.";
-    }
 
     @Override
     public String handleCommand(Player player, String command) {
@@ -62,12 +45,12 @@ public class Puzzle3Trust extends Puzzle {
 
         if (awaitingChoice) {
             if (cmd.equals("yes") || cmd.equals("enter") || cmd.equals("enter teleporter")) {
-                return completeTrustWithRewardToExitHall(player,
+                return completeWithReward(player,
                         "You saw through the illusion and made the right choice.");
             }
 
             if (cmd.equals("no")) {
-                return completeTrustWithRewardToExitHall(player,
+                return completeWithReward(player,
                         "You choose not to leave immediately, but the trial has accepted your decision.");
             }
 
