@@ -1,4 +1,3 @@
-//Danny Class
 import java.util.ArrayList;
 
 public class Player {
@@ -54,7 +53,7 @@ public class Player {
         this.attackPower = attackPower;
     }
 
-    public void setMaxHP(int MaxHP){
+    public void setMaxHP(int maxHP) {
         this.maxHP = maxHP;
     }
 
@@ -79,10 +78,8 @@ public class Player {
 
     public Item findItemByName(String itemName) {
         if (itemName == null) return null;
-
         for (Item item : inventory) {
-            if (item.getitemName() != null &&
-                    item.getitemName().equalsIgnoreCase(itemName)) {
+            if (item.getItemName() != null && item.getItemName().equalsIgnoreCase(itemName)) {
                 return item;
             }
         }
@@ -92,15 +89,13 @@ public class Player {
     public boolean useItem(String itemName) {
         Item item = findItemByName(itemName);
         if (item == null) return false;
-
         item.use(this);
         return true;
     }
 
     public boolean hasSword() {
         for (Item item : inventory) {
-            if (item.getitemName() != null &&
-                    item.getitemName().toLowerCase().contains("sword")) {
+            if (item.getItemName() != null && item.getItemName().toLowerCase().contains("sword")) {
                 return true;
             }
         }
@@ -117,11 +112,9 @@ public class Player {
     public int heal(int amount) {
         int before = currentHP;
         currentHP += amount;
-
         if (currentHP > maxHP) {
             currentHP = maxHP;
         }
-
         return currentHP - before;
     }
 
@@ -129,13 +122,15 @@ public class Player {
         currentHP = maxHP;
     }
 
+    public void fullHeal() {
+        this.currentHP = this.maxHP;
+    }
+
     public void modifyMaxHP(int amount) {
         maxHP += amount;
-
         if (maxHP < 1) {
             maxHP = 1;
         }
-
         if (currentHP > maxHP) {
             currentHP = maxHP;
         }
@@ -162,5 +157,21 @@ public class Player {
     public void attack(Monster monster) {
         if (monster == null) return;
         monster.takeDamage(attackPower);
+    }
+
+    public void useSword() {
+        Item sword = null;
+        for (Item item : inventory) {
+            if (item instanceof Sword) {
+                sword = item;
+                break;
+            }
+        }
+        if (sword != null) {
+            inventory.remove(sword);
+            if (attackPower > 1) {
+                attackPower -= ((Sword) sword).getDamageBonus();
+            }
+        }
     }
 }

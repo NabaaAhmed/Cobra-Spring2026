@@ -34,7 +34,7 @@ public class Puzzle4Sacrifice extends Puzzle {
             if (swordTaken) return "You already took the sword.";
             swordTaken = true;
             Sword trialSword = new Sword("TRIAL-SWORD", "Trial Sword",
-                    "A powerful sword used in the Trial of Sacrifice.", false, 3, 3);
+                    "A powerful sword used in the Trial of Sacrifice.", false, 3);
             player.addItem(trialSword);
             return "You took the sword.";
         }
@@ -48,7 +48,7 @@ public class Puzzle4Sacrifice extends Puzzle {
         if (cmd.equals("throw sword")) {
             if (!reachedBridge) return "You need to reach the bridge first.";
             if (swordThrown) return "You already threw the sword.";
-            Item sword = player.findItem("Trial Sword");
+            Item sword = player.findItemByName("Trial Sword");
             if (sword != null) player.removeItem(sword);
             swordThrown = true;
             return "You throw the sword away before reaching the end.";
@@ -72,7 +72,7 @@ public class Puzzle4Sacrifice extends Puzzle {
                         "You get +1 Max HP, Trial Token, full HP restore!\n" +
                         "You are teleported back to the Entrance Zone.";
             }
-            Item sword = player.findItem("Trial Sword");
+            Item sword = player.findItemByName("Trial Sword");
             if (sword != null) player.removeItem(sword);
             Monster wraith = new Monster("M-SAC", "Wraith", 2, 1, false);
             failPuzzle(player, wraith);

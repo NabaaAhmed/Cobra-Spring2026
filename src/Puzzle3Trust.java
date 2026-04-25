@@ -16,18 +16,18 @@ public class Puzzle3Trust extends Puzzle {
     public String startPuzzle() {
         String result = "\n===== Trial of Trust =====\n";
         result += "A guardian statue watches you.\n";
-        result += "Hint: " + getHint();
+        result += "Hint: " + hint;
         return result;
     }
 
     @Override
     public String handleCommand(Player player, String command) {
         if (command == null) return "Invalid command.";
-        if (isFinished()) return "Trial already complete.";
+        if (finished) return "Trial already complete.";
 
         String cmd = command.trim().toLowerCase();
 
-        if (cmd.equals("attack guardian")) {
+        if (cmd.equals("attack guardian") || cmd.equals("attack guardian statue")) {
             if (guardianBroken) return "Guardian already broken.";
             guardianBroken = true;
             chestAppeared = true;
@@ -36,8 +36,8 @@ public class Puzzle3Trust extends Puzzle {
 
         if (cmd.equals("destroy chest")) {
             if (!guardianBroken) return "Break the guardian first.";
-            setSolved(true);
-            setFinished(true);
+            solved = true;
+            finished = true;
             completePuzzle(player);
             return "You made the right choice! Trial of Trust Complete!\n+1 Max HP, Token, Full Heal!";
         }
@@ -45,7 +45,7 @@ public class Puzzle3Trust extends Puzzle {
         if (cmd.equals("open chest")) {
             if (!chestAppeared) return "No chest here.";
             player.takeDamage(1);
-            Monster guardian = new Monster("Guardian", 2, 1, false);
+            Monster guardian = new Monster("M-02", "Guardian", 2, 1, false);
             failPuzzle(player, guardian);
             return "Guardian reforms! You lose 1 HP! Combat begins!";
         }

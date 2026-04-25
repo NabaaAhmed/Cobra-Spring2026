@@ -1,4 +1,3 @@
-//Nabaa Class
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +9,28 @@ public class Monster {
     private int atkValue;
     private ArrayList<Item> inventory;
     private int turnCounter;
+    private boolean isBoss;
 
     public Monster(String name, int hp) {
         this.name = name;
         this.hp = hp;
         this.turnCounter = 0;
+        this.atkValue = 1;
+        this.inventory = new ArrayList<>();
+    }
+
+    public Monster(String monsterID, String name, int hp, int atkValue, boolean isBoss) {
+        this.monsterID = monsterID;
+        this.name = name;
+        this.hp = hp;
+        this.atkValue = atkValue;
+        this.isBoss = isBoss;
+        this.turnCounter = 0;
+        this.inventory = new ArrayList<>();
+    }
+
+    public Monster(String id, String name, int hp, int atkValue) {
+        this(id, name, hp, atkValue, false);
     }
 
     public String getName() {
@@ -23,6 +39,10 @@ public class Monster {
 
     public int getHp() {
         return hp;
+    }
+
+    public int getAttackValue() {
+        return atkValue;
     }
 
     public boolean isAlive() {
@@ -42,7 +62,6 @@ public class Monster {
     }
 
     public void onEncounter(Player player) {
-        // optional special effect later
     }
 
     public void onTurn(Player player) {
@@ -54,11 +73,10 @@ public class Monster {
     }
 
     public int attack() {
-        return 1;
+        return atkValue;
     }
 
     public void trigger() {
-        // optional special trigger later
     }
 
     public List<Item> dropLoot() {

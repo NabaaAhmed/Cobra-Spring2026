@@ -1,10 +1,9 @@
 public class GameView {
-    //Nabaa
+
     public void displayMessage(String message) {
         System.out.println(message);
     }
 
-    //Nabaa and Danny
     public void displayRoom(Room room) {
         if (room == null) {
             System.out.println("No room is currently loaded.");
@@ -16,41 +15,39 @@ public class GameView {
         if (!room.getItems().isEmpty()) {
             System.out.println("\nItems in room:");
             for (Item item : room.getItems()) {
-                System.out.println("- " + item.getitemName());
+                System.out.println("- " + item.getItemName());
             }
         }
 
-        if (!room.getConnections().isEmpty()) {
-            System.out.println("\nConnections:");
-            for (int i = 0; i < room.getConnections().size(); i++) {
-                System.out.println(i + ": " + room.getConnections().get(i).getRoomName());
+        if (!room.getExits().isEmpty()) {
+            System.out.println("\nExits:");
+            int i = 0;
+            for (String direction : room.getExits().keySet()) {
+                System.out.println(i + ": " + direction);
+                i++;
             }
         }
     }
 
-    //Nabaa
     public void displayInventory(Player player) {
         System.out.println("=== Inventory ===");
         if (player.getInventory().isEmpty()) {
             System.out.println("Inventory is empty.");
         } else {
-            player.getInventory().forEach(item ->
-                    System.out.println("- " + item.getitemName())
-            );
+            for (Item item : player.getInventory()) {
+                System.out.println("- " + item.getItemName());
+            }
         }
     }
 
-    //Nabaa
     public void displayCombat(String message) {
         System.out.println("[COMBAT] " + message);
     }
 
-    //Nabaa
     public void displayError(String message) {
         System.out.println("[ERROR] " + message);
     }
 
-    //Nabaa
     public void displayStatus(Player player) {
         System.out.println("=== Player Status ===");
         System.out.println("Current Room: " + player.getCurrentRoomID());
@@ -59,40 +56,61 @@ public class GameView {
         System.out.println("Trial Tokens: " + player.getTrialTokens());
     }
 
-    //Danny and Mai
-    public void displayHelp() {
-        System.out.println("=== Commands ===");
-        System.out.println("Help <Displays a list of all valid commands and their descriptions>");
-        System.out.println("Move to [room number] <Move to a connected room by its name>");
-        System.out.println("Inventory <Displays all items currently held by the player>");
-        System.out.println("Status <Displays the player's current status, including HP, max HP, attack power, and trial tokens>");
-        System.out.println("Take [item] <Picks up an item from the current room into the inventory");
-        System.out.println("Drop [item] <Drops an item from the inventory into the current room");
-        System.out.println("Use [item] <Uses an item from inventory, applying its effect or interacting with a target in the room>");
-        System.out.println("Inspect [item] <Provides a description of an item in the inventory or the current room>");
-        System.out.println("Consume [potion] <Consumes a consumable item (e.g., potion), applying its effect and removing it from inventory>");
-        System.out.println("Throw [item] <Throws an item at a target in the current room>");
-        System.out.println("Equip [sword] <Equips a weapon, applying its stat bonuses to the player>");
-        System.out.println("Fight <Initiates combat with a monster in the current room>");
-        System.out.println("Choose trial <Allows player to choose to attempt from the entrance room>");
-        System.out.println("Save <Saves current game state to file>");
-        System.out.println("Load <Loads a previously saved game state from file>");
-        System.out.println("Exit <Exits current game>");
+    public void displayHint(String hint) {
+        System.out.println("[HINT] " + hint);
     }
 
-    //Mai
+    public void displaySaveSuccess() {
+        System.out.println("[SAVE] Game saved successfully!");
+    }
+
+    public void displayLoadSuccess() {
+        System.out.println("[LOAD] Game loaded successfully!");
+    }
+
+    public void displayGameOver() {
+        System.out.println("\n========================================");
+        System.out.println("            GAME OVER                   ");
+        System.out.println("========================================");
+        System.out.println("You have died. Your journey ends here.");
+    }
+
+    public void displayWin() {
+        System.out.println("\n========================================");
+        System.out.println("         CONGRATULATIONS!               ");
+        System.out.println("========================================");
+        System.out.println("You have obtained the Catalyst!");
+        System.out.println("You are the worthy successor!");
+        System.out.println("         YOU WIN!                       ");
+        System.out.println("========================================");
+    }
+
+    public void displayHelp() {
+        System.out.println("=== Commands ===");
+        System.out.println("help - Displays a list of all valid commands");
+        System.out.println("move [number] - Move to a connected room by its number");
+        System.out.println("inventory - Displays all items held by the player");
+        System.out.println("status - Displays player status");
+        System.out.println("take [item] - Picks up an item from the current room");
+        System.out.println("drop [item] - Drops an item from inventory");
+        System.out.println("inspect [item] - Provides a description of an item");
+        System.out.println("consume [potion] - Consumes a potion");
+        System.out.println("equip [sword] - Equips a weapon");
+        System.out.println("unequip - Unequips current weapon");
+        System.out.println("attack - Initiates combat with a monster");
+        System.out.println("save - Saves current game state");
+        System.out.println("load - Loads a saved game state");
+        System.out.println("exit - Exits current game");
+    }
+
     public static void displayIntro() {
         System.out.println("     /\\      /\\      /\\      /\\      /\\      /\\      /\\");
         System.out.println("    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\    /  \\");
         System.out.println("    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /    \\  /");
         System.out.println("     \\/      \\/      \\/      \\/      \\/      \\/      \\/");
-
         System.out.println("==============WELCOME TO THE DUNGEON OF TRIALS==============");
         System.out.println("The Dungeon of Trials was constructed by a king to find a worthy successor.");
         System.out.println("The dungeon tests character across five themed trials.");
-        System.out.println("A detached Teleport Trap Room serves as a penalty zone for incorrect puzzle actions.");
         System.out.println("Good Luck!");
     }
-
-
 }

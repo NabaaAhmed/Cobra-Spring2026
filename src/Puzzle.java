@@ -1,14 +1,14 @@
 public abstract class Puzzle {
-    private String puzzleId;
-    private String trialName;
-    private String roomId;
-    private boolean solved;
-    private boolean finished;
-    private String description;
-    private String solution;
-    private String hint;
-    private boolean combatTriggered;
-    private Monster failureMonster;
+    protected String puzzleId;
+    protected String trialName;
+    protected String roomId;
+    protected boolean solved;
+    protected boolean finished;
+    protected String description;
+    protected String solution;
+    protected String hint;
+    protected boolean combatTriggered;
+    protected Monster failureMonster;
 
     public Puzzle(String puzzleId, String trialName, String roomId, String description, String solution, String hint) {
         this.puzzleId = puzzleId;
@@ -47,7 +47,7 @@ public abstract class Puzzle {
     public abstract String startPuzzle();
     public abstract String handleCommand(Player player, String command);
 
-    public void completePuzzle(Player player) {
+    protected void completePuzzle(Player player) {
         if (finished) return;
         if (solved) {
             player.modifyMaxHP(1);
@@ -58,7 +58,7 @@ public abstract class Puzzle {
         finished = true;
     }
 
-    public void failPuzzle(Player player, Monster monster) {
+    protected void failPuzzle(Player player, Monster monster) {
         this.combatTriggered = true;
         this.failureMonster = monster;
         this.finished = true;

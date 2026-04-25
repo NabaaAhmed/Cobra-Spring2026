@@ -1,9 +1,13 @@
-//Mai
 public class Sword extends Item {
     private int damageBonus;
 
-    public Sword(String itemId, String itemName, String description, String roomID, Boolean stackable, int damageBonus) {
+    public Sword(String itemId, String itemName, String description, String roomID, boolean stackable, int damageBonus) {
         super(itemId, itemName, description, roomID, stackable);
+        this.damageBonus = damageBonus;
+    }
+
+    public Sword(String itemId, String itemName, String description, boolean stackable, int damageBonus) {
+        super(itemId, itemName, description, stackable);
         this.damageBonus = damageBonus;
     }
 
