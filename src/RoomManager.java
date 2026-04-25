@@ -63,11 +63,7 @@ public class RoomManager {
 
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i].trim();
-            if (line.isEmpty()||line.startsWith("//")) {
-                continue;
-            }
-
-            if (i == 0 && line.toLowerCase().startsWith("id,")) {
+            if (line.isEmpty() || line.startsWith("//")) {
                 continue;
             }
 
@@ -83,7 +79,12 @@ public class RoomManager {
             String monsterField = parts[4].trim();
             boolean stackable = Boolean.parseBoolean(parts[5].trim());
 
+            Item newItem = createItem(itemId, itemName, description, stackable);
             if (!monsterField.equals("0")) {
+                GameModel.registerMonsterReward(monsterField.trim(), newItem);
+            }
+
+            if (monsterField.equals("0")) {
                 continue;
             }
 

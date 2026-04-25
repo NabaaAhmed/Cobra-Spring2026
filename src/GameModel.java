@@ -9,6 +9,7 @@ public class GameModel {
 
     private HashMap<String, Monster> monsterTemplates;
     private HashMap<String, String> puzzleRoomMap;
+    private static HashMap<String, Item> pendingRewards = new HashMap<>();
 
     public GameModel(Player player, RoomManager roomManager) {
         this.player = player;
@@ -106,6 +107,12 @@ public class GameModel {
             if ((destinationId.equals("FN-01") || destinationId.equals("FN-02") || destinationId.equals("EZ-02"))
                     && player.getTrialTokens() < 5) {
                 GameResult result = new GameResult("That area is locked. Complete all 5 trials first.");
+                result.setSuccess(false);
+                return result;
+            }
+
+            if (destinationId.equals("TP-TRAP-01")){
+                GameResult result = new GameResult("That area is locked. Complete the Awareness trial in AW-02 first.");
                 result.setSuccess(false);
                 return result;
             }
@@ -444,6 +451,10 @@ public class GameModel {
         return null;
     }
 
+    public static void registerMonsterReward(String monsterId, Item item) {
+        pendingRewards.put(monsterId, item);
+    }
+
     private void loadMonsters(String filename) {
         String fileData = FileManager.load(filename);
         String[] lines = fileData.split("\n");
@@ -455,7 +466,7 @@ public class GameModel {
             }
 
             String[] parts = line.split(",");
-            if (parts.length < 5) {
+            if (parts.length < 4) {
                 continue;
             }
 
@@ -463,9 +474,16 @@ public class GameModel {
             String name = parts[1].trim();
             int hp = Integer.parseInt(parts[2].trim());
             int atkValue = Integer.parseInt(parts[3].trim());
-            String reward = parts[4].trim();
 
-            monsterTemplates.put(monsterID, new Monster(monsterID, name, hp, atkValue, reward));
+            Monster monster = new Monster(monsterID, name, hp, atkValue);
+            monsterTemplates.put(monsterID, monster);
+
+            if (pendingRewards.containsKey(monsterID)) {
+                Item reward = pendingRewards.get(monsterID);
+                monster.setRewardItemName(reward.getItemName());
+            }
+
+            monsterTemplates.put(monsterID, monster);
         }
     }
 
@@ -511,8 +529,7 @@ public class GameModel {
                 template.getMonsterID(),
                 template.getName(),
                 template.getHp(),
-                template.getAttackValue(),
-                rewardName
+                template.getAttackValue()
         );
     }
 
