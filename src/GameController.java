@@ -365,9 +365,9 @@ public class GameController {
         view.displayMessage("load");
 
         if (puzzle instanceof Puzzle1Awareness) {
-            view.displayMessage("take red gem");
+            view.displayMessage("take glowing red gem");
             view.displayMessage("take rubble");
-            view.displayMessage("throw red gem");
+            view.displayMessage("throw glowing red gem");
             view.displayMessage("throw rubble");
             view.displayMessage("inspect teleporter");
             view.displayMessage("enter");
