@@ -418,7 +418,6 @@ public class GameController {
             view.displayMessage("place core fragment");
             view.displayMessage("step symbol");
             view.displayMessage("throw final jewel");
-            view.displayMessage("throw stalker corpse");
             view.displayMessage("enter unstable teleporter");
             view.displayMessage("yes / no");
             return;
