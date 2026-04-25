@@ -37,8 +37,13 @@ public class Combat {
                 result += "You and " + enemy.getName() + " clash.\n";
                 result += "Both of you take damage in the struggle.\n";
             }
-        } else if (command.equalsIgnoreCase("use potion") || command.equalsIgnoreCase("consume potion")) {
+        } else if (command.equalsIgnoreCase("consume potion")) {
             Item potion = player.findItemByName("Potion");
+
+            if (potion == null) {
+                potion = player.findItemByName("Monster potion");
+            }
+
             if (potion == null) {
                 return "You do not have a potion.\n";
             }
@@ -58,7 +63,7 @@ public class Combat {
                 result += "The potion is used up.\n";
             }
         } else {
-            return "Invalid combat command. Use 'attack' or 'use potion'.\n";
+            return "Invalid combat command. Use 'attack' or 'consume potion'.\n";
         }
 
         result += "Player HP: " + player.getCurrentHP() + "/" + player.getMaxHP() + "\n";
@@ -72,18 +77,16 @@ public class Combat {
         enemy.onEncounter(player);
         view.displayCombat("A " + enemy.getName() + " appears!");
 
-        // CHANGE #1: Track if sword was used during combat
         boolean swordWasUsed = false;
 
         while (!isBattleOver()) {
             view.displayCombat("Turn " + turnCount);
-            view.displayCombat("Type: attack, use potion, or consume potion");
+            view.displayCombat("Type: attack or consume potion");
 
             String command = input.nextLine().trim();
             String result = action(command);
             view.displayCombat(result);
 
-            // CHANGE #2: Check if sword was used to kill the monster
             if (result.contains("sword cuts through")) {
                 swordWasUsed = true;
             }
@@ -94,9 +97,9 @@ public class Combat {
         } else {
             view.displayCombat("Monster defeated!");
 
-            // CHANGE #3: Remove sword after combat if it was used (durability = 1)
             if (swordWasUsed) {
                 Item swordToRemove = null;
+
                 for (Item item : player.getInventory()) {
                     if (item.getItemName() != null &&
                             item.getItemName().toLowerCase().contains("sword")) {
@@ -104,6 +107,7 @@ public class Combat {
                         break;
                     }
                 }
+
                 if (swordToRemove != null) {
                     player.removeItem(swordToRemove);
                     view.displayCombat("The sword crumbles after its powerful strike.");

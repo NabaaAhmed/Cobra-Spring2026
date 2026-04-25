@@ -9,6 +9,8 @@ public class Potion extends Item {
 
     @Override
     public void use(Player player) {
-        player.heal(healAmount);
+        // Heal to full current Max HP.
+        // Player.heal() already caps HP at maxHP.
+        player.heal(player.getMaxHP());
     }
 }
