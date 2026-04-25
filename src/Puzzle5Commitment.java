@@ -1,61 +1,86 @@
 public class Puzzle5Commitment extends Puzzle {
     private int forwardMoves;
     private int takeCount;
+    private boolean awaitingChoice;
 
     public Puzzle5Commitment() {
-        super("PZ-05", "Commitment", "CM-05",
-                "A long corridor with tempting items. Footsteps echo behind you.",
-                "move forward six times",
-                "Keep moving forward. Don't stop to take or examine items.");
-
+        super("PZ-05", "Trial of Commitment", "CM-01");
         this.forwardMoves = 0;
         this.takeCount = 0;
+        this.awaitingChoice = false;
     }
 
     @Override
     public String startPuzzle() {
-        String result = "\n===== Trial of Commitment =====\n";
-        result += "Footsteps echo behind you. Keep moving!\n";
-        result += "Hint: " + getHint();
-        return result;
+        return "==== Welcome to the Trial of Commitment =====\n"
+                + "Heavy footsteps echo from behind you. Commit to your path and do not linger.";
+    }
+
+    @Override
+    public String getHint() {
+        return "Hint: The Pursuer is two rooms behind you. Every time you stop to examine or take an item, it gets closer.";
     }
 
     @Override
     public String handleCommand(Player player, String command) {
-        if (command == null) return "Invalid command.";
-        if (isFinished()) return "Trial already complete.";
+        if (command == null) {
+            return "Invalid command.";
+        }
 
         String cmd = command.trim().toLowerCase();
 
-        switch (cmd) {
-            case "move forward" -> {
-                forwardMoves++;
-                if (forwardMoves >= 6) {
-                    setSolved(true);
-                    setFinished(true);
-                    completePuzzle(player);
-                    return "You stayed the course!\nTrial of Commitment Complete!\n+1 Max HP, Token, Full Heal!";
-                }
-                return "You move forward. Progress: " + forwardMoves + "/6";
+        if (awaitingChoice) {
+            if (cmd.equals("yes") || cmd.equals("no")) {
+                return completeWithReward(player,
+                        "You stayed the course. Commitment proven.");
             }
-            case "examine item", "inspect item" -> {
-                player.takeDamage(1);
-                player.setCurrentRoomID("EZ-01");
-                setFinished(true);
-                return "Too slow! The Pursuer caught you! You lose 1 HP. Trial failed.";
-            }
-            case "take item" -> {
-                takeCount++;
-                if (takeCount >= 2) {
-                    player.takeDamage(1);
-                    player.setCurrentRoomID("EZ-01");
-                    setFinished(true);
-                    return "Too slow! The Pursuer caught you! You lose 1 HP. Trial failed.";
-                }
-                return "You take an item. The Pursuer gets closer!";
-            }
+            return "Please answer yes or no.";
         }
 
-        return "Invalid command. Try: move forward, take item, examine item";
+        if (cmd.equals("move forward")) {
+            forwardMoves++;
+
+            if (forwardMoves >= 6) {
+                awaitingChoice = true;
+                return "You reach the teleporter.\nWould you like to go through it? Yes or no";
+            }
+
+            return "You move forward.\nProgress: " + forwardMoves + "/6";
+        }
+
+        if (cmd.equals("examine item") || cmd.equals("inspect item")) {
+            player.takeDamage(1);
+            player.setCurrentRoomId("EZ-01");
+            isFinished = true;
+            trialComplete = false;
+            rewardEarned = false;
+            return "You hesitated for too long. The Pursuer catches you and you lose 1 HP.\n"
+                    + "You have failed the Trial of Commitment. You must try again.";
+        }
+
+        if (cmd.equals("take item")) {
+            takeCount++;
+
+            if (takeCount >= 2) {
+                player.takeDamage(1);
+                player.setCurrentRoomId("EZ-01");
+                isFinished = true;
+                trialComplete = false;
+                rewardEarned = false;
+                return "You slowed down for too long. The Pursuer catches you and you lose 1 HP.\n"
+                        + "You have failed the Trial of Commitment. You must try again.";
+            }
+
+            return "You stop to take an item. The Pursuer gets closer.";
+        }
+
+        if (cmd.equals("kill pursuer")) {
+            player.takeDamage(1);
+            return completeNoReward(player,
+                    "You kill the Pursuer. BOOM! It implodes, destroys the path behind you, and you lose 1 HP.\n"
+                            + "You have completed the Trial of Commitment. (No Reward)");
+        }
+
+        return "Invalid command.";
     }
 }

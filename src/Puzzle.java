@@ -1,66 +1,84 @@
 public abstract class Puzzle {
-    private String puzzleId;
-    private String trialName;
-    private String roomId;
-    private boolean solved;
-    private boolean finished;
-    private String description;
-    private String solution;
-    private String hint;
-    private boolean combatTriggered;
-    private Monster failureMonster;
+    protected String puzzleId;
+    protected String trialName;
+    protected String roomId;
+    protected boolean isSolved;
+    protected boolean isFinished;
+    protected boolean trialComplete;
+    protected boolean rewardEarned;
 
-    public Puzzle(String puzzleId, String trialName, String roomId, String description, String solution, String hint) {
+    public Puzzle(String puzzleId, String trialName, String roomId) {
         this.puzzleId = puzzleId;
         this.trialName = trialName;
         this.roomId = roomId;
-        this.solved = false;
-        this.finished = false;
-        this.description = description;
-        this.solution = solution != null ? solution.toLowerCase() : "";
-        this.hint = hint;
-        this.combatTriggered = false;
-        this.failureMonster = null;
+        this.isSolved = false;
+        this.isFinished = false;
+        this.trialComplete = false;
+        this.rewardEarned = false;
     }
 
-    public String getPuzzleId() { return puzzleId; }
-    public String getTrialName() { return trialName; }
-    public String getRoomId() { return roomId; }
-    public boolean isSolved() { return solved; }
-    public boolean isFinished() { return finished; }
-    public String getDescription() { return description; }
-    public String getHint() { return hint; }
-    public boolean isCombatTriggered() { return combatTriggered; }
-    public Monster getFailureMonster() { return failureMonster; }
-
-    public void setSolved(boolean solved) { this.solved = solved; }
-    public void setFinished(boolean finished) { this.finished = finished; }
-    public void setCombatTriggered(boolean triggered) { this.combatTriggered = triggered; }
-    public void setFailureMonster(Monster monster) { this.failureMonster = monster; }
-
-    public boolean checkSolution(String attempt) {
-        return solution.equals(attempt.toLowerCase().trim());
+    public String getPuzzleId() {
+        return puzzleId;
     }
 
-    public String getSolution() { return solution; }
+    public String getPuzzleID() {
+        return getPuzzleId();
+    }
+
+    public String getTrialName() {
+        return trialName;
+    }
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public String getRoomID() {
+        return getRoomId();
+    }
+
+    public boolean isSolved() {
+        return isSolved;
+    }
+
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public boolean isTrialComplete() {
+        return trialComplete;
+    }
+
+    public boolean isRewardEarned() {
+        return rewardEarned;
+    }
+
+    protected String completeWithReward(Player player, String completionMessage) {
+        player.modifyMaxHP(1);
+        player.heal(player.getMaxHP());
+        player.addTrialToken();
+        player.setCurrentRoomId("EZ-01");
+        isSolved = true;
+        isFinished = true;
+        trialComplete = true;
+        rewardEarned = true;
+
+        return completionMessage
+                + "\nYou have completed the " + trialName + " and have been teleported to the entrance zone!"
+                + "\nYou get +1 Max HP, Trial Token, full HP restore.";
+    }
+
+    protected String completeNoReward(Player player, String completionMessage) {
+        player.setCurrentRoomId("EZ-01");
+        isFinished = true;
+        trialComplete = true;
+        rewardEarned = false;
+        return completionMessage;
+    }
 
     public abstract String startPuzzle();
+
+    public abstract String getHint();
+
     public abstract String handleCommand(Player player, String command);
-
-    public void completePuzzle(Player player) {
-        if (finished) return;
-        if (solved) {
-            player.modifyMaxHP(1);
-            player.heal(player.getMaxHP());
-            player.addTrialToken();
-            player.setCurrentRoomID("EZ-01");
-        }
-        finished = true;
-    }
-
-    public void failPuzzle(Player player, Monster monster) {
-        this.combatTriggered = true;
-        this.failureMonster = monster;
-        this.finished = true;
-    }
 }

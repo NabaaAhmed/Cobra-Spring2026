@@ -1,88 +1,80 @@
-public class Puzzle2Restraint extends Puzzle{
-private boolean mimicTriggered;
-private boolean coinTaken;
-private boolean chestExamined;
-private boolean chestOpened;
-private boolean coinPlaced;
-private Item baitCoin;
+public class Puzzle2Restraint extends Puzzle {
+    private boolean coinTaken;
+    private boolean awaitingChoice;
+    private boolean combatTriggered;
+    private Monster failureMonster;
 
-public Puzzle2Restraint() {
-    super("PZ-02", "Restraint", "RS-02",
-            "A golden chest sits in the center with a bait coin nearby.",
-            "examine chest", "Don't pick up the coin before examining the chest");
-
-    this.mimicTriggered = false;
-    this.coinTaken = false;
-    this.chestExamined = false;
-    this.chestOpened = false;
-    this.coinPlaced = false;
-    this.baitCoin = new QuestItems("I-11", "Bait Coin", "A dull coin.", "RS-02", false);
-}
-
-public boolean isMimicTriggered() { return mimicTriggered; }
-public boolean isCoinTaken() { return coinTaken; }
-public Item getBaitCoin() { return baitCoin; }
-public void setCoinTaken(boolean taken) { this.coinTaken = taken; }
-
-@Override
-public String startPuzzle() {
-    String result = "\n===== Trial of Restraint =====\n";
-    result += "A golden chest sits before you.\n";
-    if (!coinTaken) result += "A dull coin lies nearby.\n";
-    return result;
-}
-
-@Override
-public String handleCommand(Player player, String command) {
-    if (command == null) return "Invalid command.";
-    if (isFinished()) return "Trial already complete.";
-
-    String cmd = command.trim().toLowerCase();
-
-    if (cmd.equals("take coin")) {
-        if (coinTaken) return "Coin already taken.";
-        player.takeItem(baitCoin);
-        coinTaken = true;
-        return "You took the Bait Coin.";
+    public Puzzle2Restraint() {
+        super("PZ-02", "Trial of Restraint", "RS-02");
+        this.coinTaken = false;
+        this.awaitingChoice = false;
+        this.combatTriggered = false;
+        this.failureMonster = null;
     }
 
-    if (cmd.equals("examine chest")) {
-        chestExamined = true;
-        if (!coinTaken) {
-            return "The chest is normal. Nothing happens.\nType 'complete' to finish.";
-        } else {
-            player.takeDamage(1);
-            mimicTriggered = true;
-            setFinished(true);
-            return "Mimic attacks! You lose 1 HP! Trial failed (No Reward).";
+    public boolean isCombatTriggered() {
+        return combatTriggered;
+    }
+
+    public Monster getFailureMonster() {
+        return failureMonster;
+    }
+
+    @Override
+    public String startPuzzle() {
+        return "====== Welcome to the Trial of Restraint =====\n"
+                + "A chest rests in the center of the room, with a single coin lying nearby.";
+    }
+
+    @Override
+    public String getHint() {
+        return "Hint: The coin may not help you. Be careful how you interact with the chest.";
+    }
+
+    @Override
+    public String handleCommand(Player player, String command) {
+        if (command == null) {
+            return "Invalid command.";
         }
-    }
 
-    if (cmd.equals("open chest")) {
-        chestOpened = true;
-        if (coinTaken) return "There's a slot for the coin. Type 'place coin'.";
-        return "The chest is locked. The coin might be a key.";
-    }
+        String cmd = command.trim().toLowerCase();
 
-    if (cmd.equals("place coin")) {
-        if (!coinTaken) return "You don't have the coin.";
-        if (!chestOpened) return "Open the chest first.";
-        if (coinPlaced) return "Coin already placed.";
-        coinPlaced = true;
-        return "Coin placed. Type 'complete' to finish.";
-    }
-
-    if (cmd.equals("complete")) {
-        if ((!coinTaken && chestExamined && !mimicTriggered) ||
-                (coinTaken && chestOpened && coinPlaced && !mimicTriggered)) {
-            setSolved(true);
-            setFinished(true);
-            completePuzzle(player);
-            return "Trial of Restraint Complete! +1 Max HP, Token, Full Heal!";
+        if (awaitingChoice) {
+            if (cmd.equals("yes") || cmd.equals("no")) {
+                return completeWithReward(player,
+                        "You resisted greed and interacted with the chest safely.");
+            }
+            return "Please answer yes or no.";
         }
-        return "You haven't solved the puzzle yet.";
-    }
 
-    return "Invalid command. Try: take coin, examine chest, open chest, place coin, complete";
-}
+        if (cmd.equals("take coin") || cmd.equals("take bait coin")) {
+            if (coinTaken) {
+                return "You already picked up the coin.";
+            }
+            coinTaken = true;
+            return "You picked up the coin.";
+        }
+
+        if (cmd.equals("inspect chest") || cmd.equals("open chest")) {
+            if (coinTaken) {
+                player.takeDamage(1);
+                failureMonster = new Monster("M-01", "Mimic", 2, 1, null);
+                combatTriggered = true;
+                isFinished = true;
+                trialComplete = true;
+                rewardEarned = false;
+                return "The Mimic ambushes you as you approach the chest!\n"
+                        + "You lose 1 HP.";
+            }
+
+            awaitingChoice = true;
+            return "The chest remains still.\nWould you like to leave the room? Yes or no";
+        }
+
+        if (cmd.equals("inspect coin")) {
+            return "A dull coin lies nearby. It looks tempting, but unimportant.";
+        }
+
+        return "Invalid command.";
+    }
 }

@@ -1,27 +1,20 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public class Monster {
-    private String id;
+    private String monsterID;
     private String name;
     private int hp;
     private int attackValue;
-    private boolean canAmbush;
-    private Item reward;
-    private boolean isAlive;
+    private String rewardItemName;
 
-    public Monster(String id, String name, int hp, int attackValue, boolean canAmbush) {
-        this.id = id;
+    public Monster(String monsterID, String name, int hp, int attackValue, String rewardItemName) {
+        this.monsterID = monsterID;
         this.name = name;
         this.hp = hp;
         this.attackValue = attackValue;
-        this.canAmbush = canAmbush;
-        this.reward = reward;
-        this.isAlive = true;
+        this.rewardItemName = rewardItemName;
     }
 
-    public String getId() {
-        return id;
+    public String getMonsterID() {
+        return monsterID;
     }
 
     public String getName() {
@@ -37,43 +30,48 @@ public class Monster {
     }
 
     public boolean isAlive() {
-        return isAlive && hp > 0;
+        return hp > 0;
     }
 
-    public boolean isCanAmbush() {
-        return canAmbush;
+    public void takeDamage(int dmg) {
+        hp -= dmg;
+        if (hp < 0) hp = 0;
     }
 
-    public void takeDamage(int amount) {
-        hp -= amount;
-        if (hp <= 0) {
-            isAlive = false;
-            hp = 0;
-        }
-    }
-
-    /**
-     * Clash combat - both player and monster take damage
-     */
-    public void clash(Player player) {
-        // Monster damages player
+    public void attack(Player player) {
         player.takeDamage(attackValue);
-        // Player damages monster
-        this.takeDamage(player.getAttackPower());
     }
 
-    /**
-     * Pre-emptive ambush attack before combat begins when player encounters monster
-     */
+    public void clash(Player player) {
+        player.takeDamage(attackValue);
+        this.takeDamage(1);
+    }
+
     public void onEncounter(Player player) {
-        if (canAmbush) {
-            player.takeDamage(attackValue);
-        }
+        // kept empty on purpose
     }
 
-    public Item dropLoot() {
-        Item dropped = reward;
-        reward = null;
-        return dropped;
+    public Item dropReward() {
+        if (rewardItemName == null || rewardItemName.equalsIgnoreCase("null")) {
+            return null;
+        }
+
+        if (rewardItemName.equalsIgnoreCase("Potion")) {
+            return new Potion("DROP-POTION", "Potion",
+                    "A small vial of restorative red liquid.", "0", true, 2);
+        }
+
+        if (rewardItemName.toLowerCase().contains("sword")) {
+            return new Sword("DROP-SWORD", rewardItemName,
+                    rewardItemName, "0", false, 2);
+        }
+
+        return new QuestItems(
+                "DROP-" + rewardItemName.toUpperCase().replace(" ", "_"),
+                rewardItemName,
+                rewardItemName,
+                "0",
+                false
+        );
     }
 }

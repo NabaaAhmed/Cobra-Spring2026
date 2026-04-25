@@ -1,79 +1,90 @@
 public class Puzzle1Awareness extends Puzzle {
-    private boolean explosionTriggered;
-    private Item glowingRedGem;
-    private Item rubble;
-    private boolean gemTaken;
+    private boolean redGemTaken;
     private boolean rubbleTaken;
+    private boolean awaitingEnterChoice;
 
     public Puzzle1Awareness() {
-        super("PZ-01", "Awareness", "AW-02",
-                "You see an unstable teleporter, a glowing red gem, and some rubble.",
-                "throw gem", "Try throwing the glowing gem at the teleporter");
-
-        this.explosionTriggered = false;
-        this.gemTaken = false;
+        super("PZ-01", "Trial of Awareness", "AW-02");
+        this.redGemTaken = false;
         this.rubbleTaken = false;
-        this.glowingRedGem = new QuestItems("I-09", "Glowing Red Gem", "A radiant gem.", "AW-02", false);
-        this.rubble = new QuestItems("I-10", "Rubble", "Broken stone.", "AW-02", false);
+        this.awaitingEnterChoice = false;
     }
-
-    public boolean isExplosionTriggered() { return explosionTriggered; }
-    public Item getGlowingRedGem() { return glowingRedGem; }
-    public Item getRubble() { return rubble; }
-    public boolean isGemTaken() { return gemTaken; }
-    public boolean isRubbleTaken() { return rubbleTaken; }
-    public void setGemTaken(boolean taken) { this.gemTaken = taken; }
-    public void setRubbleTaken(boolean taken) { this.rubbleTaken = taken; }
 
     @Override
     public String startPuzzle() {
-        String result = "\n===== Trial of Awareness =====\n";
-        result += "A teleporter crackles with unstable energy.\n";
-        result += "Items in the room:\n";
-        if (!gemTaken) result += "  - Glowing Red Gem\n";
-        if (!rubbleTaken) result += "  - Rubble\n";
-        result += "\nFind the right item to throw.";
-        return result;
+        return "==== Welcome to the Trial of Awareness =====\n"
+                + "A damaged teleporter crackles in front of you.\n"
+                + "You must find the correct item to stabilize it.";
+    }
+
+    @Override
+    public String getHint() {
+        return "Hint: The teleporter's core is shifting toward a deep crimson.\n"
+                + "Its unstable pulse matches the color of the item you need.";
     }
 
     @Override
     public String handleCommand(Player player, String command) {
-        if (command == null) return "Invalid command.";
-        if (isFinished()) return "This trial is already complete.";
+        if (command == null) {
+            return "Invalid command.";
+        }
 
         String cmd = command.trim().toLowerCase();
 
-        if (cmd.equals("take gem")) {
-            if (gemTaken) return "Gem already taken.";
-            player.takeItem(glowingRedGem);
-            gemTaken = true;
-            return "You took the Glowing Red Gem.";
+        if (awaitingEnterChoice) {
+            if (cmd.equals("enter") || cmd.equals("yes")) {
+                return completeWithReward(player,
+                        "The teleporter stabilizes and carries you safely away.");
+            } else if (cmd.equals("no")) {
+                return "The teleporter hums steadily in front of you. Type 'enter' when you are ready.";
+            }
+        }
+
+        if (cmd.equals("take red gem") || cmd.equals("take glowing red gem")) {
+            if (redGemTaken) {
+                return "You already picked up the glowing red gem.";
+            }
+            redGemTaken = true;
+            return "You picked up the glowing red gem.";
         }
 
         if (cmd.equals("take rubble")) {
-            if (rubbleTaken) return "Rubble already taken.";
-            player.takeItem(rubble);
+            if (rubbleTaken) {
+                return "You already picked up the rubble.";
+            }
             rubbleTaken = true;
-            return "You took the rubble.";
+            return "You picked up the rubble.";
         }
 
-        if (cmd.equals("throw gem")) {
-            if (!gemTaken) return "You don't have the gem!";
-            setSolved(true);
-            setFinished(true);
-            completePuzzle(player);
-            return "You throw the gem! The teleporter stabilizes!\nTrial of Awareness Complete!\n+1 Max HP, Token, Full Heal!";
+        if (cmd.equals("throw red gem") || cmd.equals("throw glowing red gem")) {
+            if (!redGemTaken) {
+                return "You need to take the glowing red gem first.";
+            }
+
+            awaitingEnterChoice = true;
+            return "The teleporter begins to stabilize.\n"
+                    + "Enter to return to the entrance zone. Type <enter>.";
         }
 
         if (cmd.equals("throw rubble")) {
-            if (!rubbleTaken) return "You don't have rubble!";
+            if (!rubbleTaken) {
+                return "You need to take the rubble first.";
+            }
+
             player.takeDamage(1);
-            explosionTriggered = true;
-            setFinished(true);
-            player.setCurrentRoomID("TP-TRAP-01");
-            return "BOOM! Explosion! You lose 1 HP and are sent to the Trap Room!";
+            player.setCurrentRoomId("TP-TRAP-01");
+            isFinished = true;
+            trialComplete = true;
+            rewardEarned = false;
+
+            return "BOOM! The teleporter erupts and you lose 1 HP.\n"
+                    + "You have completed the Trial of Awareness. (No Reward)";
         }
 
-        return "Invalid command. Try: take gem, take rubble, throw gem, throw rubble";
+        if (cmd.equals("inspect teleporter")) {
+            return "The teleporter crackles violently. It looks unstable and seems to need the correct item.";
+        }
+
+        return "Invalid command.";
     }
 }

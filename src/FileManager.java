@@ -8,7 +8,7 @@ public class FileManager {
         try {
             FileWriter writer = new FileWriter(filename);
 
-            writer.write(player.getCurrentRoomID() + "\n");
+            writer.write(player.getCurrentRoomId() + "\n");
             writer.write(player.getCurrentHP() + "\n");
             writer.write(player.getMaxHP() + "\n");
             writer.write(player.getAttackPower() + "\n");
@@ -98,7 +98,7 @@ public class FileManager {
                             );
                         }
 
-                        player.takeItem(item);
+                        player.addItem(item);
                     }
                 }
             }

@@ -2,13 +2,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class RoomManager {
-    private HashMap<String, Room> roomMap = new HashMap<>();
+    private HashMap<String, Room> rooms;
     private Room currentRoom;
 
     public RoomManager() {
-        loadRooms("Rooms.txt");
+        rooms = new HashMap<>();
+        loadRooms("rooms.txt");
         loadItems("item.txt");
-        this.currentRoom = roomMap.get("EZ-01");
     }
 
     private void loadRooms(String filename) {
@@ -17,7 +17,7 @@ public class RoomManager {
 
         ArrayList<String[]> rawData = new ArrayList<>();
 
-        for (int i =1; i < lines.length; i++) {
+        for (int i = 1; i < lines.length; i++) {
             String line = lines[i].trim();
             if (line.isEmpty()) {
                 continue;
@@ -33,24 +33,27 @@ public class RoomManager {
             String desc = parts[2].trim();
 
             Room room = new Room(id, name, desc);
-            roomMap.put(id, room);
+            rooms.put(id, room);
             rawData.add(parts);
         }
 
         for (String[] parts : rawData) {
-            Room room = roomMap.get(parts[0].trim());
-            if (parts.length > 3) {
-                String[] exitIds = parts[3].split(";");
-                for (String targetId : exitIds) {
-                    targetId = targetId.trim();
-                    if (roomMap.containsKey(targetId)) {
-                        room.connection(roomMap.get(targetId));
-                    }
+            Room room = rooms.get(parts[0].trim());
+
+            for (int i = 3; i < parts.length; i++) {
+                String targetId = parts[i].trim();
+
+                if (targetId.equals("0")) {
+                    continue;
+                }
+
+                if (rooms.containsKey(targetId)) {
+                    room.connection(rooms.get(targetId));
                 }
             }
         }
 
-        currentRoom = roomMap.get("EZ-01");
+        currentRoom = rooms.get("EZ-01");
     }
 
     private void loadItems(String filename) {
@@ -95,9 +98,9 @@ public class RoomManager {
             String[] roomIds = roomField.split(";");
             for (String rawRoomId : roomIds) {
                 String roomID = rawRoomId.trim();
-                if (roomMap.containsKey(roomID)) {
+                if (rooms.containsKey(roomID)) {
                     Item roomItem = createItem(itemId, itemName, description, stackable);
-                    roomMap.get(roomID).addItem(roomItem);
+                    rooms.get(roomID).addItem(roomItem);
                 }
             }
         }
@@ -107,7 +110,7 @@ public class RoomManager {
         if (itemName.equalsIgnoreCase("Potion") || itemName.equalsIgnoreCase("Monster potion")) {
             return new Potion(itemId, itemName, description, "0", stackable, 2);
         } else if (itemName.toLowerCase().contains("sword")) {
-            return new Sword(itemId, itemName, description, "0", stackable, 1);
+            return new Sword(itemId, itemName, description, "0", stackable, 2);
         } else {
             return new QuestItems(itemId, itemName, description, "0", stackable);
         }
@@ -128,32 +131,30 @@ public class RoomManager {
     }
 
     public void setRoom(String id) {
-        if (roomMap.containsKey(id)) {
-            currentRoom = roomMap.get(id);
+        if (rooms.containsKey(id)) {
+            currentRoom = rooms.get(id);
         }
     }
 
     private String[] splitCSVLine(String line) {
         ArrayList<String> result = new ArrayList<>();
-        String currentCell = "";
+        StringBuilder current = new StringBuilder();
         boolean inQuotes = false;
 
-        for (int i = 0; i < line.length(); i++) {
-            char c = line.charAt(i);
-
-            if (c == '\"') {
+        for (char c : line.toCharArray()) {
+            if (c == '"') {
                 inQuotes = !inQuotes;
             } else if (c == ',' && !inQuotes) {
-                result.add(currentCell.trim());
-                currentCell = ""; // Reset to empty string
+                result.add(current.toString());
+                current = new StringBuilder();
             } else {
-                currentCell += c; // Standard string concatenation
+                current.append(c);
             }
         }
-        result.add(currentCell.trim());
+
+        result.add(current.toString());
         return result.toArray(new String[0]);
     }
-
 
     private String[] splitItemLine(String line) {
         ArrayList<String> result = new ArrayList<>();
@@ -188,7 +189,7 @@ public class RoomManager {
                 description.append(result.get(i));
             }
 
-            return new String[] {
+            return new String[]{
                     itemId,
                     itemName,
                     description.toString().trim(),

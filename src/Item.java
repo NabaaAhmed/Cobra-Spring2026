@@ -40,7 +40,7 @@ public abstract class Item {
     }
 
     public void setRoomID(String roomID) {
-        this.roomId = roomId;
+        this.roomId = roomID;
     }
 
     public Boolean getStackable() {
@@ -62,7 +62,7 @@ public abstract class Item {
 
     public void moveToRoom(String roomID) {
         this.inPlayerInventory = false;
-        this.roomId = roomId;
+        this.roomId = roomID;
     }
 
     public abstract void use(Player player);

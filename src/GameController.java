@@ -15,9 +15,11 @@ public class GameController {
 
     public void startGame() {
         view.displayIntro();
+        view.displayMessage("");
         view.displayMessage(model.lookRoom().getMessage());
 
         while (isRunning) {
+            view.displayMessage("");
             view.displayMessage("Enter command:");
             System.out.print("> ");
 
@@ -150,6 +152,42 @@ public class GameController {
             return;
         }
 
+        if (command.equalsIgnoreCase("status")) {
+            view.displayMessage(model.showStatus().getMessage());
+            return;
+        }
+
+        if (command.equalsIgnoreCase("inventory")) {
+            view.displayMessage(model.showInventory().getMessage());
+            return;
+        }
+
+        if (command.equalsIgnoreCase("save")) {
+            displayResult(model.saveGame());
+            return;
+        }
+
+        if (command.equalsIgnoreCase("load")) {
+            displayResult(model.loadGame());
+            return;
+        }
+
+        if (command.equalsIgnoreCase("fight") || command.equalsIgnoreCase("startcombat")) {
+            GameResult fightResult = model.startCombatForCurrentRoom();
+            displayResult(fightResult);
+
+            if (fightResult.isCombatStarted()) {
+                runCombat(fightResult.getMonster());
+            }
+            return;
+        }
+
+        if (command.equalsIgnoreCase("exit")) {
+            view.displayMessage("Exiting game.");
+            isRunning = false;
+            return;
+        }
+
         GameResult result = model.handlePuzzleCommand(command);
         displayResult(result);
 
@@ -163,7 +201,7 @@ public class GameController {
 
         if (result.isPuzzleFinished()) {
             Puzzle finishedPuzzle = result.getPuzzle();
-            boolean completedTrial = finishedPuzzle != null && finishedPuzzle.isSolved();
+            boolean completedTrial = finishedPuzzle != null && finishedPuzzle.isTrialComplete();
 
             if (completedTrial) {
                 model.markTrialCompletedForPuzzle(finishedPuzzle);
@@ -201,36 +239,36 @@ public class GameController {
         }
 
         if (!combat.isMonsterAlive()) {
-            Item reward = monster.dropLoot();
+            Item reward = monster.dropReward();
             if (reward != null) {
-                model.getPlayer().takeItem(reward);
+                model.getPlayer().addItem(reward);
                 view.displayMessage("Monster dropped: " + reward.getItemName());
             }
 
             if (activePuzzleBeforeCombat instanceof Puzzle2Restraint) {
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                model.getPlayer().setCurrentRoomID("EZ-01");
+                model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
-                view.displayMessage("You have completed the Trial of Restraint, and you need to return to the entrance zone! (No Reward)");
+                view.displayMessage("You have completed the Trial of Restraint and returned to the entrance zone. (No Reward)");
                 return;
             }
 
             if (activePuzzleBeforeCombat instanceof Puzzle3Trust) {
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                model.getPlayer().setCurrentRoomID("EZ-01");
+                model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
-                view.displayMessage("You have completed Trial of Trust (No Reward)");
+                view.displayMessage("You have completed the Trial of Trust. (No Reward)");
                 return;
             }
 
             if (activePuzzleBeforeCombat instanceof Puzzle4Sacrifice) {
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                model.getPlayer().setCurrentRoomID("EZ-01");
+                model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
-                view.displayMessage("You have completed Trial of Sacrifice (No Reward)");
+                view.displayMessage("You have completed the Trial of Sacrifice. (No Reward)");
                 return;
             }
 
@@ -242,7 +280,7 @@ public class GameController {
             }
         }
 
-        model.getRoomManager().setRoom(model.getPlayer().getCurrentRoomID());
+        model.getRoomManager().setRoom(model.getPlayer().getCurrentRoomId());
     }
 
     private void displayResult(GameResult result) {
@@ -254,21 +292,7 @@ public class GameController {
     }
 
     private void printMainHelp() {
-        view.displayMessage("=== Commands ===");
-        view.displayMessage("inspect room");
-        view.displayMessage("move [number]");
-        view.displayMessage("take [item]");
-        view.displayMessage("drop [item]");
-        view.displayMessage("consume [item]");
-        view.displayMessage("equip [item]");
-        view.displayMessage("unequip [item]");
-        view.displayMessage("inventory");
-        view.displayMessage("status");
-        view.displayMessage("fight");
-        view.displayMessage("hint");
-        view.displayMessage("save");
-        view.displayMessage("load");
-        view.displayMessage("exit");
+        view.displayMainHelp();
     }
 
     private void printPuzzleHelp(Puzzle puzzle) {
@@ -279,6 +303,10 @@ public class GameController {
 
         view.displayMessage("=== Puzzle Commands ===");
         view.displayMessage("hint");
+        view.displayMessage("status");
+        view.displayMessage("inventory");
+        view.displayMessage("save");
+        view.displayMessage("load");
 
         if (puzzle instanceof Puzzle1Awareness) {
             view.displayMessage("take red gem");
@@ -326,6 +354,7 @@ public class GameController {
         }
 
         if (puzzle instanceof Puzzle6FinalTrial) {
+            view.displayMessage("fight");
             view.displayMessage("burn chest");
             view.displayMessage("extinguish fire");
             view.displayMessage("open chest");
@@ -339,7 +368,8 @@ public class GameController {
             return;
         }
 
-        if (puzzle instanceof Puzzle7Trap) {
+        if (puzzle instanceof Puzzle7AwarenessTrap) {
+            view.displayMessage("fight");
             view.displayMessage("inspect room");
             view.displayMessage("take rubble");
             view.displayMessage("take red gem");
@@ -347,7 +377,6 @@ public class GameController {
             view.displayMessage("throw red gem");
             view.displayMessage("enter teleporter");
             view.displayMessage("yes / no");
-            return;
         }
     }
 }

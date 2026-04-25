@@ -1,10 +1,9 @@
-//Mai
 public class Potion extends Item {
     private final int healAmount;
 
     public Potion(String itemId, String itemName, String description, String roomID, Boolean stackable, int healAmount) {
         super(itemId, itemName, description, roomID, stackable);
-        this.healAmount = 9;
+        this.healAmount = healAmount;
     }
 
     @Override
@@ -12,4 +11,3 @@ public class Potion extends Item {
         player.heal(healAmount);
     }
 }
-

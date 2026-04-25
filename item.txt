@@ -1,4 +1,3 @@
-//Danny and Mai
 I-01,Broken Torch Handle,A cracked wooden torch shaft found at the dungeon entrance.,EZ-01, 0, false
 I-02,Strong Trial Sword,A glowing blade filled with unstable power.,SC-01, 0, false
 I-03,Explosive Device,A compact cylindrical bomb, half the size of a hand.,EZ-02, 0, false
@@ -17,4 +16,3 @@ I-15,Crystal Lens,A translucent optical lens.,CM-04, 0, false
 I-16,Ancient Map,A worn parchment marked with faded paths.,CM-06, 0, false
 I-17,Final Jewel,A jewel revealed beneath the cracked floor symbol.,FN-02, 0, false
 I-18,Monster potion,A potion dropped by the Warden.,0, M-07, false
-
