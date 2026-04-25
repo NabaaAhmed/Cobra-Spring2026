@@ -1,3 +1,4 @@
+//nabaa
 public class Puzzle7AwarenessTrap extends Puzzle {
     private boolean rubbleTaken;
     private boolean redGemTaken;

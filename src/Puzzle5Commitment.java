@@ -1,3 +1,4 @@
+//danny
 public class Puzzle5Commitment extends Puzzle {
     private int forwardMoves;
     private int takeCount;

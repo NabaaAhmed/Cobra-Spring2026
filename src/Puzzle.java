@@ -1,3 +1,4 @@
+//mai
 public abstract class Puzzle {
     protected String puzzleId;
     protected String trialName;

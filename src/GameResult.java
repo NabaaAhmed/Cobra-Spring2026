@@ -1,3 +1,4 @@
+//danny
 public class GameResult {
     private String message;
     private boolean success;

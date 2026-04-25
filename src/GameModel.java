@@ -1,3 +1,4 @@
+//team
 import java.util.HashMap;
 
 public class GameModel {
@@ -87,7 +88,7 @@ public class GameModel {
             Room current = roomManager.getCurrentRoom();
 
             if (index < 0 || index >= current.getConnections().size()) {
-                GameResult result = new GameResult("Invalid room connection.");
+                GameResult result = new GameResult("No current room loaded.");
                 result.setSuccess(false);
                 return result;
             }
@@ -207,12 +208,26 @@ public class GameModel {
             return result;
         }
 
-        item.use(player);
-
         if (item instanceof Potion) {
+            int beforeHP = player.getCurrentHP();
+
+            item.use(player);
             player.removeItem(item);
-            return new GameResult("You used a potion.");
+
+            int healedAmount = player.getCurrentHP() - beforeHP;
+
+            if (healedAmount > 0) {
+                return new GameResult("You drink the potion. Warmth rushes through your body.\n"
+                        + "Your HP increased by " + healedAmount + " point(s).\n"
+                        + "Current HP: " + player.getCurrentHP() + "/" + player.getMaxHP());
+            } else {
+                return new GameResult("You drink the potion, but your HP was already full.\n"
+                        + "The potion is used up.\n"
+                        + "Current HP: " + player.getCurrentHP() + "/" + player.getMaxHP());
+            }
         }
+
+        item.use(player);
 
         if (lower.startsWith("equip ")) {
             return new GameResult("You equipped " + item.getItemName() + ".");
@@ -249,7 +264,7 @@ public class GameModel {
 
     public GameResult saveGame() {
         FileManager.savePlayer("save.txt", player);
-        return new GameResult("Game saved.");
+        return new GameResult("Game progress has been saved!");
     }
 
     public GameResult loadGame() {

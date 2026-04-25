@@ -1,3 +1,4 @@
+//team
 import java.util.Scanner;
 
 public class GameController {
@@ -119,10 +120,10 @@ public class GameController {
                 return;
 
             case "save":
-                displayResult(model.saveGame());
-                return;
+                view.displayError("You cannot save in the middle of a puzzle. Finish or fail the puzzle first.");                return;
 
             case "load":
+                model.clearActivePuzzle();
                 displayResult(model.loadGame());
                 return;
 
@@ -137,6 +138,13 @@ public class GameController {
     }
 
     private void handlePuzzleLoop(String command) {
+        if (command.isEmpty()) {
+            view.displayError("Please enter a command.");
+            return;
+        }
+
+        String action = command.split(" ")[0].toLowerCase();
+
         if (command.equalsIgnoreCase("help")) {
             printPuzzleHelp(model.getActivePuzzle());
             return;
@@ -159,6 +167,23 @@ public class GameController {
 
         if (command.equalsIgnoreCase("inventory")) {
             view.displayMessage(model.showInventory().getMessage());
+            return;
+        }
+
+        // Allow normal item commands even while a puzzle is active.
+        // This lets the player pick up potions, consume potions, equip swords, etc.
+        if (action.equals("take")) {
+            displayResult(model.takeItem(command));
+            return;
+        }
+
+        if (action.equals("drop")) {
+            displayResult(model.dropItem(command));
+            return;
+        }
+
+        if (action.equals("use") || action.equals("consume") || action.equals("equip") || action.equals("unequip")) {
+            displayResult(model.useItem(command));
             return;
         }
 
@@ -305,6 +330,11 @@ public class GameController {
         view.displayMessage("hint");
         view.displayMessage("status");
         view.displayMessage("inventory");
+        view.displayMessage("take [item]");
+        view.displayMessage("drop [item]");
+        view.displayMessage("consume [item]");
+        view.displayMessage("equip [item]");
+        view.displayMessage("unequip [item]");
         view.displayMessage("save");
         view.displayMessage("load");
 

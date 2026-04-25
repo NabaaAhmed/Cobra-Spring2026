@@ -1,3 +1,4 @@
+//nabaa
 public class Puzzle2Restraint extends Puzzle {
     private boolean coinTaken;
     private boolean awaitingChoice;
