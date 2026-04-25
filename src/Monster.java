@@ -6,12 +6,11 @@ public class Monster {
     private int attackValue;
     private String rewardItemName;
 
-    public Monster(String monsterID, String name, int hp, int attackValue, String rewardItemName) {
+    public Monster(String monsterID, String name, int hp, int attackValue) {
         this.monsterID = monsterID;
         this.name = name;
         this.hp = hp;
         this.attackValue = attackValue;
-        this.rewardItemName = rewardItemName;
     }
 
     public String getMonsterID() {
@@ -37,6 +36,11 @@ public class Monster {
     public void takeDamage(int dmg) {
         hp -= dmg;
         if (hp < 0) hp = 0;
+
+    }
+
+    public void setRewardItemName(String rewardItemName) {
+        this.rewardItemName = rewardItemName;
     }
 
     public void attack(Player player) {

@@ -59,7 +59,7 @@ public class Puzzle2Restraint extends Puzzle {
         if (cmd.equals("inspect chest") || cmd.equals("open chest")) {
             if (coinTaken) {
                 player.takeDamage(1);
-                failureMonster = new Monster("M-01", "Mimic", 2, 1, null);
+                failureMonster = new Monster("M-01", "Mimic", 2, 1);
                 combatTriggered = true;
                 isFinished = true;
                 trialComplete = true;

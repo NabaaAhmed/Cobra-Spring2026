@@ -119,7 +119,7 @@ public class Puzzle4Sacrifice extends Puzzle {
                         "You chose to let go of power and were spared.");
             }
 
-            failureMonster = new Monster("M-04", "Wraith", 2, 1, null);
+            failureMonster = new Monster("M-04", "Wraith", 2, 1);
             combatTriggered = true;
             isFinished = true;
             trialComplete = true;

@@ -114,7 +114,7 @@ public class Puzzle6FinalTrial extends Puzzle {
 
             fireExtinguished = true;
             stalkerPathRequired = true;
-            failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1, null);
+            failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1);
             combatTriggered = true;
             return "The trial can no longer proceed normally.\n"
                     + "The Stalker appears!";
@@ -130,7 +130,7 @@ public class Puzzle6FinalTrial extends Puzzle {
             }
 
             stalkerPathRequired = true;
-            failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1, null);
+            failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1);
             combatTriggered = true;
             return "A trap is triggered!\n"
                     + "You lose 5 HP and 5 Max HP.\n"
@@ -201,7 +201,7 @@ public class Puzzle6FinalTrial extends Puzzle {
             }
             if (player.getTrialTokens() < 5 && !stalkerDefeated) {
                 stalkerPathRequired = true;
-                failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1, null);
+                failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1);
                 combatTriggered = true;
                 return "The teleporter rejects your progress.\nThe Stalker appears!";
             }
