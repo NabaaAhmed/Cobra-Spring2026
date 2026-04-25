@@ -1,6 +1,7 @@
-monsterID,name,HP,atkValue,reward
+//Team
+//monsterID,name,HP,atkValue,reward
 M-01,Mimic,2,1,null
-M-02,Guardian,2,1,Silver Sigil/Emerald Fragment
+M-02,Guardian,2,1,Silver Sigil
 M-03,Golem,2,1,Gold Chain
 M-04,Wraith,2,1,null
 M-05,Pursuer,2,1,null
