@@ -92,6 +92,7 @@ public class Puzzle6FinalTrial extends Puzzle {
         combatTriggered = true;
 
         String message = reasonMessage;
+        message += "\nA dark presence tears itself free from the chamber's shadows.";
 
         if (ambushDamage) {
             player.takeDamage(1);
@@ -107,7 +108,8 @@ public class Puzzle6FinalTrial extends Puzzle {
 
         // 5 tokens means no Stalker from wrong-action rule.
         if (tokens >= 5) {
-            return wrongMessage;
+            return wrongMessage
+                    + "\nYour five Trial Tokens protect you from the Stalker, but the Final Trial still cannot be completed out of order.";
         }
 
         wrongActionCount++;
@@ -130,15 +132,17 @@ public class Puzzle6FinalTrial extends Puzzle {
     @Override
     public String startPuzzle() {
         return "==== Welcome to the Final Trial =====\n"
-                + "Everything you have learned will now be tested.\n"
-                + "A chest, a looming statue, a cracked floor symbol, and an unstable teleporter pad stand before you.";
+                + "The chamber is quiet except for the low hum of an unstable teleporter.\n"
+                + "A chest sits near the center of the room, surrounded by signs of old fire and damage.\n"
+                + "A looming statue, a broken pillar, and a cracked floor symbol stand nearby.\n"
+                + "Everything in the room feels connected. The order of your actions matters.";
     }
 
     @Override
     public String getHint() {
-        return "Hint: Do not extinguish the fire.\n"
-                + "Timing and order matter.\n"
-                + "Some actions cannot be undone.";
+        return "Hint: Fire reveals what is hidden.\n"
+                + "Do not put the flames out.\n"
+                + "The statue, the pillar, the cracked symbol, and the teleporter must be handled in the correct order.";
     }
 
     @Override
@@ -157,7 +161,9 @@ public class Puzzle6FinalTrial extends Puzzle {
                 trialComplete = true;
                 rewardEarned = false;
 
-                return "You have completed the Final Trial and reached the end room!\n"
+                return "You step into the stabilized teleporter.\n"
+                        + "The dungeon falls silent as the light carries you beyond the trials.\n"
+                        + "You have completed the Final Trial and reached the Ascension Chamber!\n"
                         + "You obtain the Catalyst... You Win!";
             }
 
@@ -168,8 +174,9 @@ public class Puzzle6FinalTrial extends Puzzle {
                 trialComplete = true;
                 rewardEarned = false;
 
-                return "You must enter the teleporter to complete your journey.\n"
-                        + "You obtain the Catalyst... You Win!";
+                return "You hesitate, but the stabilized teleporter pulls you forward.\n"
+                        + "The dungeon refuses to let the final path remain unfinished.\n"
+                        + "You arrive in the Ascension Chamber and obtain the Catalyst... You Win!";
             }
 
             return "Please answer yes or no.";
@@ -182,7 +189,9 @@ public class Puzzle6FinalTrial extends Puzzle {
 
             chestBurned = true;
             actionsSinceBurn = 1;
-            return "The chest catches fire.\nThe room grows hotter. Keep moving in the correct order.";
+            return "The chest catches fire.\n"
+                    + "Heat spreads through the chamber, and the unstable teleporter pulses in response.\n"
+                    + "Something hidden in the room begins to shift.";
         }
 
         if (cmd.equals("extinguish fire")) {
@@ -197,11 +206,15 @@ public class Puzzle6FinalTrial extends Puzzle {
             fireExtinguished = true;
 
             if (player.getTrialTokens() >= 5) {
-                return "The fire goes out.\nThe trial can no longer proceed normally, but no monster appears because you have all 5 Trial Tokens.";
+                return "The flames die out, and the chamber falls into a heavy silence.\n"
+                        + "Your five Trial Tokens protect you from the Stalker, but the normal final path is now broken.\n"
+                        + "Without the fire, the cracked floor symbol can no longer fully reveal itself.\n"
+                        + "The unstable teleporter remains your only way out.";
             }
 
             return triggerStalker(player,
-                    "The trial can no longer proceed normally.",
+                    "The flames die out, and the chamber reacts violently.\n"
+                            + "The cracked symbol fades before it can fully appear.",
                     true);
         }
 
@@ -213,18 +226,24 @@ public class Puzzle6FinalTrial extends Puzzle {
                 isFinished = true;
                 trialComplete = true;
                 rewardEarned = false;
-                return "A trap is triggered!\nYou lose 5 HP and 5 Max HP.\nYou died during the Final Trial.";
+                return "You open the chest, and the chamber answers with a violent surge of energy.\n"
+                        + "A trap is triggered!\n"
+                        + "You lose 5 HP and 5 Max HP.\n"
+                        + "You died during the Final Trial.";
             }
 
             if (player.getTrialTokens() >= 5) {
-                return "A trap is triggered!\n"
+                return "You open the chest, and the chamber answers with a violent surge of energy.\n"
+                        + "A trap is triggered!\n"
                         + "You lose 5 HP and 5 Max HP.\n"
-                        + "No monster appears because you have all 5 Trial Tokens.";
+                        + "Your five Trial Tokens prevent the Stalker from appearing, but the final path is now unstable.";
             }
 
             // No extra -1 ambush here because open chest already punishes heavily.
             return triggerStalker(player,
-                    "A trap is triggered!\nYou lose 5 HP and 5 Max HP.",
+                    "You open the chest, and the chamber answers with a violent surge of energy.\n"
+                            + "A trap is triggered!\n"
+                            + "You lose 5 HP and 5 Max HP.",
                     false);
         }
 
@@ -241,9 +260,12 @@ public class Puzzle6FinalTrial extends Puzzle {
             advanceBurnCounter();
             statueBroken = true;
 
-            String message = "The statue shatters.\nCore Fragment drops.";
+            String message = "You place the explosive device into the statue.\n"
+                    + "A sharp crack echoes through the chamber as the statue bursts apart.\n"
+                    + "A glowing Core Fragment falls from the rubble.";
+
             if (crackedSymbolAppeared) {
-                message += "\nA cracked floor symbol is now visible.";
+                message += "\nThe cracked floor symbol now glows clearly beneath your feet.";
             }
 
             return message;
@@ -261,9 +283,12 @@ public class Puzzle6FinalTrial extends Puzzle {
             advanceBurnCounter();
             corePlaced = true;
 
-            String message = "The teleporter activates, but it remains unstable.";
+            String message = "You place the Core Fragment into the broken pillar.\n"
+                    + "The pillar glows, sending a thin beam of light toward the teleporter.\n"
+                    + "The teleporter activates, but its energy is still unstable.";
+
             if (crackedSymbolAppeared) {
-                message += "\nA cracked floor symbol is now visible.";
+                message += "\nThe cracked floor symbol now glows clearly beneath your feet.";
             }
 
             return message;
@@ -280,7 +305,9 @@ public class Puzzle6FinalTrial extends Puzzle {
             }
 
             finalJewelAppeared = true;
-            return "The floor collapses.\nFinal Jewel appears.";
+            return "You step onto the glowing floor symbol.\n"
+                    + "The stone beneath it collapses, revealing a hidden chamber below.\n"
+                    + "A Final Jewel rises from the darkness, pulsing with the same energy as the teleporter.";
         }
 
         if (cmd.equals("throw final jewel")) {
@@ -303,12 +330,14 @@ public class Puzzle6FinalTrial extends Puzzle {
                 if (shouldBossAppearByTokenChance(player) && !stalkerDefeated) {
                     if (player.getTrialTokens() <= 0) {
                         return triggerStalker(player,
-                                "You have no Trial Tokens.\nThe teleporter rejects your progress.",
+                                "The Final Jewel strikes the teleporter, but nothing protects you from the dungeon's judgment.\n"
+                                        + "With no Trial Tokens, the chamber rejects your attempt to pass.",
                                 true);
                     }
 
                     return triggerStalker(player,
-                            "Your Trial Tokens flicker uncertainly.\nThe teleporter resists your progress.",
+                            "Your Trial Tokens flicker weakly as the Final Jewel hits the teleporter.\n"
+                                    + "For a moment, the path almost stabilizes... then the chamber growls back.",
                             true);
                 }
             }
@@ -317,18 +346,21 @@ public class Puzzle6FinalTrial extends Puzzle {
             awaitingChoice = true;
 
             if (player.getTrialTokens() >= 5) {
-                return "Your five Trial Tokens shine brightly.\n"
-                        + "The teleporter stabilizes without resistance.\n"
+                return "Your five Trial Tokens shine brightly, forming a circle of light around the teleporter.\n"
+                        + "The Final Jewel locks into the center of the unstable energy field.\n"
+                        + "The teleporter becomes calm and clear.\n"
                         + "Would you like to go through the teleporter? Yes or no";
             }
 
-            return "The teleporter stabilizes.\nWould you like to go through the teleporter? Yes or no";
+            return "The Final Jewel strikes the center of the teleporter pad.\n"
+                    + "The unstable energy finally settles into a steady glow.\n"
+                    + "Would you like to go through the teleporter? Yes or no";
         }
 
         if (cmd.equals("enter unstable teleporter")) {
             if (teleporterStabilized) {
                 awaitingChoice = true;
-                return "The teleporter is ready. Would you like to go through the teleporter? Yes or no";
+                return "The teleporter is ready.\nWould you like to go through the teleporter? Yes or no";
             }
 
             player.setCurrentRoomId("TP-TRAP-01");
@@ -336,9 +368,11 @@ public class Puzzle6FinalTrial extends Puzzle {
             trialComplete = true;
             rewardEarned = false;
 
-            return "You are pulled into a distorted space...\nYou are sent to the Trap Room.";
+            return "You step onto the unstable teleporter before it is ready.\n"
+                    + "The energy twists violently around you, ripping open a distorted path.\n"
+                    + "You are thrown into the Trap Room.";
         }
 
-        return countWrongAction(player, "Invalid command.");
+        return "Invalid command.";
     }
 }
