@@ -1,24 +1,32 @@
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Player {
-    private String currentRoomID;
+    private String currentRoomId;
     private int maxHP;
     private int currentHP;
     private ArrayList<Item> inventory;
     private int attackPower;
     private int trialTokens;
+    private HashSet<String> completedTrials;
 
-    public Player(String startingRoomID) {
-        this.currentRoomID = startingRoomID;
+    public Player(String startingRoomId) {
+        this.currentRoomId = startingRoomId;
         this.maxHP = 5;
         this.currentHP = 5;
         this.inventory = new ArrayList<>();
         this.attackPower = 1;
         this.trialTokens = 0;
+        this.completedTrials = new HashSet<>();
+    }
+
+    public String getCurrentRoomId() {
+        return currentRoomId;
     }
 
     public String getCurrentRoomID() {
-        return currentRoomID;
+        return getCurrentRoomId();
     }
 
     public int getCurrentHP() {
@@ -45,24 +53,24 @@ public class Player {
         return trialTokens;
     }
 
-    public void setCurrentRoomID(String currentRoomID) {
-        this.currentRoomID = currentRoomID;
+    public Set<String> getCompletedTrials() {
+        return completedTrials;
+    }
+
+    public void setCurrentRoomId(String currentRoomId) {
+        this.currentRoomId = currentRoomId;
+    }
+
+    public void setCurrentRoomID(String currentRoomId) {
+        setCurrentRoomId(currentRoomId);
     }
 
     public void setAttackPower(int attackPower) {
         this.attackPower = attackPower;
     }
 
-    public void setMaxHP(int maxHP) {
-        this.maxHP = maxHP;
-    }
-
-    public void setCurrentHP(int currentHP) {
-        this.currentHP = currentHP;
-    }
-
-    public void moveToRoom(String roomID) {
-        this.currentRoomID = roomID;
+    public void moveToRoom(String roomId) {
+        this.currentRoomId = roomId;
     }
 
     public void addItem(Item item) {
@@ -78,8 +86,10 @@ public class Player {
 
     public Item findItemByName(String itemName) {
         if (itemName == null) return null;
+
         for (Item item : inventory) {
-            if (item.getItemName() != null && item.getItemName().equalsIgnoreCase(itemName)) {
+            if (item.getItemName() != null &&
+                    item.getItemName().equalsIgnoreCase(itemName)) {
                 return item;
             }
         }
@@ -89,13 +99,15 @@ public class Player {
     public boolean useItem(String itemName) {
         Item item = findItemByName(itemName);
         if (item == null) return false;
+
         item.use(this);
         return true;
     }
 
     public boolean hasSword() {
         for (Item item : inventory) {
-            if (item.getItemName() != null && item.getItemName().toLowerCase().contains("sword")) {
+            if (item.getItemName() != null &&
+                    item.getItemName().toLowerCase().contains("sword")) {
                 return true;
             }
         }
@@ -112,25 +124,25 @@ public class Player {
     public int heal(int amount) {
         int before = currentHP;
         currentHP += amount;
+
         if (currentHP > maxHP) {
             currentHP = maxHP;
         }
+
         return currentHP - before;
-    }
-
-    public void healToFull() {
-        currentHP = maxHP;
-    }
-
-    public void fullHeal() {
-        this.currentHP = this.maxHP;
     }
 
     public void modifyMaxHP(int amount) {
         maxHP += amount;
+
         if (maxHP < 1) {
             maxHP = 1;
         }
+
+        if (maxHP > 10) {
+            maxHP = 10;
+        }
+
         if (currentHP > maxHP) {
             currentHP = maxHP;
         }
@@ -141,7 +153,9 @@ public class Player {
     }
 
     public void addTrialToken() {
-        trialTokens++;
+        if (trialTokens < 5) {
+            trialTokens++;
+        }
     }
 
     public void removeTrialToken() {
@@ -150,28 +164,11 @@ public class Player {
         }
     }
 
-    public String waitTurn() {
-        return "You wait for a turn.";
+    public boolean hasCompletedTrial(String trialKey) {
+        return completedTrials.contains(trialKey);
     }
 
-    public void attack(Monster monster) {
-        if (monster == null) return;
-        monster.takeDamage(attackPower);
-    }
-
-    public void useSword() {
-        Item sword = null;
-        for (Item item : inventory) {
-            if (item instanceof Sword) {
-                sword = item;
-                break;
-            }
-        }
-        if (sword != null) {
-            inventory.remove(sword);
-            if (attackPower > 1) {
-                attackPower -= ((Sword) sword).getDamageBonus();
-            }
-        }
+    public void markTrialCompleted(String trialKey) {
+        completedTrials.add(trialKey);
     }
 }

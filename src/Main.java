@@ -3,9 +3,11 @@ public class Main {
         Player player = new Player("EZ-01");
         RoomManager roomManager = new RoomManager();
         GameView view = new GameView();
-        FileManager fileManager = new FileManager();
 
-        GameControllerNA game = new GameControllerNA(player, roomManager, view, fileManager);
-        game.startGame();
+        GameModel model = new GameModel(player, roomManager);
+        GameController controller = new GameController(model, view);
+
+        controller.startGame();
     }
 }
+

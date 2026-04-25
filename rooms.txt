@@ -1,25 +1,10 @@
 id,name,description,exits/connections
-EZ-01,Main Hall,"Large cracked hall. 5 teleporters in arc, each connected by a glowing line to a jewel embedded in the far wall. Jewel is immovable while any trial remains active.",EZ-02,AW-02,RS-03,TR-03,SC-03,CM-07,TP-TRAP-01
-EZ-02,Hidden Bomb Room,"Small stone chamber accessed only after all 5 trials complete, by removing the wall jewel from EZ-01. Single pedestal. Heavy dust.",EZ-01
-AW-01,Awareness Antechamber,"Quiet entry room. Broken teleporter parts scattered. Wall inscription: 'Some exits are not given. They are rebuilt.' Examinables: broken crystal lens, burned wiring, stone manual fragments.",AW-02
-AW-02,Awareness Trial Chamber,"You see an unstable teleporter, a glowing red gem, and some rubble. The teleporter crackles with unstable energy.",AW-01
-RS-01,Restraint Antechamber,"Dark chamber. Next chamber visible through iron bars, showing the chest within. Loose torch bracket.",RS-02
-RS-02,Restraint Trial Chamber,"Circular room. Normal golden chest in center. Bait coin visible on the floor nearby.",RS-01,RS-03
-RS-03,Restraint Exit Corridor,"Plain corridor with a cracked wall and loose floor tiles.",RS-02,EZ-01
-TR-01,Trust Antechamber,"Entry chamber. Guardian statue with faintly glowing eyes. Floor inscription: 'Trust the unguarded.'",TR-02
-TR-02,Guardian Chamber,"Guardian statue pointing toward a pedestal. A golden glint from a chest is visible beneath the guardian.",TR-01,TR-03
-TR-03,Trust Exit Hall,"Narrow hallway. Small alcove with nothing but dust.",TR-02,EZ-01
-SC-01,Sacrifice Antechamber,"Valuable-looking sword with a faint glow on a pedestal.",SC-02
-SC-02,Long Bridge,"Windy stone bridge. The bridge extends forward.",SC-01,SC-03
-SC-03,Wraith End,"End of the bridge. Broken lantern, carved pillar and loose stone tiles.",SC-02,EZ-01
-CM-01,Commitment Entry,"Entry room. Inscription: 'Forward is safety.' Side door locked. Broken shelf.",CM-02
-CM-02,Dagger Chamber,"Pedestal with Jeweled Dagger.",CM-01,CM-03
-CM-03,Chalice Hall,"Ornate Chalice on display.",CM-02,CM-04
-CM-04,Lens Storage,"Crystal Lens on display.",CM-03,CM-05
-CM-05,Idol Room,"Decorative Idol present. Breakable crate.",CM-04,CM-06
-CM-06,Map Corridor,"Ancient Map on shelf.",CM-05,CM-07
-CM-07,Commitment Exit,"Clean stone chamber. Safe.",CM-06,EZ-01
-TP-TRAP-01,Warden Arena,"Circular arena with broken teleporter frame, burned corpse, scattered crystals, and pillars.",EZ-01
-FN-01,Final Antechamber,"Minimal chamber. A statue of the Stalker stands near the entrance as a warning.",FN-02
-FN-02,The Last Mechanism,"A large chamber with a glowing chest, a monster statue, a broken pillar, a cracked floor, and an unstable teleporter pad.",FN-01
-END-01,Ascension Chamber,"Bright chamber. A glowing jewel floats above the center. A pedestal holds the Catalyst.",FN-02
+EZ-01,Main Hall,"A large cracked hall where the trial paths branch out from the entrance. The air is still, and each path leads to a different test.",AW-02,RS-02,TR-02,SC-01,CM-01,FN-02
+AW-02,Awareness Trial Room,"A strange teleporter crackles in the center of the room. A glowing red gem and a pile of rubble lie nearby.",EZ-01
+RS-02,Restraint Trial Chamber,"A chest rests in the center of the chamber. A single coin lies nearby, tempting anyone who enters.",EZ-01
+TR-02,Guardian Chamber,"A silent guardian statue stands before you. Something about the room suggests not everything here should be trusted.",EZ-01
+SC-01,Sacrifice Antechamber,"A powerful sword rests before a narrow bridge. The room feels like a test of what you are willing to give up.",EZ-01
+CM-01,Commitment Entry,"A long path stretches ahead. Forward feels safe, but every delay carries a sense of danger.",EZ-01
+FN-02,The Last Mechanism,"A large chamber holds a chest, a looming statue, a cracked floor symbol, and an unstable teleporter pad. Everything here feels important.",EZ-01,TP-TRAP-01,END-01
+TP-TRAP-01,Trap Room,"A ruined chamber littered with debris and broken stone. An unstable teleporter frame offers a second chance.",EZ-01
+END-01,Ascension Chamber,"A bright chamber beyond the trials. A glowing jewel floats above the center, and a pedestal holds the Catalyst.",0

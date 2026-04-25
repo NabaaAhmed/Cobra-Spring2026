@@ -1,32 +1,26 @@
-//Nabaa Class
-public class Combat {
+import java.util.Scanner;
 
+public class Combat {
     private final Player player;
-    private Monster enemy;
+    private final Monster enemy;
     private int turnCount;
-    private boolean retreated;
 
     public Combat(Player player, Monster enemy) {
         this.player = player;
         this.enemy = enemy;
         this.turnCount = 1;
-        this.retreated = false;
     }
 
     public boolean isBattleOver() {
-        return !player.isAlive() || !enemy.isAlive() || retreated;
-    }
-
-    public int getTurnCount() {
-        return turnCount;
-    }
-
-    public String getMonsterHealth() {
-        return String.valueOf(enemy.getHp());
+        return !player.isAlive() || !enemy.isAlive();
     }
 
     public boolean isMonsterAlive() {
         return enemy.isAlive();
+    }
+
+    public Monster getEnemy() {
+        return enemy;
     }
 
     public String action(String command) {
@@ -35,58 +29,48 @@ public class Combat {
         if (command.equalsIgnoreCase("attack")) {
             if (player.hasSword()) {
                 enemy.takeDamage(enemy.getHp());
-                result += "You used a sword! Instant kill.\n";
+                result += "You used the sword! Instant kill.\n";
             } else {
                 enemy.clash(player);
-                result += "You and " + enemy.getName() + " both take 1 damage.\n";
+                result += "You and " + enemy.getName() + " clash.\n";
             }
-        } else if (command.equalsIgnoreCase("retreat")) {
-            retreated = true;
-            result += "You retreat from the battle.\n";
-        } else if (command.equalsIgnoreCase("wait")) {
-            result += player.waitTurn() + "\n";
+        } else if (command.equalsIgnoreCase("use potion")) {
+            Item potion = player.findItemByName("Potion");
+            if (potion == null) {
+                return "You do not have a potion.\n";
+            }
+
+            potion.use(player);
+            player.removeItem(potion);
+            result += "You used a potion.\n";
         } else {
-            result += "Invalid combat command. Try attack, wait, or retreat.\n";
-            return result;
+            return "Invalid combat command. Use 'attack' or 'use potion'.\n";
         }
 
-        applyTurnEffects();
-
-        result += "Player HP: " + player.getCurrentHP() + "\n";
+        result += "Player HP: " + player.getCurrentHP() + "/" + player.getMaxHP() + "\n";
         result += enemy.getName() + " HP: " + enemy.getHp() + "\n";
 
         turnCount++;
         return result;
     }
 
-    public void applyTurnEffects() {
-        enemy.onTurn(player);
-    }
-
-    public void startBattle(GameView view, java.util.Scanner input) {
+    public void startBattle(GameView view, Scanner input) {
         enemy.onEncounter(player);
         view.displayCombat("A " + enemy.getName() + " appears!");
 
         while (!isBattleOver()) {
             view.displayCombat("Turn " + turnCount);
-            view.displayCombat("Type: attack / wait / retreat");
+            view.displayCombat("Type: attack or use potion");
 
-            String command = input.nextLine();
+            String command = input.nextLine().trim();
             String result = action(command);
             view.displayCombat(result);
         }
 
-        if (retreated) {
-            view.displayCombat("You fled the battle.");
-        } else if (!player.isAlive()) {
+        if (!player.isAlive()) {
             view.displayCombat("You died.");
         } else {
             view.displayCombat("Monster defeated!");
-
-            for (Item item : enemy.dropLoot()) {
-                player.addItem(item);
-                view.displayCombat("You got: " + item.getitemName());
-            }
         }
     }
 }
