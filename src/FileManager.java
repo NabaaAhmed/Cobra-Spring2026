@@ -28,7 +28,6 @@ public class FileManager {
             writer.write(completedTrialsLine.toString() + "\n");
 
             writer.close();
-            System.out.println("Game progress has been saved!");
         } catch (Exception e) {
             System.out.println("Error saving game progress file.");
         }

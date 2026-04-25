@@ -87,6 +87,12 @@ public class GameModel {
             int index = Integer.parseInt(parts[1]);
             Room current = roomManager.getCurrentRoom();
 
+            if (current == null) {
+                GameResult result = new GameResult("No current room loaded.");
+                result.setSuccess(false);
+                return result;
+            }
+
             if (index < 0 || index >= current.getConnections().size()) {
                 GameResult result = new GameResult("No current room loaded.");
                 result.setSuccess(false);
@@ -94,11 +100,23 @@ public class GameModel {
             }
 
             Room destination = current.getConnections().get(index);
-            String destinationTrial = getTrialKeyForRoom(destination.getRoomId());
+            String destinationId = destination.getRoomId();
+
+            if ((destinationId.equals("FN-01") || destinationId.equals("FN-02") || destinationId.equals("EZ-02"))
+                    && player.getTrialTokens() < 5) {
+                GameResult result = new GameResult("That area is locked. Complete all 5 trials first.");
+                result.setSuccess(false);
+                return result;
+            }
+
+            String destinationTrial = getTrialKeyForRoom(destinationId);
+
             if (destinationTrial != null
                     && player.hasCompletedTrial(destinationTrial)
-                    && !destination.getRoomId().equals("TP-TRAP-01")
-                    && !destination.getRoomId().equals("END-01")) {
+                    && !destinationId.equals("TP-TRAP-01")
+                    && !destinationId.equals("END-01")
+                    && !destinationId.equals("FN-01")
+                    && !destinationId.equals("FN-02")) {
                 GameResult result = new GameResult("That trial has already been completed.");
                 result.setSuccess(false);
                 return result;
@@ -124,6 +142,13 @@ public class GameModel {
 
         String itemName = command.substring(5).trim();
         Room room = roomManager.getCurrentRoom();
+
+        if (room == null) {
+            GameResult result = new GameResult("No room loaded.");
+            result.setSuccess(false);
+            return result;
+        }
+
         Item item = room.takeItemByName(itemName);
 
         if (item == null) {
@@ -208,12 +233,26 @@ public class GameModel {
             return result;
         }
 
-        item.use(player);
-
         if (item instanceof Potion) {
+            int beforeHP = player.getCurrentHP();
+
+            item.use(player);
             player.removeItem(item);
-            return new GameResult("You used a potion.");
+
+            int healedAmount = player.getCurrentHP() - beforeHP;
+
+            if (healedAmount > 0) {
+                return new GameResult("You drink the potion. Warmth rushes through your body.\n"
+                        + "Your HP increased by " + healedAmount + " point(s).\n"
+                        + "Current HP: " + player.getCurrentHP() + "/" + player.getMaxHP());
+            } else {
+                return new GameResult("You drink the potion, but your HP was already full.\n"
+                        + "The potion is used up.\n"
+                        + "Current HP: " + player.getCurrentHP() + "/" + player.getMaxHP());
+            }
         }
+
+        item.use(player);
 
         if (lower.startsWith("equip ")) {
             return new GameResult("You equipped " + item.getItemName() + ".");
@@ -249,8 +288,14 @@ public class GameModel {
     }
 
     public GameResult saveGame() {
+        if (hasActivePuzzle()) {
+            GameResult result = new GameResult("You cannot save in the middle of a puzzle. Finish or fail the puzzle first.");
+            result.setSuccess(false);
+            return result;
+        }
+
         FileManager.savePlayer("save.txt", player);
-        return new GameResult("Game saved.");
+        return new GameResult("Game progress has been saved!");
     }
 
     public GameResult loadGame() {
@@ -265,6 +310,7 @@ public class GameModel {
         this.player = loaded;
         roomManager.setRoom(player.getCurrentRoomId());
         activePuzzle = null;
+
         return new GameResult("Game loaded.");
     }
 
@@ -354,7 +400,6 @@ public class GameModel {
     private String getTrialKeyForRoom(String roomId) {
         switch (roomId) {
             case "AW-02":
-            case "TP-TRAP-01":
                 return "AWARENESS";
             case "RS-02":
                 return "RESTRAINT";
@@ -364,6 +409,8 @@ public class GameModel {
                 return "SACRIFICE";
             case "CM-01":
                 return "COMMITMENT";
+            case "TP-TRAP-01":
+                return "TRAP";
             case "FN-02":
                 return "FINAL";
             default:
@@ -372,7 +419,7 @@ public class GameModel {
     }
 
     private String getTrialKeyForPuzzle(Puzzle puzzle) {
-        if (puzzle instanceof Puzzle1Awareness || puzzle instanceof Puzzle7AwarenessTrap) {
+        if (puzzle instanceof Puzzle1Awareness) {
             return "AWARENESS";
         }
         if (puzzle instanceof Puzzle2Restraint) {
@@ -386,6 +433,9 @@ public class GameModel {
         }
         if (puzzle instanceof Puzzle5Commitment) {
             return "COMMITMENT";
+        }
+        if (puzzle instanceof Puzzle7AwarenessTrap) {
+            return "TRAP";
         }
         if (puzzle instanceof Puzzle6FinalTrial) {
             return "FINAL";
@@ -453,7 +503,8 @@ public class GameModel {
             return null;
         }
 
-        String rewardName = template.dropReward() == null ? "null" : template.dropReward().getItemName();
+        Item reward = template.dropReward();
+        String rewardName = reward == null ? "null" : reward.getItemName();
 
         return new Monster(
                 template.getMonsterID(),

@@ -30,20 +30,33 @@ public class Combat {
         if (command.equalsIgnoreCase("attack")) {
             if (player.hasSword()) {
                 enemy.takeDamage(enemy.getHp());
-                result += "You used the sword! Instant kill.\n";
+                result += "You grip the sword and strike with overwhelming force.\n";
+                result += "The sword cuts through " + enemy.getName() + " instantly.\n";
             } else {
                 enemy.clash(player);
                 result += "You and " + enemy.getName() + " clash.\n";
+                result += "Both of you take damage in the struggle.\n";
             }
-        } else if (command.equalsIgnoreCase("use potion")) {
+        } else if (command.equalsIgnoreCase("use potion") || command.equalsIgnoreCase("consume potion")) {
             Item potion = player.findItemByName("Potion");
             if (potion == null) {
                 return "You do not have a potion.\n";
             }
 
+            int beforeHP = player.getCurrentHP();
+
             potion.use(player);
             player.removeItem(potion);
-            result += "You used a potion.\n";
+
+            int healedAmount = player.getCurrentHP() - beforeHP;
+
+            if (healedAmount > 0) {
+                result += "You drink the potion during combat.\n";
+                result += "Your wounds begin to close as you recover " + healedAmount + " HP.\n";
+            } else {
+                result += "You drink the potion, but your HP was already full.\n";
+                result += "The potion is used up.\n";
+            }
         } else {
             return "Invalid combat command. Use 'attack' or 'use potion'.\n";
         }
@@ -61,7 +74,7 @@ public class Combat {
 
         while (!isBattleOver()) {
             view.displayCombat("Turn " + turnCount);
-            view.displayCombat("Type: attack or use potion");
+            view.displayCombat("Type: attack, use potion, or consume potion");
 
             String command = input.nextLine().trim();
             String result = action(command);
