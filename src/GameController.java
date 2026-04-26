@@ -91,7 +91,7 @@ public class GameController {
 
         switch (action) {
             case "help":
-                printMainHelp();
+                view.displayMainHelp();
                 return;
 
             case "explore":
@@ -178,7 +178,7 @@ public class GameController {
         String action = command.split(" ")[0].toLowerCase();
 
         if (command.equalsIgnoreCase("help")) {
-            printPuzzleHelp(model.getActivePuzzle());
+            view.displayPuzzleHelp(model.getActivePuzzle());
             return;
         }
 
@@ -189,7 +189,9 @@ public class GameController {
 
         if (command.equalsIgnoreCase("explore") || command.equalsIgnoreCase("explore room")) {
             if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
-                displayCommitmentExplore();
+                Room room = model.getRoomManager().getCurrentRoom();
+                boolean atFinalRoom = model.getPlayer().getCurrentRoomId().equals("CM-07");
+                view.displayCommitmentExplore(room, atFinalRoom);
             } else {
                 view.displayMessage(model.exploreRoom().getMessage());
             }
@@ -315,11 +317,7 @@ public class GameController {
             model.markTrialCompletedForPuzzle(sacrifice);
             model.clearActivePuzzle();
 
-            view.displayMessage("");
-            view.displayMessage("Puzzle complete.");
-            view.displayStatus(model.getPlayer());
-            view.displayMessage("");
-            view.displayMessage(model.roomHeader().getMessage());
+            view.displayPuzzleComplete(model.getPlayer(), model.roomHeader().getMessage());
         }
     }
 
@@ -348,38 +346,6 @@ public class GameController {
         if (movementResult != null && !movementResult.isEmpty()) {
             view.displayMessage(movementResult);
         }
-    }
-
-    private void displayCommitmentExplore() {
-        String roomId = model.getPlayer().getCurrentRoomId();
-        Room room = model.getRoomManager().getCurrentRoom();
-
-        if (room == null) {
-            view.displayMessage("No room loaded.");
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(room.getRoomName())
-                .append(" (").append(room.getRoomId()).append(") ===\n");
-        sb.append(room.getRoomDesc());
-
-        sb.append("\n\nConnections:");
-
-        if (roomId.equals("CM-07")) {
-            sb.append("\n- No forward exits. The path to the Main Hall is open.");
-        } else if (room.getConnections().size() > 1) {
-            Room forwardRoom = room.getConnections().get(1);
-            sb.append("\n1: ")
-                    .append(forwardRoom.getRoomName())
-                    .append(" (")
-                    .append(forwardRoom.getRoomId())
-                    .append(")");
-        } else {
-            sb.append("\n- No forward exits.");
-        }
-
-        view.displayMessage(sb.toString());
     }
 
     private int getMoveIndex(String command) {
@@ -451,11 +417,7 @@ public class GameController {
             }
 
             if (completedTrial) {
-                view.displayMessage("");
-                view.displayMessage("Puzzle complete.");
-                view.displayStatus(model.getPlayer());
-                view.displayMessage("");
-                view.displayMessage(model.roomHeader().getMessage());
+                view.displayPuzzleComplete(model.getPlayer(), model.roomHeader().getMessage());
             }
 
             autoStartPuzzleAfterMove();
@@ -472,7 +434,7 @@ public class GameController {
         if (puzzleResult != null && puzzleResult.isPuzzleStarted()) {
             view.displayMessage("");
             view.displayMessage(puzzleResult.getMessage());
-            printPuzzleHelp(puzzleResult.getPuzzle());
+            view.displayPuzzleHelp(puzzleResult.getPuzzle());
         }
     }
 
@@ -508,11 +470,7 @@ public class GameController {
                     return;
                 }
 
-                view.displayMessage("You have completed the Trial of Restraint. (No Reward)");
-                view.displayMessage("You have been teleported back to the Main Hall.");
-                view.displayStatus(model.getPlayer());
-                view.displayMessage("");
-                view.displayMessage(model.roomHeader().getMessage());
+                view.displayTrialComplete("Trial of Restraint", model.getPlayer(), model.roomHeader().getMessage());
                 return;
             }
 
@@ -526,11 +484,7 @@ public class GameController {
                     return;
                 }
 
-                view.displayMessage("You have completed the Trial of Trust. (No Reward)");
-                view.displayMessage("You have been teleported back to the Main Hall.");
-                view.displayStatus(model.getPlayer());
-                view.displayMessage("");
-                view.displayMessage(model.roomHeader().getMessage());
+                view.displayTrialComplete("Trial of Trust", model.getPlayer(), model.roomHeader().getMessage());
                 return;
             }
 
@@ -544,11 +498,7 @@ public class GameController {
                     return;
                 }
 
-                view.displayMessage("You have completed the Trial of Sacrifice. (No Reward)");
-                view.displayMessage("You have been teleported back to the Main Hall.");
-                view.displayStatus(model.getPlayer());
-                view.displayMessage("");
-                view.displayMessage(model.roomHeader().getMessage());
+                view.displayTrialComplete("Trial of Sacrifice", model.getPlayer(), model.roomHeader().getMessage());
                 return;
             }
 
@@ -560,13 +510,12 @@ public class GameController {
                     return;
                 }
 
-                view.displayMessage("You have been teleported back to the Main Hall.");
-
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
 
+                view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayStatus(model.getPlayer());
                 view.displayMessage("");
                 view.displayMessage(model.roomHeader().getMessage());
@@ -594,13 +543,12 @@ public class GameController {
                     return;
                 }
 
-                view.displayMessage("You have been teleported back to the Main Hall.");
-
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
 
+                view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayStatus(model.getPlayer());
                 view.displayMessage("");
                 view.displayMessage(model.roomHeader().getMessage());
@@ -616,88 +564,6 @@ public class GameController {
             view.displayMessage(result.getMessage());
         } else {
             view.displayError(result.getMessage());
-        }
-    }
-
-    private void printMainHelp() {
-        view.displayMainHelp();
-    }
-
-    private void printPuzzleHelp(Puzzle puzzle) {
-        if (puzzle == null) {
-            view.displayMessage("No active puzzle.");
-            return;
-        }
-
-        view.displayMessage("=== Puzzle Commands ===");
-        view.displayMessage("hint");
-
-        if (puzzle instanceof Puzzle1Awareness) {
-            view.displayMessage("take glowing red gem");
-            view.displayMessage("take rubble");
-            view.displayMessage("throw glowing red gem");
-            view.displayMessage("throw rubble");
-            view.displayMessage("inspect teleporter");
-            view.displayMessage("enter");
-            return;
-        }
-
-        if (puzzle instanceof Puzzle2Restraint) {
-            view.displayMessage("take coin");
-            view.displayMessage("inspect coin");
-            view.displayMessage("inspect chest");
-            view.displayMessage("open chest");
-            view.displayMessage("yes / no");
-            return;
-        }
-
-        if (puzzle instanceof Puzzle3Trust) {
-            view.displayMessage("attack guardian");
-            view.displayMessage("inspect chest");
-            view.displayMessage("destroy chest");
-            view.displayMessage("open chest");
-            view.displayMessage("yes / no");
-            return;
-        }
-
-        if (puzzle instanceof Puzzle4Sacrifice) {
-            view.displayMessage("take sword");
-            view.displayMessage("move [number]");
-            view.displayMessage("inspect bridge");
-            view.displayMessage("throw sword");
-            return;
-        }
-
-        if (puzzle instanceof Puzzle5Commitment) {
-            view.displayMessage("move [number]");
-            view.displayMessage("examine item");
-            view.displayMessage("take [item]");
-            view.displayMessage("kill pursuer");
-            view.displayMessage("yes / no");
-            return;
-        }
-
-        if (puzzle instanceof Puzzle6FinalTrial) {
-            view.displayMessage("burn chest");
-            view.displayMessage("extinguish fire");
-            view.displayMessage("open chest");
-            view.displayMessage("insert explosive device");
-            view.displayMessage("place core fragment");
-            view.displayMessage("step symbol");
-            view.displayMessage("throw final jewel");
-            view.displayMessage("enter unstable teleporter");
-            view.displayMessage("yes / no");
-            return;
-        }
-
-        if (puzzle instanceof Puzzle7AwarenessTrap) {
-            view.displayMessage("inspect room");
-            view.displayMessage("take rubble");
-            view.displayMessage("take red gem");
-            view.displayMessage("throw rubble");
-            view.displayMessage("throw red gem");
-            view.displayMessage("enter teleporter");
-            view.displayMessage("yes / no");
         }
     }
 }

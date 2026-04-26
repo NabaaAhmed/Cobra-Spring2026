@@ -422,32 +422,6 @@ public class GameModel {
         return new GameResult("You used " + item.getItemName() + ".");
     }
 
-    public GameResult showInventory() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== Inventory ===");
-
-        if (player.getInventory().isEmpty()) {
-            sb.append("\n- empty");
-        } else {
-            for (Item item : player.getInventory()) {
-                sb.append("\n- ").append(item.getItemName());
-            }
-        }
-
-        return new GameResult(sb.toString());
-    }
-
-    public GameResult showStatus() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Current Room: ").append(player.getCurrentRoomId());
-        sb.append("\nCurrent HP: ").append(player.getCurrentHP());
-        sb.append("\nMax HP: ").append(player.getMaxHP());
-        sb.append("\nAttack Power: ").append(player.getAttackPower());
-        sb.append("\nTrial Tokens: ").append(player.getTrialTokens());
-
-        return new GameResult(sb.toString());
-    }
-
     public GameResult saveGame() {
         if (hasActivePuzzle()) {
             GameResult result = new GameResult("You cannot save in the middle of a puzzle. Finish or fail the puzzle first.");
