@@ -44,6 +44,7 @@ public class GameModel {
 
     public GameResult lookRoom() {
         Room room = roomManager.getCurrentRoom();
+
         if (room == null) {
             return new GameResult("No room loaded.");
         }
@@ -60,16 +61,29 @@ public class GameModel {
         }
 
         sb.append("\n\nConnections:");
+
+        boolean anyVisibleConnection = false;
+
         if (!room.getConnections().isEmpty()) {
             for (int i = 0; i < room.getConnections().size(); i++) {
                 Room connectedRoom = room.getConnections().get(i);
+                String connectedId = connectedRoom.getRoomId();
+
+                if (shouldHideConnection(room.getRoomId(), connectedId)) {
+                    continue;
+                }
+
+                anyVisibleConnection = true;
+
                 sb.append("\n").append(i).append(": ")
                         .append(connectedRoom.getRoomName())
                         .append(" (")
                         .append(connectedRoom.getRoomId())
                         .append(")");
             }
-        } else {
+        }
+
+        if (!anyVisibleConnection) {
             sb.append("\n- No exits from this room.");
         }
 
@@ -168,8 +182,7 @@ public class GameModel {
             Room destination = current.getConnections().get(index);
             String destinationId = destination.getRoomId();
 
-            // Final Trial and Hidden Bomb Room unlock after all five main trials are completed,
-            // regardless of how many tokens the player earned.
+            // Hidden Bomb Room and Final Trial unlock after all five main trials are completed.
             if ((destinationId.equals("FN-01") || destinationId.equals("FN-02") || destinationId.equals("EZ-02"))
                     && !allMainTrialsCompleted()) {
                 GameResult result = new GameResult("That area is locked. Complete all 5 trials first.");
@@ -177,23 +190,23 @@ public class GameModel {
                 return result;
             }
 
+            // Trap Room should only be entered through puzzle failure, not directly from Main Hall.
             if (destinationId.equals("TP-TRAP-01")) {
-                GameResult result = new GameResult("That area is locked. You only go there through the awareness trial");
+                GameResult result = new GameResult("That area is locked. You only go there through a trap or failed trial action.");
                 result.setSuccess(false);
                 return result;
             }
 
             String destinationTrial = getTrialKeyForRoom(destinationId);
 
-            if (destinationTrial != null && player.hasCompletedTrial(destinationTrial)) {
-                    if (puzzleRoomMap.containsKey(destinationId) || destinationId.endsWith("-01")) {
-                        if (!destinationId.equals("EZ-01")) {
-                            GameResult result = new GameResult("The way is sealed. This trial has already been mastered.");
-                            result.setSuccess(false);
-                            return result;
-                        }
-                    }
-                }
+            if (destinationTrial != null
+                    && player.hasCompletedTrial(destinationTrial)
+                    && !destinationId.equals("TP-TRAP-01")
+                    && !destinationId.equals("END-01")) {
+                GameResult result = new GameResult("That trial has already been completed.");
+                result.setSuccess(false);
+                return result;
+            }
 
             roomManager.move(index);
             player.setCurrentRoomId(roomManager.getRoomId());
@@ -472,6 +485,34 @@ public class GameModel {
                 && player.hasCompletedTrial("TRUST")
                 && player.hasCompletedTrial("SACRIFICE")
                 && player.hasCompletedTrial("COMMITMENT");
+    }
+
+    private boolean shouldHideConnection(String currentRoomId, String destinationId) {
+        if (currentRoomId == null || destinationId == null) {
+            return false;
+        }
+
+        // Only hide these from the Main Hall display.
+        if (!currentRoomId.equals("EZ-01")) {
+            return false;
+        }
+
+        // Hide Hidden Bomb Room until all 5 main trials are complete.
+        if (destinationId.equals("EZ-02") && !allMainTrialsCompleted()) {
+            return true;
+        }
+
+        // Hide Final Trial until all 5 main trials are complete.
+        if ((destinationId.equals("FN-01") || destinationId.equals("FN-02")) && !allMainTrialsCompleted()) {
+            return true;
+        }
+
+        // Hide Trap Room from Main Hall because it should only be reached through failure.
+        if (destinationId.equals("TP-TRAP-01")) {
+            return true;
+        }
+
+        return false;
     }
 
     private String getTrialKeyForRoom(String roomId) {
