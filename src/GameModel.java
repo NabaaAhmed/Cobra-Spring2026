@@ -8,6 +8,7 @@ public class GameModel {
 
     private HashMap<String, Monster> monsterTemplates;
     private HashMap<String, String> puzzleRoomMap;
+    private HashMap<String, String> puzzleHintMap;
     private static HashMap<String, Item> pendingRewards = new HashMap<>();
 
     public GameModel(Player player, RoomManager roomManager) {
@@ -17,6 +18,7 @@ public class GameModel {
 
         this.monsterTemplates = new HashMap<>();
         this.puzzleRoomMap = new HashMap<>();
+        this.puzzleHintMap = new HashMap<>();
 
         loadMonsters("monster.txt");
         loadPuzzles("puzzle.txt");
@@ -524,6 +526,20 @@ public class GameModel {
         return result;
     }
 
+    public String getActivePuzzleHint() {
+        if (activePuzzle == null) {
+            return "There is no active puzzle.";
+        }
+
+        String puzzleId = getPuzzleIdForPuzzle(activePuzzle);
+
+        if (puzzleId != null && puzzleHintMap.containsKey(puzzleId)) {
+            return puzzleHintMap.get(puzzleId);
+        }
+
+        return activePuzzle.getHint();
+    }
+
     public GameResult startCombatForCurrentRoom() {
         Monster monster = getMonsterForCurrentRoom();
 
@@ -624,24 +640,63 @@ public class GameModel {
         if (puzzle instanceof Puzzle1Awareness) {
             return "AWARENESS";
         }
+
         if (puzzle instanceof Puzzle2Restraint) {
             return "RESTRAINT";
         }
+
         if (puzzle instanceof Puzzle3Trust) {
             return "TRUST";
         }
+
         if (puzzle instanceof Puzzle4Sacrifice) {
             return "SACRIFICE";
         }
+
         if (puzzle instanceof Puzzle5Commitment) {
             return "COMMITMENT";
         }
+
         if (puzzle instanceof Puzzle7AwarenessTrap) {
             return "TRAP";
         }
+
         if (puzzle instanceof Puzzle6FinalTrial) {
             return "FINAL";
         }
+
+        return null;
+    }
+
+    private String getPuzzleIdForPuzzle(Puzzle puzzle) {
+        if (puzzle instanceof Puzzle1Awareness) {
+            return "PZ-01";
+        }
+
+        if (puzzle instanceof Puzzle2Restraint) {
+            return "PZ-02";
+        }
+
+        if (puzzle instanceof Puzzle3Trust) {
+            return "PZ-03";
+        }
+
+        if (puzzle instanceof Puzzle4Sacrifice) {
+            return "PZ-04";
+        }
+
+        if (puzzle instanceof Puzzle5Commitment) {
+            return "PZ-05";
+        }
+
+        if (puzzle instanceof Puzzle6FinalTrial) {
+            return "PZ-06";
+        }
+
+        if (puzzle instanceof Puzzle7AwarenessTrap) {
+            return "PZ-07";
+        }
+
         return null;
     }
 
@@ -692,7 +747,8 @@ public class GameModel {
                 continue;
             }
 
-            String[] parts = line.split(",");
+            String[] parts = line.split(",", 5);
+
             if (parts.length < 3) {
                 continue;
             }
@@ -701,6 +757,14 @@ public class GameModel {
             String roomId = parts[2].trim();
 
             puzzleRoomMap.put(roomId, puzzleID);
+
+            if (parts.length >= 5) {
+                String hint = parts[4].trim();
+
+                if (!hint.isEmpty()) {
+                    puzzleHintMap.put(puzzleID, hint);
+                }
+            }
         }
     }
 

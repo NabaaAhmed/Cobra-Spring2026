@@ -142,7 +142,7 @@ public class GameController {
         }
 
         if (command.equalsIgnoreCase("hint") || command.equalsIgnoreCase("givehint")) {
-            view.displayMessage(model.getActivePuzzle().getHint());
+            view.displayMessage(model.getActivePuzzleHint());
             return;
         }
 
@@ -315,7 +315,8 @@ public class GameController {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(room.getRoomName()).append(" (").append(room.getRoomId()).append(") ===\n");
+        sb.append("=== ").append(room.getRoomName())
+                .append(" (").append(room.getRoomId()).append(") ===\n");
         sb.append(room.getRoomDesc());
 
         sb.append("\n\nConnections:");
