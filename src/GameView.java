@@ -53,18 +53,18 @@ public class GameView {
 
     public void displayMainHelp() {
         System.out.println("=== Commands ===");
-        System.out.println("explore room  - read the current room description and exits");
-        System.out.println("inspect room  - check items in the current room");
-        System.out.println("move [number] - move to a connected room");
-        System.out.println("take [item]   - pick up an item");
-        System.out.println("drop [item]   - drop an item");
-        System.out.println("consume [item]");
-        System.out.println("equip [item]");
-        System.out.println("unequip [item]");
-        System.out.println("inventory     - view inventory");
-        System.out.println("status        - view player status");
-        System.out.println("save          - save the game");
-        System.out.println("load          - load the game");
-        System.out.println("exit          - quit the game");
+        System.out.println("explore room    - read the current room description and exits");
+        System.out.println("inspect room    - check items in the current room");
+        System.out.println("move [number]   - move to a connected room");
+        System.out.println("take [item]     - pick up an item");
+        System.out.println("drop [item]     - drop an item");
+        System.out.println("consume [potion]- consume potion");
+        System.out.println("equip [sword]   - equip a sword");
+        System.out.println("unequip [sword]- unequip sword");
+        System.out.println("inventory      - view inventory");
+        System.out.println("status         - view player status");
+        System.out.println("save           - save the game");
+        System.out.println("load           - load the game");
+        System.out.println("exit           - quit the game");
     }
 }
