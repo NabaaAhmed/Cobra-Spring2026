@@ -1,7 +1,5 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 public class RoomManager {
 
@@ -10,156 +8,49 @@ public class RoomManager {
     private Map<String, Monster> monsters = new HashMap<>();
     private Map<String, Puzzle> puzzles = new HashMap<>();
 
-
-    // -------- ROOM --------
-
+    private Player player;
     private Room currentRoom;
+    private Set<String> visitedRooms = new HashSet<>();
 
-    public RoomManager() {
-        loadItems();
-        loadMonsters();
-        loadPuzzles();
-        loadRooms();
+    private FileManager fileManager;
+
+    public RoomManager(String dataPath) {
+
+        this.fileManager = new FileManager(dataPath);
+
+        this.player = new Player();
+
+        try {
+            fileManager.loadAllData(this);
+            assignPuzzlesToRooms();
+            setStartingRoom();
+        }
+        catch (IOException e) {
+            System.out.println("Error loading game: " + e.getMessage());
+        }
     }
+    private void setStartingRoom() {
 
-    private void loadRooms() {
+        currentRoom = rooms.get("START");
 
-        String fileData = FileManager.loadGame("rooms.txt");
-        String[] lines = fileData.split("\n");
-
-        // STEP 1: create rooms
-        for (int i = 1; i < lines.length; i++) {
-
-            String[] parts = splitCSVLine(lines[i]);
-
-            if (parts.length < 3) continue;
-
-            String id = parts[0].trim();
-            String name = parts[1].trim();
-            String desc = parts[2].trim();
-
-            rooms.put(id, new Room(id, name, desc));
+        if (currentRoom == null && !rooms.isEmpty()) {
+            currentRoom = rooms.values().iterator().next();
         }
 
-        // STEP 2: connect rooms + place items + monsters
-        for (int i = 1; i < lines.length; i++) {
-
-            String[] parts = splitCSVLine(lines[i]);
-
-            Room room = rooms.get(parts[0].trim());
-            if (room == null) continue;
-
-            int option = 1;
-
-            for (int j = 3; j < parts.length; j++) {
-
-                String value = parts[j].trim();
-
-                if (value.equals("") || value.equals("null")) continue;
-
-                // ROOM CONNECTION
-                if (rooms.containsKey(value)) {
-                    room.addExit("Option " + option, value);
-                    option++;
-                }
-
-                // ITEM
-                else if (value.startsWith("I-")) {
-                    Item item = items.get(value);
-                    if (item != null) {
-                        room.addItem(item);
-                    }
-                }
-
-                // MONSTER
-                else if (value.startsWith("M-")) {
-                    Monster monster = monsters.get(value);
-                    if (monster != null) {
-                        room.setMonster(monster);
-                    }
-                }
-            }
-        }
-
-        currentRoom = rooms.get("EZ-01");
-    }
-
-    // ---------------- ITEMS ----------------
-    private void loadItems() {
-
-        String fileData = FileManager.loadGame("items.txt");
-        String[] lines = fileData.split("\n");
-
-        for (int i = 1; i < lines.length; i++) {
-
-            String[] parts = splitCSVLine(lines[i]);
-
-            String id = parts[0];
-            String name = parts[1];
-            String desc = parts[2];
-            boolean stackable = Boolean.parseBoolean(parts[3]);
-
-            items.put(id, new Item(id, name, desc, stackable) {
-                @Override
-                public void use(Player player) {
-
-                }
-            });
+        if (currentRoom != null) {
+            visitedRooms.add(currentRoom.getId());
         }
     }
 
-    // ---------------- MONSTERS ----------------
-    private void loadMonsters() {
-
-        String fileData = FileManager.loadGame("monsters.txt");
-        String[] lines = fileData.split("\n");
-
-        for (int i = 1; i < lines.length; i++) {
-
-            String[] parts = splitCSVLine(lines[i]);
-
-            String id = parts[0].trim();
-            String name = parts[1].trim();
-            int hp = Integer.parseInt(parts[2].trim());
-            int atk = Integer.parseInt(parts[3].trim());
-
-            monsters.put(id, new Monster(id, name, hp, atk));
-        }
-    }
-
-    // ---------------- PUZZLES ----------------
-    private void loadPuzzles() {
-
-        String fileData = FileManager.loadGame("puzzles.txt");
-        String[] lines = fileData.split("\n");
-
-        for (int i = 1; i < lines.length; i++) {
-
-            String[] parts = splitCSVLine(lines[i]);
-
-            String id = parts[0].trim();
-            String name = parts[1].trim();
-            String roomID = parts[2].trim();
-            boolean solved = Boolean.parseBoolean(parts[3].trim());
-
-            puzzles.put(id, new Puzzle(id, name, roomID, solved));
-        }
-    }
-
-    // ---------------- ASSIGN PUZZLES ----------------
     private void assignPuzzlesToRooms() {
 
-        for (Puzzle puzzle : puzzles.values()) {
-
-            Room room = rooms.get(puzzle.getRoomID());
-
-            if (room != null) {
-                room.setPuzzle(puzzle);
-            }
+        for (Puzzle p : puzzles.values()) {
+            Room r = rooms.get(p.getRoomID());
+            if (r != null) r.setPuzzle(p);
         }
     }
+    // -------- ROOM --------
 
-    // ---------------- SHOW ROOM ----------------
     public void showRoom() {
 
         if (currentRoom == null) {
@@ -170,25 +61,23 @@ public class RoomManager {
         System.out.println("\n" + currentRoom.getRoomName());
         System.out.println(currentRoom.getRoomDesc());
 
-        // ITEMS
+        visitedRooms.add(currentRoom.getId());
+
         if (!currentRoom.getItems().isEmpty()) {
             System.out.println("\nItems:");
-            for (Item item : currentRoom.getItems()) {
-                System.out.println("- " + item.getitemName());
+            for (Item i : currentRoom.getItems()) {
+                System.out.println("- " + i.getitemName());
             }
         }
 
-        // MONSTER
         if (currentRoom.hasMonster()) {
             System.out.println("\nMonster: " + currentRoom.getMonster().getName());
         }
 
-        // PUZZLE
         if (currentRoom.hasPuzzle()) {
             System.out.println("\nPuzzle: " + currentRoom.getPuzzle().getTrialName());
         }
 
-        // EXITS
         System.out.println("\nConnections:");
 
         List<String> exits = new ArrayList<>(currentRoom.getExits().keySet());
@@ -196,17 +85,14 @@ public class RoomManager {
         for (int i = 0; i < exits.size(); i++) {
 
             String key = exits.get(i);
-            String targetId = currentRoom.getExits().get(key);
+            String target = currentRoom.getExits().get(key);
 
-            Room target = rooms.get(targetId);
+            Room r = rooms.get(target);
 
-            String name = (target != null) ? target.getRoomName() : targetId;
-
-            System.out.println(i + ": " + name);
+            System.out.println(i + ": " + (r != null ? r.getRoomName() : target));
         }
     }
 
-    // ---------------- MOVE ----------------
     public void move(int index) {
 
         List<String> exits = new ArrayList<>(currentRoom.getExits().keySet());
@@ -216,41 +102,34 @@ public class RoomManager {
             return;
         }
 
-        String key = exits.get(index);
-        String targetId = currentRoom.getExits().get(key);
+        String target = currentRoom.getExits().get(exits.get(index));
 
-        currentRoom = rooms.get(targetId);
+        Room next = rooms.get(target);
 
-        showRoom();
-    }
-
-    // ---------------- CSV PARSER ----------------
-    private String[] splitCSVLine(String line) {
-
-        ArrayList<String> result = new ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        boolean inQuotes = false;
-
-        for (char c : line.toCharArray()) {
-
-            if (c == '"') {
-                inQuotes = !inQuotes;
-            }
-            else if (c == ',' && !inQuotes) {
-                result.add(current.toString());
-                current = new StringBuilder();
-            }
-            else {
-                current.append(c);
-            }
+        if (next == null) {
+            System.out.println("You cannot go there.");
+            return;
         }
 
-        result.add(current.toString());
-        return result.toArray(new String[0]);
+        currentRoom = next;
+        showRoom();
     }
+    public void addRoom(Room r) { rooms.put(r.getId(), r); }
+    public void addItem(Item i) { items.put(i.getId(), i); }
+    public void addMonster(Monster m) { monsters.put(m.getId(), m); }
+    public void addPuzzle(Puzzle p) { puzzles.put(p.getId(), p); }
 
-    // ---------------- GET CURRENT ROOM ----------------
-    public Room getCurrentRoom() {
-        return currentRoom;
-    }
+    public Room getCurrentRoom() { return currentRoom; }
+    public Player getPlayer() { return player; }
+
+    public Map<String, Room> getRooms() { return rooms; }
+    public Map<String, Item> getItems() { return items; }
+    public Map<String, Monster> getMonsters() { return monsters; }
+    public Map<String, Puzzle> getPuzzles() { return puzzles; }
+
+    public Set<String> getVisitedRooms() { return visitedRooms; }
+
+    public Item getItem(String id) { return items.get(id); }
+    public Monster getMonster(String id) { return monsters.get(id); }
+    public Puzzle getPuzzle(String id) { return puzzles.get(id); }
 }

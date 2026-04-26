@@ -14,17 +14,7 @@ public class Main {
 
         // Start game
         controller.startGame();
-    }
-    public class Main {
-        public static void main(String[] args) {
 
-            System.out.println("Starting test...");
-
-            RoomManager rm = new RoomManager();
-
-            rm.showRoom();   // should print first room
-
-        }
     }
 
 }
