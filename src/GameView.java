@@ -37,6 +37,10 @@ public class GameView {
         System.out.println("[COMBAT] " + message);
     }
 
+    public void displayError(String message) {
+        System.out.println("[ERROR] " + message);
+    }
+
     public void displayIntro() {
         System.out.println("======================================");
         System.out.println("         DUNGEON OF TRIALS");
