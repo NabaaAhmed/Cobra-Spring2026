@@ -126,19 +126,19 @@ public class RoomManager {
             String roomField = parts[3].trim();
             String monsterField = parts[4].trim();
             boolean stackable = Boolean.parseBoolean(parts[5].trim());
-            Item newItem = createItem(itemId, itemName, description, stackable);
+
+            // Register monster drops if this item belongs to a monster.
             if (!monsterField.equals("0")) {
-                GameModel.registerMonsterReward(monsterField.trim(), newItem);
+                Item rewardItem = createItem(itemId, itemName, description, stackable);
+                GameModel.registerMonsterReward(monsterField.trim(), rewardItem);
             }
 
-            if (monsterField.equals("0")) {
-                continue;
-            }
-
+            // Do not place items that are not assigned to a room.
             if (roomField.equals("0")) {
                 continue;
             }
 
+            // These are supposed to be revealed by Final Trial logic, not sitting in the room at start.
             if (itemName.equalsIgnoreCase("Core Fragment") ||
                     itemName.equalsIgnoreCase("Final Jewel")) {
                 continue;

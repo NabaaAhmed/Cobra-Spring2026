@@ -88,7 +88,7 @@ public class Puzzle6FinalTrial extends Puzzle {
 
     private String triggerStalker(Player player, String reasonMessage, boolean ambushDamage) {
         stalkerPathRequired = true;
-        failureMonster = new Monster("M-09", "Final Trial Stalker", 6, 1);
+        failureMonster = new Monster("M-08", "Final Trial Stalker", 6, 1);
         combatTriggered = true;
 
         String message = reasonMessage;
