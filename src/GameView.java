@@ -6,6 +6,10 @@ public class GameView {
     }
 
     public void displayRoom(Room room) {
+        displayRoom(room, null, null);
+    }
+
+    public void displayRoom(Room room, Player player, Puzzle activePuzzle) {
         if (room == null) {
             System.out.println("No room loaded.");
             return;
@@ -23,8 +27,35 @@ public class GameView {
 
         if (!room.getConnections().isEmpty()) {
             System.out.println("\nConnections:");
-            for (int i = 0; i < room.getConnections().size(); i++) {
-                System.out.println(i + ": " + room.getConnections().get(i).getRoomName());
+
+            // Check if we're in Commitment trial (Puzzle5)
+            boolean isCommitmentTrial = (activePuzzle instanceof Puzzle5Commitment) &&
+                    player != null &&
+                    player.getCurrentRoomId().startsWith("CM-");
+
+            if (isCommitmentTrial) {
+                String currentRoomId = player.getCurrentRoomId();
+                int currentNum = Integer.parseInt(currentRoomId.substring(3));
+
+                // Only show connections that go forward (higher number = CM-02, CM-03, etc.)
+                for (int i = 0; i < room.getConnections().size(); i++) {
+                    Room connected = room.getConnections().get(i);
+                    String connectedId = connected.getRoomId();
+                    if (connectedId != null && connectedId.startsWith("CM-")) {
+                        int connectedNum = Integer.parseInt(connectedId.substring(3));
+                        if (connectedNum > currentNum) {
+                            System.out.println(i + ": " + connected.getRoomName());
+                        }
+                    } else {
+                        // Non-CM connections (like teleporter back) - show normally
+                        System.out.println(i + ": " + connected.getRoomName());
+                    }
+                }
+            } else {
+                // Normal display - show all connections
+                for (int i = 0; i < room.getConnections().size(); i++) {
+                    System.out.println(i + ": " + room.getConnections().get(i).getRoomName());
+                }
             }
         }
     }
