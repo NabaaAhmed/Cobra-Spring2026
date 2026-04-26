@@ -11,22 +11,7 @@ public class GameView {
             return;
         }
 
-        System.out.println("\n=== " + room.getRoomName() + " ===");
-        System.out.println(room.getRoomDesc());
-
-        if (!room.getItems().isEmpty()) {
-            System.out.println("\nItems in room:");
-            for (Item item : room.getItems()) {
-                System.out.println("- " + item.getItemName());
-            }
-        }
-
-        if (!room.getConnections().isEmpty()) {
-            System.out.println("\nConnections:");
-            for (int i = 0; i < room.getConnections().size(); i++) {
-                System.out.println(i + ": " + room.getConnections().get(i).getRoomName());
-            }
-        }
+        System.out.println("\n=== " + room.getRoomName() + " (" + room.getRoomId() + ") ===");
     }
 
     public void displayInventory(Player player) {
@@ -68,7 +53,8 @@ public class GameView {
 
     public void displayMainHelp() {
         System.out.println("=== Commands ===");
-        System.out.println("inspect room  - look at the current room");
+        System.out.println("explore room  - read the current room description and exits");
+        System.out.println("inspect room  - check items in the current room");
         System.out.println("move [number] - move to a connected room");
         System.out.println("take [item]   - pick up an item");
         System.out.println("drop [item]   - drop an item");

@@ -17,7 +17,7 @@ public class GameController {
     public void startGame() {
         view.displayIntro();
         view.displayMessage("");
-        view.displayMessage(model.lookRoom().getMessage());
+        view.displayMessage(model.roomHeader().getMessage());
 
         while (isRunning) {
             view.displayMessage("");
@@ -53,11 +53,19 @@ public class GameController {
                 printMainHelp();
                 return;
 
+            case "explore":
+                if (command.equalsIgnoreCase("explore") || command.equalsIgnoreCase("explore room")) {
+                    view.displayMessage(model.exploreRoom().getMessage());
+                } else {
+                    view.displayError("Invalid command. Use 'explore room'.");
+                }
+                return;
+
             case "inspect":
                 if (command.equalsIgnoreCase("inspect room")) {
                     view.displayMessage(model.lookRoom().getMessage());
                 } else {
-                    view.displayError("Invalid command.");
+                    view.displayError("Invalid command. Use 'inspect room'.");
                 }
                 return;
 
@@ -66,7 +74,7 @@ public class GameController {
                 displayResult(result);
 
                 if (result.isSuccess()) {
-                    view.displayMessage(model.lookRoom().getMessage());
+                    view.displayMessage(model.roomHeader().getMessage());
                     autoStartPuzzleAfterMove();
                 }
                 return;
@@ -138,12 +146,17 @@ public class GameController {
             return;
         }
 
-        if (command.equalsIgnoreCase("inspect room")) {
+        if (command.equalsIgnoreCase("explore") || command.equalsIgnoreCase("explore room")) {
             if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
-                displayCommitmentRoom();
+                displayCommitmentExplore();
             } else {
-                view.displayMessage(model.lookRoom().getMessage());
+                view.displayMessage(model.exploreRoom().getMessage());
             }
+            return;
+        }
+
+        if (command.equalsIgnoreCase("inspect room")) {
+            view.displayMessage(model.lookRoom().getMessage());
             return;
         }
 
@@ -240,7 +253,7 @@ public class GameController {
             return;
         }
 
-        view.displayMessage(model.lookRoom().getMessage());
+        view.displayMessage(model.roomHeader().getMessage());
 
         String movementResult = sacrifice.handleRoomMovement(model.getPlayer());
 
@@ -261,7 +274,7 @@ public class GameController {
             view.displayMessage("Puzzle complete.");
             view.displayMessage(model.showStatus().getMessage());
             view.displayMessage("");
-            view.displayMessage(model.lookRoom().getMessage());
+            view.displayMessage(model.roomHeader().getMessage());
         }
     }
 
@@ -283,13 +296,44 @@ public class GameController {
             return;
         }
 
-        displayCommitmentRoom();
+        view.displayMessage(model.roomHeader().getMessage());
 
         String movementResult = commitment.handleRoomMovement(model.getPlayer());
 
         if (movementResult != null && !movementResult.isEmpty()) {
             view.displayMessage(movementResult);
         }
+    }
+
+    private void displayCommitmentExplore() {
+        String roomId = model.getPlayer().getCurrentRoomId();
+        Room room = model.getRoomManager().getCurrentRoom();
+
+        if (room == null) {
+            view.displayMessage("No room loaded.");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== ").append(room.getRoomName()).append(" (").append(room.getRoomId()).append(") ===\n");
+        sb.append(room.getRoomDesc());
+
+        sb.append("\n\nConnections:");
+
+        if (roomId.equals("CM-07")) {
+            sb.append("\n- No forward exits. The path to the Main Hall is open.");
+        } else if (room.getConnections().size() > 1) {
+            Room forwardRoom = room.getConnections().get(1);
+            sb.append("\n1: ")
+                    .append(forwardRoom.getRoomName())
+                    .append(" (")
+                    .append(forwardRoom.getRoomId())
+                    .append(")");
+        } else {
+            sb.append("\n- No forward exits.");
+        }
+
+        view.displayMessage(sb.toString());
     }
 
     private int getMoveIndex(String command) {
@@ -304,44 +348,6 @@ public class GameController {
         } catch (NumberFormatException e) {
             return -1;
         }
-    }
-
-    private void displayCommitmentRoom() {
-        String roomId = model.getPlayer().getCurrentRoomId();
-        Room room = model.getRoomManager().getCurrentRoom();
-
-        if (room == null) {
-            view.displayMessage("No room loaded.");
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(room.getRoomName()).append(" ===\n");
-        sb.append(room.getRoomDesc());
-
-        if (!room.getItems().isEmpty()) {
-            sb.append("\n\nItems in room:");
-            for (Item item : room.getItems()) {
-                sb.append("\n- ").append(item.getItemName());
-            }
-        }
-
-        sb.append("\n\nConnections:");
-
-        if (roomId.equals("CM-07")) {
-            sb.append("\n- No forward exits. The teleporter waits here.");
-        } else if (room.getConnections().size() > 1) {
-            Room forwardRoom = room.getConnections().get(1);
-            sb.append("\n1: ")
-                    .append(forwardRoom.getRoomName())
-                    .append(" (")
-                    .append(forwardRoom.getRoomId())
-                    .append(")");
-        } else {
-            sb.append("\n- No forward exits.");
-        }
-
-        view.displayMessage(sb.toString());
     }
 
     private boolean isNumberMoveCommand(String command) {
@@ -394,7 +400,7 @@ public class GameController {
                 view.displayMessage("Puzzle complete.");
                 view.displayMessage(model.showStatus().getMessage());
                 view.displayMessage("");
-                view.displayMessage(model.lookRoom().getMessage());
+                view.displayMessage(model.roomHeader().getMessage());
             }
 
             autoStartPuzzleAfterMove();
@@ -443,7 +449,7 @@ public class GameController {
                 view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
                 view.displayMessage("");
-                view.displayMessage(model.lookRoom().getMessage());
+                view.displayMessage(model.roomHeader().getMessage());
                 return;
             }
 
@@ -457,7 +463,7 @@ public class GameController {
                 view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
                 view.displayMessage("");
-                view.displayMessage(model.lookRoom().getMessage());
+                view.displayMessage(model.roomHeader().getMessage());
                 return;
             }
 
@@ -471,7 +477,7 @@ public class GameController {
                 view.displayMessage("You have been teleported back to the Main Hall.");
                 view.displayMessage(model.showStatus().getMessage());
                 view.displayMessage("");
-                view.displayMessage(model.lookRoom().getMessage());
+                view.displayMessage(model.roomHeader().getMessage());
                 return;
             }
 
@@ -488,7 +494,7 @@ public class GameController {
 
                     view.displayMessage(model.showStatus().getMessage());
                     view.displayMessage("");
-                    view.displayMessage(model.lookRoom().getMessage());
+                    view.displayMessage(model.roomHeader().getMessage());
                 }
                 return;
             }
@@ -515,7 +521,7 @@ public class GameController {
 
                     view.displayMessage(model.showStatus().getMessage());
                     view.displayMessage("");
-                    view.displayMessage(model.lookRoom().getMessage());
+                    view.displayMessage(model.roomHeader().getMessage());
                 }
                 return;
             }

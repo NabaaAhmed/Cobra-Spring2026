@@ -42,7 +42,12 @@ public class GameModel {
         activePuzzle = null;
     }
 
-    public GameResult lookRoom() {
+    /*
+     * Automatically shown when entering a room.
+     * Normal rooms: only room name + room ID.
+     * Main Hall: room name + room ID + visible trial connections.
+     */
+    public GameResult roomHeader() {
         Room room = roomManager.getCurrentRoom();
 
         if (room == null) {
@@ -50,15 +55,56 @@ public class GameModel {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(room.getRoomName()).append(" ===\n");
-        sb.append(room.getRoomDesc());
+        sb.append("=== ").append(room.getRoomName())
+                .append(" (").append(room.getRoomId()).append(") ===");
 
-        if (!room.getItems().isEmpty()) {
-            sb.append("\n\nItems in room:");
-            for (Item item : room.getItems()) {
-                sb.append("\n- ").append(item.getItemName());
+        if (room.getRoomId().equals("EZ-01")) {
+            sb.append("\n\nConnections:");
+
+            boolean anyVisibleConnection = false;
+
+            if (!room.getConnections().isEmpty()) {
+                for (int i = 0; i < room.getConnections().size(); i++) {
+                    Room connectedRoom = room.getConnections().get(i);
+                    String connectedId = connectedRoom.getRoomId();
+
+                    if (shouldHideConnection(room.getRoomId(), connectedId)) {
+                        continue;
+                    }
+
+                    anyVisibleConnection = true;
+
+                    sb.append("\n").append(i).append(": ")
+                            .append(connectedRoom.getRoomName())
+                            .append(" (")
+                            .append(connectedRoom.getRoomId())
+                            .append(")");
+                }
+            }
+
+            if (!anyVisibleConnection) {
+                sb.append("\n- No exits from this room.");
             }
         }
+
+        return new GameResult(sb.toString());
+    }
+
+    /*
+     * explore room = room description + exits/connections.
+     * Does not show items.
+     */
+    public GameResult exploreRoom() {
+        Room room = roomManager.getCurrentRoom();
+
+        if (room == null) {
+            return new GameResult("No room loaded.");
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== ").append(room.getRoomName())
+                .append(" (").append(room.getRoomId()).append(") ===\n");
+        sb.append(room.getRoomDesc());
 
         sb.append("\n\nConnections:");
 
@@ -85,6 +131,35 @@ public class GameModel {
 
         if (!anyVisibleConnection) {
             sb.append("\n- No exits from this room.");
+        }
+
+        return new GameResult(sb.toString());
+    }
+
+    /*
+     * inspect room = visible items only.
+     * Does not show description or exits.
+     */
+    public GameResult lookRoom() {
+        Room room = roomManager.getCurrentRoom();
+
+        if (room == null) {
+            return new GameResult("No room loaded.");
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== Items in ")
+                .append(room.getRoomName())
+                .append(" (")
+                .append(room.getRoomId())
+                .append(") ===");
+
+        if (!room.getItems().isEmpty()) {
+            for (Item item : room.getItems()) {
+                sb.append("\n- ").append(item.getItemName());
+            }
+        } else {
+            sb.append("\nThere are no items in this room.");
         }
 
         return new GameResult(sb.toString());
@@ -182,7 +257,6 @@ public class GameModel {
             Room destination = current.getConnections().get(index);
             String destinationId = destination.getRoomId();
 
-            // Hidden Bomb Room and Final Trial unlock after all five main trials are completed.
             if ((destinationId.equals("FN-01") || destinationId.equals("FN-02") || destinationId.equals("EZ-02"))
                     && !allMainTrialsCompleted()) {
                 GameResult result = new GameResult("That area is locked. Complete all 5 trials first.");
@@ -190,7 +264,6 @@ public class GameModel {
                 return result;
             }
 
-            // Trap Room should only be entered through puzzle failure, not directly from Main Hall.
             if (destinationId.equals("TP-TRAP-01")) {
                 GameResult result = new GameResult("That area is locked. You only go there through a trap or failed trial action.");
                 result.setSuccess(false);
@@ -492,22 +565,18 @@ public class GameModel {
             return false;
         }
 
-        // Only hide these from the Main Hall display.
         if (!currentRoomId.equals("EZ-01")) {
             return false;
         }
 
-        // Hide Hidden Bomb Room until all 5 main trials are complete.
         if (destinationId.equals("EZ-02") && !allMainTrialsCompleted()) {
             return true;
         }
 
-        // Hide Final Trial until all 5 main trials are complete.
         if ((destinationId.equals("FN-01") || destinationId.equals("FN-02")) && !allMainTrialsCompleted()) {
             return true;
         }
 
-        // Hide Trap Room from Main Hall because it should only be reached through failure.
         if (destinationId.equals("TP-TRAP-01")) {
             return true;
         }
