@@ -229,6 +229,25 @@ public class GameController {
             return;
         }
 
+        if (model.getActivePuzzle() instanceof Puzzle4Sacrifice && action.equals("take")) {
+            String takeCommand = command;
+
+            if (command.equalsIgnoreCase("take sword")) {
+                takeCommand = "take strong trial sword";
+            }
+
+            GameResult takeResult = model.takeItem(takeCommand);
+
+            if (!takeResult.isSuccess()) {
+                displayResult(takeResult);
+                return;
+            }
+
+            GameResult puzzleTakeResult = model.handlePuzzleCommand("confirm sword taken");
+            handlePuzzleResult(puzzleTakeResult);
+            return;
+        }
+
         if (isNumberMoveCommand(command)) {
             if (model.getActivePuzzle() instanceof Puzzle4Sacrifice) {
                 handleSacrificeMovement(command);
@@ -244,6 +263,36 @@ public class GameController {
             return;
         }
 
+        /*
+         * Commitment special case:
+         * The actual room item should be picked up first, then Puzzle5 is told
+         * that the player stopped to take an item. This lets taking items be dangerous
+         * instead of being blocked as an invalid puzzle command.
+         */
+        if (model.getActivePuzzle() instanceof Puzzle5Commitment && action.equals("take")) {
+            GameResult takeResult = model.takeItem(command);
+            displayResult(takeResult);
+
+            if (takeResult.isSuccess()) {
+                GameResult takePuzzleResult = model.handlePuzzleCommand("take item");
+                handlePuzzleResult(takePuzzleResult);
+            }
+
+            return;
+        }
+
+        /*
+         * Commitment accepts these as dangerous lingering actions.
+         * "inspect room" remains safe because it is just checking the room list,
+         * but "examine item" / "inspect item" triggers the Pursuer logic.
+         */
+        if (model.getActivePuzzle() instanceof Puzzle5Commitment &&
+                (command.equalsIgnoreCase("examine item") || command.equalsIgnoreCase("inspect item"))) {
+            GameResult examineResult = model.handlePuzzleCommand(command);
+            handlePuzzleResult(examineResult);
+            return;
+        }
+
         GameResult puzzleResult = model.handlePuzzleCommand(command);
 
         if (!puzzleResult.getMessage().equalsIgnoreCase("Invalid command.")) {
@@ -252,18 +301,6 @@ public class GameController {
         }
 
         if (action.equals("take")) {
-            if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
-                GameResult takeResult = model.takeItem(command);
-                displayResult(takeResult);
-
-                if (takeResult.isSuccess()) {
-                    GameResult takePuzzleResult = model.handlePuzzleCommand("take item");
-                    handlePuzzleResult(takePuzzleResult);
-                }
-
-                return;
-            }
-
             displayResult(model.takeItem(command));
             return;
         }
@@ -322,6 +359,11 @@ public class GameController {
     }
 
     private void handleCommitmentMovement(String command) {
+        if (model.getPlayer().getCurrentRoomId().equals("CM-07")) {
+            view.displayError("Answer yes or no to complete the Commitment trial before moving on.");
+            return;
+        }
+
         int moveIndex = getMoveIndex(command);
 
         if (moveIndex != 1) {

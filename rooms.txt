@@ -1,7 +1,7 @@
 //id,name,description,exits/connections
 //Team
 id,name,description,exits/connections
-EZ-01,Main Hall,"Large cracked hall. Five teleporters stand in an arc, each connected by a glowing line to a jewel embedded in the far wall. The Final Trial path remains sealed until all five trials are complete.",EZ-02,AW-01,RS-01,TR-01,SC-01,CM-01,TP-TRAP-01,FN-01
+EZ-01,Main Hall,"Large cracked hall. Five teleporters stand in an arc, each connected by a glowing line to a jewel embedded in the far wall. The Final Trial path remains sealed until all five trials are complete.",EZ-02,AW-01,RS-01,TR-01,SC-01,CM-01,FN-01,TP-TRAP-01
 EZ-02,Hidden Bomb Room,"Small stone chamber accessed only after all five trials are complete. A single dusty pedestal holds an explosive device for the Final Trial.",EZ-01
 AW-01,Awareness Antechamber,"Quiet entry room. Broken teleporter parts are scattered across the floor. A wall inscription reads: 'Some exits are not given. They are rebuilt.'",EZ-01,AW-02
 AW-02,Awareness Trial Room,"A strange teleporter sits in the room. A glowing red gem and rubble lie nearby.",AW-01,EZ-01

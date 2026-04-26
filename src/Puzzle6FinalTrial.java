@@ -257,11 +257,21 @@ public class Puzzle6FinalTrial extends Puzzle {
                 return countWrongAction(player, "The statue has already been shattered.");
             }
 
+            Item explosiveDevice = player.findItemByName("Explosive Device");
+
+            if (explosiveDevice == null) {
+                return countWrongAction(player,
+                        "You do not have the Explosive Device. The statue cannot be broken without it.");
+            }
+
+            player.removeItem(explosiveDevice);
+
             advanceBurnCounter();
             statueBroken = true;
 
-            String message = "You place the explosive device into the statue.\n"
+            String message = "You place the Explosive Device into the statue.\n"
                     + "A sharp crack echoes through the chamber as the statue bursts apart.\n"
+                    + "The Explosive Device is destroyed in the blast.\n"
                     + "A glowing Core Fragment falls from the rubble.";
 
             if (crackedSymbolAppeared) {
