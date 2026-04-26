@@ -44,11 +44,6 @@ public class GameModel {
         activePuzzle = null;
     }
 
-    /*
-     * Automatically shown when entering a room.
-     * Normal rooms: only room name + room ID.
-     * Main Hall: room name + room ID + visible trial connections.
-     */
     public GameResult roomHeader() {
         Room room = roomManager.getCurrentRoom();
 
@@ -102,50 +97,32 @@ public class GameModel {
         String roomId = room.getRoomId();
         String description = room.getRoomDesc();
 
-        // Completed-state descriptions prevent contradictions after a trial is finished.
-
-        // Main Hall after all five trials are complete
         if (roomId.equals("EZ-01") && allMainTrialsCompleted()) {
-            description = "The Main Hall has changed. The hidden bomb room is open, and a final teleporter waits ahead. The final mechanism may require something from the hidden room.";
-        }
-
-        // Awareness completed descriptions
-        else if (player.hasCompletedTrial("AWARENESS") && roomId.equals("AW-01")) {
+            description = "The Main Hall has changed. The Wall Jewel can now be removed from the wall. The hidden bomb room is sealed until the jewel is taken, and a final teleporter waits ahead.";
+        } else if (player.hasCompletedTrial("AWARENESS") && roomId.equals("AW-01")) {
             description = "The Awareness entry room is quiet. Broken teleporter parts remain scattered across the floor.";
         } else if (player.hasCompletedTrial("AWARENESS") && roomId.equals("AW-02")) {
             description = "The damaged teleporter is quiet now. Scattered debris remains where the Awareness trial was decided.";
-        }
-
-        // Restraint completed descriptions
-        else if (player.hasCompletedTrial("RESTRAINT") && roomId.equals("RS-01")) {
+        } else if (player.hasCompletedTrial("RESTRAINT") && roomId.equals("RS-01")) {
             description = "The Restraint entry chamber is still and dark. The chamber ahead has already tested your self-control.";
         } else if (player.hasCompletedTrial("RESTRAINT") && roomId.equals("RS-02")) {
             description = "The chest sits silent in the circular chamber. The test of temptation has already been decided.";
         } else if (player.hasCompletedTrial("RESTRAINT") && roomId.equals("RS-03")) {
             description = "The Restraint Exit Corridor is quiet. The path back to the Main Hall remains open.";
-        }
-
-        // Trust completed descriptions
-        else if (player.hasCompletedTrial("TRUST") && roomId.equals("TR-01")) {
+        } else if (player.hasCompletedTrial("TRUST") && roomId.equals("TR-01")) {
             description = "The entry chamber is quiet now. The floor inscription still reads: 'Trust the unguarded.'";
         } else if (player.hasCompletedTrial("TRUST") && roomId.equals("TR-02")) {
             description = "The guardian statue lies shattered across the chamber. "
                     + "The false chest has been destroyed, and the pedestal stands silent.";
         } else if (player.hasCompletedTrial("TRUST") && roomId.equals("TR-03")) {
             description = "The Trust Exit Hall is quiet. The trial behind you has already been decided.";
-        }
-
-        // Sacrifice completed descriptions
-        else if (player.hasCompletedTrial("SACRIFICE") && roomId.equals("SC-01")) {
+        } else if (player.hasCompletedTrial("SACRIFICE") && roomId.equals("SC-01")) {
             description = "The sword pedestal stands empty. The bridge ahead still feels heavy with the memory of the trial.";
         } else if (player.hasCompletedTrial("SACRIFICE") && roomId.equals("SC-02")) {
             description = "The long bridge stretches across the darkness. The air is calmer now that the sacrifice has been made.";
         } else if (player.hasCompletedTrial("SACRIFICE") && roomId.equals("SC-03")) {
             description = "The end of the bridge is quiet. No Wraith blocks the path now.";
-        }
-
-        // Commitment completed descriptions
-        else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-01")) {
+        } else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-01")) {
             description = "The Commitment Entry is quiet now. The path ahead no longer echoes with pursuit.";
         } else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-02")) {
             description = "The Dagger Chamber is still. The pressure to keep moving has passed.";
@@ -159,10 +136,7 @@ public class GameModel {
             description = "The Map Corridor is quiet. The exit path remains open.";
         } else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-07")) {
             description = "The Commitment Exit is safe and quiet. The path back to the Main Hall remains open.";
-        }
-
-        // Trap completed description
-        else if (player.hasCompletedTrial("TRAP") && roomId.equals("TP-TRAP-01")) {
+        } else if (player.hasCompletedTrial("TRAP") && roomId.equals("TP-TRAP-01")) {
             description = "The trap chamber is quiet for now. Broken stone and scorched marks remain around the unstable teleporter.";
         }
 
@@ -266,6 +240,12 @@ public class GameModel {
                 return result;
             }
 
+            if (destinationId.equals("EZ-02") && player.findItemByName("Wall Jewel") == null) {
+                GameResult result = new GameResult("The Hidden Bomb Room is still sealed. Take the Wall Jewel from the Main Hall first.");
+                result.setSuccess(false);
+                return result;
+            }
+
             if (destinationId.equals("TP-TRAP-01")) {
                 GameResult result = new GameResult("That area is locked. You only go there through a trap or failed trial action.");
                 result.setSuccess(false);
@@ -316,7 +296,6 @@ public class GameModel {
             return result;
         }
 
-        // The Wall Jewel is visible in EZ-01, but it should only be removable after all 5 main trials.
         if (itemName.equalsIgnoreCase("Wall Jewel")) {
             if (!room.getRoomId().equals("EZ-01")) {
                 GameResult result = new GameResult("The Wall Jewel is not here.");
