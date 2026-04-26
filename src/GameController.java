@@ -15,9 +15,7 @@ public class GameController {
     }
 
     public void startGame() {
-        view.displayIntro();
-        view.displayMessage("");
-        view.displayMessage(model.roomHeader().getMessage());
+        printFreshGameStart();
 
         while (isRunning) {
             view.displayMessage("");
@@ -33,10 +31,53 @@ public class GameController {
             }
 
             if (!model.getPlayer().isAlive()) {
-                view.displayMessage("You died.");
-                isRunning = false;
+                handlePlayerDeath();
             }
         }
+    }
+
+    private void printFreshGameStart() {
+        view.displayIntro();
+        view.displayMessage("");
+        view.displayMessage(model.roomHeader().getMessage());
+    }
+
+    private void handlePlayerDeath() {
+        view.displayMessage("");
+        view.displayMessage("You died.");
+
+        while (true) {
+            view.displayMessage("Restart from the beginning? yes/no");
+            System.out.print("> ");
+
+            String choice = input.nextLine().trim().toLowerCase();
+
+            if (choice.equals("yes") || choice.equals("y")) {
+                restartGame();
+                return;
+            }
+
+            if (choice.equals("no") || choice.equals("n")) {
+                view.displayMessage("Game over.");
+                isRunning = false;
+                return;
+            }
+
+            view.displayError("Please type yes or no.");
+        }
+    }
+
+    private void restartGame() {
+        Player newPlayer = new Player("EZ-01");
+        RoomManager newRoomManager = new RoomManager();
+
+        this.model = new GameModel(newPlayer, newRoomManager);
+
+        view.displayMessage("");
+        view.displayMessage("Restarting game...");
+        view.displayMessage("");
+
+        printFreshGameStart();
     }
 
     private void handleMainCommand(String command) {
@@ -98,11 +139,11 @@ public class GameController {
                 return;
 
             case "inventory":
-                view.displayMessage(model.showInventory().getMessage());
+                view.displayInventory(model.getPlayer());
                 return;
 
             case "status":
-                view.displayMessage(model.showStatus().getMessage());
+                view.displayStatus(model.getPlayer());
                 return;
 
             case "hint":
@@ -161,12 +202,12 @@ public class GameController {
         }
 
         if (command.equalsIgnoreCase("status")) {
-            view.displayMessage(model.showStatus().getMessage());
+            view.displayStatus(model.getPlayer());
             return;
         }
 
         if (command.equalsIgnoreCase("inventory")) {
-            view.displayMessage(model.showInventory().getMessage());
+            view.displayInventory(model.getPlayer());
             return;
         }
 
@@ -267,12 +308,16 @@ public class GameController {
         }
 
         if (sacrifice.isFinished()) {
+            if (!model.getPlayer().isAlive()) {
+                return;
+            }
+
             model.markTrialCompletedForPuzzle(sacrifice);
             model.clearActivePuzzle();
 
             view.displayMessage("");
             view.displayMessage("Puzzle complete.");
-            view.displayMessage(model.showStatus().getMessage());
+            view.displayStatus(model.getPlayer());
             view.displayMessage("");
             view.displayMessage(model.roomHeader().getMessage());
         }
@@ -373,6 +418,11 @@ public class GameController {
     private void handlePuzzleResult(GameResult result) {
         if (result.isCombatStarted()) {
             view.displayMessage(result.getMessage());
+
+            if (!model.getPlayer().isAlive()) {
+                return;
+            }
+
             runCombat(result.getMonster());
 
             if (model.getActivePuzzle() == null || !model.getPlayer().isAlive()) {
@@ -380,6 +430,10 @@ public class GameController {
             }
         } else {
             displayResult(result);
+        }
+
+        if (!model.getPlayer().isAlive()) {
+            return;
         }
 
         if (result.isPuzzleFinished()) {
@@ -399,7 +453,7 @@ public class GameController {
             if (completedTrial) {
                 view.displayMessage("");
                 view.displayMessage("Puzzle complete.");
-                view.displayMessage(model.showStatus().getMessage());
+                view.displayStatus(model.getPlayer());
                 view.displayMessage("");
                 view.displayMessage(model.roomHeader().getMessage());
             }
@@ -440,15 +494,23 @@ public class GameController {
                 view.displayMessage("Monster dropped: " + reward.getItemName());
             }
 
+            if (!model.getPlayer().isAlive()) {
+                return;
+            }
+
             if (activePuzzleBeforeCombat instanceof Puzzle2Restraint) {
                 model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
                 model.getPlayer().setCurrentRoomId("EZ-01");
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
 
+                if (!model.getPlayer().isAlive()) {
+                    return;
+                }
+
                 view.displayMessage("You have completed the Trial of Restraint. (No Reward)");
                 view.displayMessage("You have been teleported back to the Main Hall.");
-                view.displayMessage(model.showStatus().getMessage());
+                view.displayStatus(model.getPlayer());
                 view.displayMessage("");
                 view.displayMessage(model.roomHeader().getMessage());
                 return;
@@ -460,9 +522,13 @@ public class GameController {
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
 
+                if (!model.getPlayer().isAlive()) {
+                    return;
+                }
+
                 view.displayMessage("You have completed the Trial of Trust. (No Reward)");
                 view.displayMessage("You have been teleported back to the Main Hall.");
-                view.displayMessage(model.showStatus().getMessage());
+                view.displayStatus(model.getPlayer());
                 view.displayMessage("");
                 view.displayMessage(model.roomHeader().getMessage());
                 return;
@@ -474,9 +540,13 @@ public class GameController {
                 model.getRoomManager().setRoom("EZ-01");
                 model.clearActivePuzzle();
 
+                if (!model.getPlayer().isAlive()) {
+                    return;
+                }
+
                 view.displayMessage("You have completed the Trial of Sacrifice. (No Reward)");
                 view.displayMessage("You have been teleported back to the Main Hall.");
-                view.displayMessage(model.showStatus().getMessage());
+                view.displayStatus(model.getPlayer());
                 view.displayMessage("");
                 view.displayMessage(model.roomHeader().getMessage());
                 return;
@@ -485,24 +555,31 @@ public class GameController {
             if (activePuzzleBeforeCombat instanceof Puzzle5Commitment) {
                 Puzzle5Commitment commitment = (Puzzle5Commitment) activePuzzleBeforeCombat;
                 view.displayMessage(commitment.finishAfterPursuerDefeated(model.getPlayer()));
+
+                if (!model.getPlayer().isAlive()) {
+                    return;
+                }
+
                 view.displayMessage("You have been teleported back to the Main Hall.");
 
-                if (model.getPlayer().isAlive()) {
-                    model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                    model.getPlayer().setCurrentRoomId("EZ-01");
-                    model.getRoomManager().setRoom("EZ-01");
-                    model.clearActivePuzzle();
+                model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
+                model.getPlayer().setCurrentRoomId("EZ-01");
+                model.getRoomManager().setRoom("EZ-01");
+                model.clearActivePuzzle();
 
-                    view.displayMessage(model.showStatus().getMessage());
-                    view.displayMessage("");
-                    view.displayMessage(model.roomHeader().getMessage());
-                }
+                view.displayStatus(model.getPlayer());
+                view.displayMessage("");
+                view.displayMessage(model.roomHeader().getMessage());
                 return;
             }
 
             if (activePuzzleBeforeCombat instanceof Puzzle6FinalTrial) {
                 Puzzle6FinalTrial finalTrial = (Puzzle6FinalTrial) activePuzzleBeforeCombat;
                 finalTrial.onStalkerDefeated();
+
+                if (!model.getPlayer().isAlive()) {
+                    return;
+                }
 
                 view.displayMessage("The Stalker falls. The teleporter stabilizes.");
                 view.displayMessage("Would you like to go through the teleporter? Yes or no");
@@ -512,18 +589,21 @@ public class GameController {
             if (activePuzzleBeforeCombat instanceof Puzzle7AwarenessTrap) {
                 Puzzle7AwarenessTrap trap = (Puzzle7AwarenessTrap) activePuzzleBeforeCombat;
                 view.displayMessage(trap.finishAfterWardenDefeated(model.getPlayer()));
+
+                if (!model.getPlayer().isAlive()) {
+                    return;
+                }
+
                 view.displayMessage("You have been teleported back to the Main Hall.");
 
-                if (model.getPlayer().isAlive()) {
-                    model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
-                    model.getPlayer().setCurrentRoomId("EZ-01");
-                    model.getRoomManager().setRoom("EZ-01");
-                    model.clearActivePuzzle();
+                model.markTrialCompletedForPuzzle(activePuzzleBeforeCombat);
+                model.getPlayer().setCurrentRoomId("EZ-01");
+                model.getRoomManager().setRoom("EZ-01");
+                model.clearActivePuzzle();
 
-                    view.displayMessage(model.showStatus().getMessage());
-                    view.displayMessage("");
-                    view.displayMessage(model.roomHeader().getMessage());
-                }
+                view.displayStatus(model.getPlayer());
+                view.displayMessage("");
+                view.displayMessage(model.roomHeader().getMessage());
                 return;
             }
         }
