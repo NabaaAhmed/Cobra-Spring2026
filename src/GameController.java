@@ -139,7 +139,11 @@ public class GameController {
         }
 
         if (command.equalsIgnoreCase("inspect room")) {
-            view.displayMessage(model.lookRoom().getMessage());
+            if (model.getActivePuzzle() instanceof Puzzle5Commitment) {
+                displayCommitmentRoom();
+            } else {
+                view.displayMessage(model.lookRoom().getMessage());
+            }
             return;
         }
 
@@ -169,10 +173,6 @@ public class GameController {
             return;
         }
 
-        /*
-         * Puzzle 4 and Puzzle 5 are multi-room trials.
-         * They are allowed to use normal numbered movement while their puzzle is active.
-         */
         if (isNumberMoveCommand(command)) {
             if (model.getActivePuzzle() instanceof Puzzle4Sacrifice) {
                 handleSacrificeMovement(command);
@@ -266,6 +266,14 @@ public class GameController {
     }
 
     private void handleCommitmentMovement(String command) {
+        int moveIndex = getMoveIndex(command);
+
+        if (moveIndex != 1) {
+            view.displayError("The path behind you has crumbled away. You cannot go back.");
+            view.displayMessage("Use 'move 1' to keep moving forward through the Commitment trial.");
+            return;
+        }
+
         Puzzle5Commitment commitment = (Puzzle5Commitment) model.getActivePuzzle();
 
         GameResult moveResult = model.move(command);
@@ -275,13 +283,65 @@ public class GameController {
             return;
         }
 
-        view.displayMessage(model.lookRoom().getMessage());
+        displayCommitmentRoom();
 
         String movementResult = commitment.handleRoomMovement(model.getPlayer());
 
         if (movementResult != null && !movementResult.isEmpty()) {
             view.displayMessage(movementResult);
         }
+    }
+
+    private int getMoveIndex(String command) {
+        String[] parts = command.trim().split(" ");
+
+        if (parts.length != 2) {
+            return -1;
+        }
+
+        try {
+            return Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private void displayCommitmentRoom() {
+        String roomId = model.getPlayer().getCurrentRoomId();
+        Room room = model.getRoomManager().getCurrentRoom();
+
+        if (room == null) {
+            view.displayMessage("No room loaded.");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== ").append(room.getRoomName()).append(" ===\n");
+        sb.append(room.getRoomDesc());
+
+        if (!room.getItems().isEmpty()) {
+            sb.append("\n\nItems in room:");
+            for (Item item : room.getItems()) {
+                sb.append("\n- ").append(item.getItemName());
+            }
+        }
+
+        sb.append("\n\nConnections:");
+
+        if (roomId.equals("CM-07")) {
+            sb.append("\n- No forward exits. The teleporter waits here.");
+        } else if (room.getConnections().size() > 1) {
+            Room forwardRoom = room.getConnections().get(1);
+            sb.append("\n1: ")
+                    .append(forwardRoom.getRoomName())
+                    .append(" (")
+                    .append(forwardRoom.getRoomId())
+                    .append(")");
+        } else {
+            sb.append("\n- No forward exits.");
+        }
+
+        view.displayMessage(sb.toString());
     }
 
     private boolean isNumberMoveCommand(String command) {
