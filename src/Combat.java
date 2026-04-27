@@ -4,22 +4,27 @@ import java.util.Scanner;
 public class Combat {
     private final Player player;
     private final Monster enemy;
+    // Keeps track of which turn we are on
     private int turnCount;
 
+    // Constructor: sets player, enemy, and starts turn at 1
     public Combat(Player player, Monster enemy) {
         this.player = player;
         this.enemy = enemy;
         this.turnCount = 1;
     }
+    //stores player + monster inside the class  & starts the fight at turn 1
 
+     // Checks if the battle is over
     public boolean isBattleOver() {
         return !player.isAlive() || !enemy.isAlive();
     }
-
+// Checks if monster is still alive
     public boolean isMonsterAlive() {
         return enemy.isAlive();
     }
 
+    // Returns the enemy object
     public Monster getEnemy() {
         return enemy;
     }
@@ -74,7 +79,7 @@ public class Combat {
         view.displayCombat("A " + enemy.getName() + " appears!");
 
         boolean swordWasUsed = false;
-
+       // Keep going until either the player OR the monster dies
         while (!isBattleOver()) {
             view.displayCombat("Turn " + turnCount);
             view.displayCombat("Type: attack or consume potion");
@@ -95,7 +100,6 @@ public class Combat {
 
             if (swordWasUsed) {
                 Item swordToRemove = null;
-
                 for (Item item : player.getInventory()) {
                     if (item.getItemName() != null &&
                             item.getItemName().toLowerCase().contains("sword")) {
