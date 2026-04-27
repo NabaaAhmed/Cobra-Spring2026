@@ -97,6 +97,7 @@ public class GameModel {
         String roomId = room.getRoomId();
         String description = room.getRoomDesc();
 
+        //updates description based of on completed trial
         if (roomId.equals("EZ-01") && allMainTrialsCompleted()) {
             description = "The Main Hall has changed. The Wall Jewel can now be removed from the wall. The hidden bomb room is sealed until the jewel is taken, and a final teleporter waits ahead.";
         } else if (player.hasCompletedTrial("AWARENESS") && roomId.equals("AW-01")) {
@@ -144,6 +145,8 @@ public class GameModel {
         sb.append("=== ").append(room.getRoomName())
                 .append(" (").append(room.getRoomId()).append(") ===\n");
         sb.append(description);
+        //print out === roomname  (roomId) ===
+        //                  description
 
         sb.append("\n\nConnections:");
 

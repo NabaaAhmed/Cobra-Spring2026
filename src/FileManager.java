@@ -5,16 +5,19 @@ import java.util.Scanner;
 
 public class FileManager {
 
+    //method to save the player's progress to a file
     public static void savePlayer(String filename, Player player) {
         try {
             FileWriter writer = new FileWriter(filename);
 
+            //gets player current status
             writer.write(player.getCurrentRoomId() + "\n");
             writer.write(player.getCurrentHP() + "\n");
             writer.write(player.getMaxHP() + "\n");
             writer.write(player.getAttackPower() + "\n");
             writer.write(player.getTrialTokens() + "\n");
 
+            //add to line for inventory and completed trials, separating items/trials with semicolons
             StringBuilder inventoryLine = new StringBuilder();
             for (Item item : player.getInventory()) {
                 inventoryLine.append(item.getItemName()).append(";");
@@ -33,6 +36,7 @@ public class FileManager {
         }
     }
 
+    //method to load player save stats into new game
     public static Player loadPlayer(String filename) {
         try {
             File file = new File(filename);

@@ -98,7 +98,7 @@ public class GameController {
         view.displayMessage("Restarting game...");
         view.displayMessage("");
 
-        printFreshGameStart();
+        printFreshGameStart(); //prints intro
     }
 
     private void handleMainCommand(String command) {
@@ -107,7 +107,7 @@ public class GameController {
             return;
         }
 
-        String action = command.split(" ")[0].toLowerCase();
+        String action = command.split(" ")[0].toLowerCase(); //takes first word of command as action
         GameResult result;
 
         switch (action) {
@@ -150,13 +150,16 @@ public class GameController {
                 return;
 
             case "consume":
+                 if (command.equalsIgnoreCase("consume potion")) {
+                     displayResult(model.useItem(command));
+                 } else {
+                     view.displayError("Invalid command. Use 'consume potion'.");
+                 }
+                 return;
+
             case "equip":
             case "unequip":
                 displayResult(model.useItem(command));
-                return;
-
-            case "use":
-                view.displayError("Use 'consume potion' instead of 'use potion'.");
                 return;
 
             case "inventory":
