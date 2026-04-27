@@ -1,10 +1,10 @@
 //Mai
-//puzzleID,trialName,roomID,isSolved
-puzzleID,trialName,roomID,isSolved
-PZ-01,Awareness,AW-02,false
-PZ-02,Restraint,RS-02,false
-PZ-03,Trust,TR-02,false
-PZ-04,Sacrifice,SC-01,false
-PZ-05,Commitment,CM-01,false
-PZ-06,Final,FN-02,false
-PZ-07,Trap,TP-TRAP-01,false
+//puzzleID,trialName,roomID,isSolved,hint
+puzzleID,trialName,roomID,isSolved,hint
+PZ-01,Awareness,AW-02,false,Look carefully at the teleporter. The correct item should stabilize it.
+PZ-02,Restraint,RS-02,false,Restraint means avoiding temptation. The coin may not help you.
+PZ-03,Trust,TR-02,false,Trust does not always mean accepting the reward in front of you.
+PZ-04,Sacrifice,SC-01,false,The bridge is the place of sacrifice. Not all strength should be carried to the end.
+PZ-05,Commitment,CM-01,false,Keep moving forward. Taking or examining items gives the Pursuer time to catch you.
+PZ-06,Final,FN-02,false,Fire reveals what is hidden. The statue pillar symbol and teleporter must be handled in order.
+PZ-07,Trap,TP-TRAP-01,false,This is a second chance. The item that worked before may not work here.

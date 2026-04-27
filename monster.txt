@@ -1,4 +1,4 @@
-/Team
+//Team
 //monsterID,name,HP,atkValue
 M-01,Mimic,2,1
 M-02,Guardian,2,1

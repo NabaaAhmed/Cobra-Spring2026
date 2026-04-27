@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+//team
 import java.util.HashMap;
 
 public class GameModel {
@@ -8,6 +8,7 @@ public class GameModel {
 
     private HashMap<String, Monster> monsterTemplates;
     private HashMap<String, String> puzzleRoomMap;
+    private HashMap<String, String> puzzleHintMap;
     private static HashMap<String, Item> pendingRewards = new HashMap<>();
 
     public GameModel(Player player, RoomManager roomManager) {
@@ -17,6 +18,7 @@ public class GameModel {
 
         this.monsterTemplates = new HashMap<>();
         this.puzzleRoomMap = new HashMap<>();
+        this.puzzleHintMap = new HashMap<>();
 
         loadMonsters("monster.txt");
         loadPuzzles("puzzle.txt");
@@ -42,97 +44,160 @@ public class GameModel {
         activePuzzle = null;
     }
 
-    public GameResult lookRoom() {
+    public GameResult roomHeader() {
         Room room = roomManager.getCurrentRoom();
+
         if (room == null) {
             return new GameResult("No room loaded.");
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(room.getRoomName()).append(" ===\n");
-        sb.append(room.getRoomDesc());
+        sb.append("=== ").append(room.getRoomName())
+                .append(" (").append(room.getRoomId()).append(") ===");
 
-        if (!room.getItems().isEmpty()) {
-            sb.append("\n\nItems in room:");
-            for (Item item : room.getItems()) {
-                sb.append("\n- ").append(item.getItemName());
+        if (room.getRoomId().equals("EZ-01")) {
+            sb.append("\n\nConnections:");
+
+            boolean anyVisibleConnection = false;
+
+            if (!room.getConnections().isEmpty()) {
+                for (int i = 0; i < room.getConnections().size(); i++) {
+                    Room connectedRoom = room.getConnections().get(i);
+                    String connectedId = connectedRoom.getRoomId();
+
+                    if (shouldHideConnection(room.getRoomId(), connectedId)) {
+                        continue;
+                    }
+
+                    anyVisibleConnection = true;
+
+                    sb.append("\n").append(i).append(": ")
+                            .append(connectedRoom.getRoomName())
+                            .append(" (")
+                            .append(connectedRoom.getRoomId())
+                            .append(")");
+                }
+            }
+
+            if (!anyVisibleConnection) {
+                sb.append("\n- No exits from this room.");
             }
         }
 
+        return new GameResult(sb.toString());
+    }
+
+    public GameResult exploreRoom() {
+        Room room = roomManager.getCurrentRoom();
+
+        if (room == null) {
+            return new GameResult("No room loaded.");
+        }
+
+        String roomId = room.getRoomId();
+        String description = room.getRoomDesc();
+
+        if (roomId.equals("EZ-01") && allMainTrialsCompleted()) {
+            description = "The Main Hall has changed. The Wall Jewel can now be removed from the wall. The hidden bomb room is sealed until the jewel is taken, and a final teleporter waits ahead.";
+        } else if (player.hasCompletedTrial("AWARENESS") && roomId.equals("AW-01")) {
+            description = "The Awareness entry room is quiet. Broken teleporter parts remain scattered across the floor.";
+        } else if (player.hasCompletedTrial("AWARENESS") && roomId.equals("AW-02")) {
+            description = "The damaged teleporter is quiet now. Scattered debris remains where the Awareness trial was decided.";
+        } else if (player.hasCompletedTrial("RESTRAINT") && roomId.equals("RS-01")) {
+            description = "The Restraint entry chamber is still and dark. The chamber ahead has already tested your self-control.";
+        } else if (player.hasCompletedTrial("RESTRAINT") && roomId.equals("RS-02")) {
+            description = "The chest sits silent in the circular chamber. The test of temptation has already been decided.";
+        } else if (player.hasCompletedTrial("RESTRAINT") && roomId.equals("RS-03")) {
+            description = "The Restraint Exit Corridor is quiet. The path back to the Main Hall remains open.";
+        } else if (player.hasCompletedTrial("TRUST") && roomId.equals("TR-01")) {
+            description = "The entry chamber is quiet now. The floor inscription still reads: 'Trust the unguarded.'";
+        } else if (player.hasCompletedTrial("TRUST") && roomId.equals("TR-02")) {
+            description = "The guardian statue lies shattered across the chamber. "
+                    + "The false chest has been destroyed, and the pedestal stands silent.";
+        } else if (player.hasCompletedTrial("TRUST") && roomId.equals("TR-03")) {
+            description = "The Trust Exit Hall is quiet. The trial behind you has already been decided.";
+        } else if (player.hasCompletedTrial("SACRIFICE") && roomId.equals("SC-01")) {
+            description = "The sword pedestal stands empty. The bridge ahead still feels heavy with the memory of the trial.";
+        } else if (player.hasCompletedTrial("SACRIFICE") && roomId.equals("SC-02")) {
+            description = "The long bridge stretches across the darkness. The air is calmer now that the sacrifice has been made.";
+        } else if (player.hasCompletedTrial("SACRIFICE") && roomId.equals("SC-03")) {
+            description = "The end of the bridge is quiet. No Wraith blocks the path now.";
+        } else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-01")) {
+            description = "The Commitment Entry is quiet now. The path ahead no longer echoes with pursuit.";
+        } else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-02")) {
+            description = "The Dagger Chamber is still. The pressure to keep moving has passed.";
+        } else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-03")) {
+            description = "The Chalice Hall is quiet now. The footsteps behind you are gone.";
+        } else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-04")) {
+            description = "The Lens Storage room is silent. The Commitment trial has already been decided.";
+        } else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-05")) {
+            description = "The Idol Room is still. The Pursuer no longer follows this path.";
+        } else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-06")) {
+            description = "The Map Corridor is quiet. The exit path remains open.";
+        } else if (player.hasCompletedTrial("COMMITMENT") && roomId.equals("CM-07")) {
+            description = "The Commitment Exit is safe and quiet. The path back to the Main Hall remains open.";
+        } else if (player.hasCompletedTrial("TRAP") && roomId.equals("TP-TRAP-01")) {
+            description = "The trap chamber is quiet for now. Broken stone and scorched marks remain around the unstable teleporter.";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== ").append(room.getRoomName())
+                .append(" (").append(room.getRoomId()).append(") ===\n");
+        sb.append(description);
+
         sb.append("\n\nConnections:");
+
+        boolean anyVisibleConnection = false;
+
         if (!room.getConnections().isEmpty()) {
             for (int i = 0; i < room.getConnections().size(); i++) {
                 Room connectedRoom = room.getConnections().get(i);
+                String connectedId = connectedRoom.getRoomId();
+
+                if (shouldHideConnection(room.getRoomId(), connectedId)) {
+                    continue;
+                }
+
+                anyVisibleConnection = true;
+
                 sb.append("\n").append(i).append(": ")
                         .append(connectedRoom.getRoomName())
                         .append(" (")
                         .append(connectedRoom.getRoomId())
                         .append(")");
             }
-        } else {
+        }
+
+        if (!anyVisibleConnection) {
             sb.append("\n- No exits from this room.");
         }
 
         return new GameResult(sb.toString());
     }
 
-    public GameResult showMap() {
-        ArrayList<Room> rooms = roomManager.getAllRooms();
+    public GameResult lookRoom() {
+        Room room = roomManager.getCurrentRoom();
 
-        rooms.sort((room1, room2) -> room1.getRoomId().compareTo(room2.getRoomId()));
+        if (room == null) {
+            return new GameResult("No room loaded.");
+        }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("=== Full Dungeon Map ===\n");
-        sb.append("Total rooms loaded: ").append(roomManager.getRoomCount()).append("\n");
+        sb.append("=== Items in ")
+                .append(room.getRoomName())
+                .append(" (")
+                .append(room.getRoomId())
+                .append(") ===");
 
-        int count = 1;
-        for (Room room : rooms) {
-            sb.append("\n").append(count).append(". ")
-                    .append(room.getRoomId())
-                    .append(" - ")
-                    .append(room.getRoomName());
-
-            if (!room.getConnections().isEmpty()) {
-                sb.append("\n   Exits: ");
-                for (int i = 0; i < room.getConnections().size(); i++) {
-                    if (i > 0) {
-                        sb.append(", ");
-                    }
-                    sb.append(room.getConnections().get(i).getRoomId());
-                }
-            } else {
-                sb.append("\n   Exits: none");
+        if (!room.getItems().isEmpty()) {
+            for (Item item : room.getItems()) {
+                sb.append("\n- ").append(item.getItemName());
             }
-
-            count++;
+        } else {
+            sb.append("\nThere are no items in this room.");
         }
-
-        sb.append("\n\nNormal movement: use move [number] from the current room.");
-        sb.append("\nDemo/testing movement: use goto [roomID]. Example: goto CM-07");
 
         return new GameResult(sb.toString());
-    }
-
-    public GameResult goToRoomById(String command) {
-        if (command == null || command.trim().length() <= 5) {
-            GameResult result = new GameResult("Use: goto [roomID]. Example: goto AW-02");
-            result.setSuccess(false);
-            return result;
-        }
-
-        String roomId = command.substring(5).trim().toUpperCase();
-
-        if (!roomManager.hasRoom(roomId)) {
-            GameResult result = new GameResult("Room not found: " + roomId);
-            result.setSuccess(false);
-            return result;
-        }
-
-        roomManager.setRoom(roomId);
-        player.setCurrentRoomId(roomId);
-        activePuzzle = null;
-
-        return new GameResult("You moved to " + roomManager.getCurrentRoom().getRoomName() + " (" + roomId + ")");
     }
 
     public GameResult move(String command) {
@@ -168,8 +233,6 @@ public class GameModel {
             Room destination = current.getConnections().get(index);
             String destinationId = destination.getRoomId();
 
-            // Final Trial and Hidden Bomb Room unlock after all five main trials are completed,
-            // regardless of how many tokens the player earned.
             if ((destinationId.equals("FN-01") || destinationId.equals("FN-02") || destinationId.equals("EZ-02"))
                     && !allMainTrialsCompleted()) {
                 GameResult result = new GameResult("That area is locked. Complete all 5 trials first.");
@@ -177,23 +240,34 @@ public class GameModel {
                 return result;
             }
 
-            if (destinationId.equals("TP-TRAP-01")) {
-                GameResult result = new GameResult("That area is locked. You only go there through the awareness trial");
+            if (destinationId.equals("EZ-02") && player.findItemByName("Wall Jewel") == null) {
+                GameResult result = new GameResult("The Hidden Bomb Room is still sealed. Take the Wall Jewel from the Main Hall first.");
                 result.setSuccess(false);
                 return result;
             }
 
+            if (destinationId.equals("TP-TRAP-01")) {
+                GameResult result = new GameResult("That area is locked. You only go there through a trap or failed trial action.");
+                result.setSuccess(false);
+                return result;
+            }
+
+            String currentTrial = getTrialKeyForRoom(current.getRoomId());
             String destinationTrial = getTrialKeyForRoom(destinationId);
 
-            if (destinationTrial != null && player.hasCompletedTrial(destinationTrial)) {
-                    if (puzzleRoomMap.containsKey(destinationId) || destinationId.endsWith("-01")) {
-                        if (!destinationId.equals("EZ-01")) {
-                            GameResult result = new GameResult("The way is sealed. This trial has already been mastered.");
-                            result.setSuccess(false);
-                            return result;
-                        }
-                    }
+            if (destinationTrial != null
+                    && player.hasCompletedTrial(destinationTrial)
+                    && !destinationId.equals("TP-TRAP-01")
+                    && !destinationId.equals("END-01")) {
+
+                boolean movingInsideSameTrial = currentTrial != null && currentTrial.equals(destinationTrial);
+
+                if (!movingInsideSameTrial) {
+                    GameResult result = new GameResult("That trial has already been completed.");
+                    result.setSuccess(false);
+                    return result;
                 }
+            }
 
             roomManager.move(index);
             player.setCurrentRoomId(roomManager.getRoomId());
@@ -222,6 +296,20 @@ public class GameModel {
             return result;
         }
 
+        if (itemName.equalsIgnoreCase("Wall Jewel")) {
+            if (!room.getRoomId().equals("EZ-01")) {
+                GameResult result = new GameResult("The Wall Jewel is not here.");
+                result.setSuccess(false);
+                return result;
+            }
+
+            if (!allMainTrialsCompleted()) {
+                GameResult result = new GameResult("The Wall Jewel is still locked in place. Complete all 5 trials first.");
+                result.setSuccess(false);
+                return result;
+            }
+        }
+
         Item item = room.takeItemByName(itemName);
 
         if (item == null) {
@@ -231,6 +319,17 @@ public class GameModel {
         }
 
         player.addItem(item);
+
+        if (item.getItemName().equalsIgnoreCase("Wall Jewel")) {
+            return new GameResult("You pry the Wall Jewel from the Main Hall wall.\n"
+                    + "A hidden passage opens nearby, revealing the Hidden Bomb Room.");
+        }
+
+        if (item.getItemName().equalsIgnoreCase("Explosive Device")) {
+            return new GameResult("You picked up the Explosive Device.\n"
+                    + "It looks like it belongs in the Final Trial mechanism.");
+        }
+
         return new GameResult("You picked up: " + item.getItemName());
     }
 
@@ -242,6 +341,14 @@ public class GameModel {
         }
 
         String itemName = command.substring(5).trim();
+
+        if (itemName.equalsIgnoreCase("Wall Jewel") ||
+                itemName.equalsIgnoreCase("Explosive Device")) {
+            GameResult result = new GameResult("You should not drop that item. It is needed for final progression.");
+            result.setSuccess(false);
+            return result;
+        }
+
         Item item = player.findItemByName(itemName);
 
         if (item == null) {
@@ -334,32 +441,6 @@ public class GameModel {
         return new GameResult("You used " + item.getItemName() + ".");
     }
 
-    public GameResult showInventory() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== Inventory ===");
-
-        if (player.getInventory().isEmpty()) {
-            sb.append("\n- empty");
-        } else {
-            for (Item item : player.getInventory()) {
-                sb.append("\n- ").append(item.getItemName());
-            }
-        }
-
-        return new GameResult(sb.toString());
-    }
-
-    public GameResult showStatus() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Current Room: ").append(player.getCurrentRoomId());
-        sb.append("\nCurrent HP: ").append(player.getCurrentHP());
-        sb.append("\nMax HP: ").append(player.getMaxHP());
-        sb.append("\nAttack Power: ").append(player.getAttackPower());
-        sb.append("\nTrial Tokens: ").append(player.getTrialTokens());
-
-        return new GameResult(sb.toString());
-    }
-
     public GameResult saveGame() {
         if (hasActivePuzzle()) {
             GameResult result = new GameResult("You cannot save in the middle of a puzzle. Finish or fail the puzzle first.");
@@ -438,6 +519,20 @@ public class GameModel {
         return result;
     }
 
+    public String getActivePuzzleHint() {
+        if (activePuzzle == null) {
+            return "There is no active puzzle.";
+        }
+
+        String puzzleId = getPuzzleIdForPuzzle(activePuzzle);
+
+        if (puzzleId != null && puzzleHintMap.containsKey(puzzleId)) {
+            return puzzleHintMap.get(puzzleId);
+        }
+
+        return activePuzzle.getHint();
+    }
+
     public GameResult startCombatForCurrentRoom() {
         Monster monster = getMonsterForCurrentRoom();
 
@@ -472,6 +567,30 @@ public class GameModel {
                 && player.hasCompletedTrial("TRUST")
                 && player.hasCompletedTrial("SACRIFICE")
                 && player.hasCompletedTrial("COMMITMENT");
+    }
+
+    private boolean shouldHideConnection(String currentRoomId, String destinationId) {
+        if (currentRoomId == null || destinationId == null) {
+            return false;
+        }
+
+        if (!currentRoomId.equals("EZ-01")) {
+            return false;
+        }
+
+        if (destinationId.equals("EZ-02") && !allMainTrialsCompleted()) {
+            return true;
+        }
+
+        if ((destinationId.equals("FN-01") || destinationId.equals("FN-02")) && !allMainTrialsCompleted()) {
+            return true;
+        }
+
+        if (destinationId.equals("TP-TRAP-01")) {
+            return true;
+        }
+
+        return false;
     }
 
     private String getTrialKeyForRoom(String roomId) {
@@ -514,24 +633,63 @@ public class GameModel {
         if (puzzle instanceof Puzzle1Awareness) {
             return "AWARENESS";
         }
+
         if (puzzle instanceof Puzzle2Restraint) {
             return "RESTRAINT";
         }
+
         if (puzzle instanceof Puzzle3Trust) {
             return "TRUST";
         }
+
         if (puzzle instanceof Puzzle4Sacrifice) {
             return "SACRIFICE";
         }
+
         if (puzzle instanceof Puzzle5Commitment) {
             return "COMMITMENT";
         }
+
         if (puzzle instanceof Puzzle7AwarenessTrap) {
             return "TRAP";
         }
+
         if (puzzle instanceof Puzzle6FinalTrial) {
             return "FINAL";
         }
+
+        return null;
+    }
+
+    private String getPuzzleIdForPuzzle(Puzzle puzzle) {
+        if (puzzle instanceof Puzzle1Awareness) {
+            return "PZ-01";
+        }
+
+        if (puzzle instanceof Puzzle2Restraint) {
+            return "PZ-02";
+        }
+
+        if (puzzle instanceof Puzzle3Trust) {
+            return "PZ-03";
+        }
+
+        if (puzzle instanceof Puzzle4Sacrifice) {
+            return "PZ-04";
+        }
+
+        if (puzzle instanceof Puzzle5Commitment) {
+            return "PZ-05";
+        }
+
+        if (puzzle instanceof Puzzle6FinalTrial) {
+            return "PZ-06";
+        }
+
+        if (puzzle instanceof Puzzle7AwarenessTrap) {
+            return "PZ-07";
+        }
+
         return null;
     }
 
@@ -582,7 +740,8 @@ public class GameModel {
                 continue;
             }
 
-            String[] parts = line.split(",");
+            String[] parts = line.split(",", 5);
+
             if (parts.length < 3) {
                 continue;
             }
@@ -591,12 +750,20 @@ public class GameModel {
             String roomId = parts[2].trim();
 
             puzzleRoomMap.put(roomId, puzzleID);
+
+            if (parts.length >= 5) {
+                String hint = parts[4].trim();
+
+                if (!hint.isEmpty()) {
+                    puzzleHintMap.put(puzzleID, hint);
+                }
+            }
         }
     }
 
     private Monster getMonsterForCurrentRoom() {
         if ("TP-TRAP-01".equals(player.getCurrentRoomId())) {
-            return copyMonster("M-07");
+            return copyMonster("M-06");
         }
 
         return null;

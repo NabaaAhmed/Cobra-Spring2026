@@ -29,6 +29,8 @@ public class Puzzle7AwarenessTrap extends Puzzle {
     }
 
     public String finishAfterWardenDefeated(Player player) {
+        player.setCurrentRoomId("EZ-01");
+
         return completeNoReward(player,
                 "You defeated the Warden and escaped the trap.\n"
                         + "You have completed the Trap. (No Reward)");
@@ -55,13 +57,19 @@ public class Puzzle7AwarenessTrap extends Puzzle {
 
         if (awaitingChoice) {
             if (cmd.equals("yes") || cmd.equals("enter") || cmd.equals("enter teleporter")) {
-                return completeWithReward(player,
-                        "The teleporter stabilizes and carries you safely away.");
+                player.setCurrentRoomId("EZ-01");
+
+                return completeNoReward(player,
+                        "The teleporter stabilizes and carries you safely back to the Main Hall.\n"
+                                + "You have completed the Trap. (No Reward)");
             }
 
             if (cmd.equals("no")) {
-                return completeWithReward(player,
-                        "The teleporter remains stable, and you return to the entrance zone to receive your reward.");
+                player.setCurrentRoomId("EZ-01");
+
+                return completeNoReward(player,
+                        "The teleporter remains stable, but the trap has already tested you.\n"
+                                + "You return to the Main Hall. (No Reward)");
             }
 
             return "Please answer yes or no.";
@@ -112,7 +120,7 @@ public class Puzzle7AwarenessTrap extends Puzzle {
                     + "Wrong choice. You have to fight the Warden to leave.";
         }
 
-        if (cmd.equals("enter teleporter")) {
+        if (cmd.equals("enter") || cmd.equals("enter teleporter")) {
             return "The teleporter is still unstable. Try stabilizing it first.";
         }
 

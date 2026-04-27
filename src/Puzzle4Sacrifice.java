@@ -74,7 +74,7 @@ public class Puzzle4Sacrifice extends Puzzle {
                         + "The path back to the Main Hall is now open.";
             }
 
-            failureMonster = new Monster("M-04", "Wraith", 2, 1);
+            failureMonster = new Monster("M-03", "Wraith", 2, 1);
             combatTriggered = true;
             isFinished = true;
             trialComplete = true;
@@ -109,7 +109,11 @@ public class Puzzle4Sacrifice extends Puzzle {
 
         String cmd = command.trim().toLowerCase();
 
-        if (cmd.equals("take sword") || cmd.equals("take strong trial sword")) {
+        /*
+         * GameController will remove the sword from the room first using model.takeItem().
+         * This command only updates the puzzle state, so the room item does not duplicate.
+         */
+        if (cmd.equals("confirm sword taken")) {
             if (swordTaken) {
                 return "You already took the sword.";
             }
@@ -118,19 +122,16 @@ public class Puzzle4Sacrifice extends Puzzle {
                 return "The sword can only be taken from the Sacrifice Antechamber.";
             }
 
+            if (player.findItemByName("Strong Trial Sword") == null) {
+                return "You do not have the sword.";
+            }
+
             swordTaken = true;
-
-            Item sword = new Sword(
-                    "TRIAL-SWORD",
-                    "Strong Trial Sword",
-                    "A glowing blade filled with unstable power.",
-                    null,
-                    false,
-                    2
-            );
-
-            player.addItem(sword);
             return "You take the sword from the pedestal.";
+        }
+
+        if (cmd.equals("take sword") || cmd.equals("take strong trial sword")) {
+            return "Use the take command to pick up the sword from the room.";
         }
 
         if (cmd.equals("inspect bridge")) {
@@ -172,6 +173,7 @@ public class Puzzle4Sacrifice extends Puzzle {
             }
 
             swordThrown = true;
+
             return "You throw the sword off the bridge.\n"
                     + "It disappears into the darkness below.\n"
                     + "The weight in the air lifts.";
