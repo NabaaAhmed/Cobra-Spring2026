@@ -20,7 +20,7 @@ public class FileManager {
         this.dataPath = dataPath;
     }
 
-    // --- 1. LOAD ROOMS ---
+    // --- LOAD ROOMS ---
     public ArrayList<Room> loadRooms(Map<String, Item> itemsMap, Map<String, Monster> monstersMap) {
         ArrayList<Room> rooms = new ArrayList<>();
         try (Scanner reader = new Scanner(new File(dataPath + "\\" + ROOM_FILE))) {
@@ -71,7 +71,7 @@ public class FileManager {
         return rooms;
     }
 
-    // --- 2. LOAD ITEMS ---
+    // --- LOAD ITEMS ---
     public ArrayList<Item> loadItems() {
         ArrayList<Item> items = new ArrayList<>();
         try (Scanner reader = new Scanner(new File(dataPath + "\\" + ITEM_FILE))) {
@@ -92,7 +92,7 @@ public class FileManager {
         return items;
     }
 
-    // --- 3. LOAD PUZZLES ---
+    // --- LOAD PUZZLES ---
     public ArrayList<Puzzle> loadPuzzles() {
         ArrayList<Puzzle> puzzles = new ArrayList<>();
         try (Scanner reader = new Scanner(new File(dataPath + "\\" + PUZZLE_FILE))) {
@@ -113,7 +113,7 @@ public class FileManager {
         return puzzles;
     }
 
-    // --- 4. LOAD MONSTERS ---
+    // --- LOAD MONSTERS ---
     public ArrayList<Monster> loadMonsters() {
         ArrayList<Monster> monsters = new ArrayList<>();
         try (Scanner reader = new Scanner(new File(dataPath + "\\" + MONSTER_FILE))) {
@@ -140,7 +140,7 @@ public class FileManager {
         return monsters;
     }
 
-    // --- 5. LOAD ALL DATA ---
+    // --- LOAD ALL DATA ---
     public void loadAllData(RoomManager rm) {
         // Load and add items first
         ArrayList<Item> items = loadItems();
@@ -159,7 +159,7 @@ public class FileManager {
         for (Room r : rooms) rm.addRoom(r);
     }
 
-    // --- 6. SAVE GAME STATE ---
+    // --- SAVE GAME STATE ---
     public void saveGame(String roomID, int hp, ArrayList<String> inventory, ArrayList<Puzzle> puzzles) {
         try {
             PrintWriter writer = new PrintWriter(dataPath + "\\" + SAVE_FILE);
@@ -171,11 +171,6 @@ public class FileManager {
             // Save inventory
             String invString = String.join(",", inventory);
             writer.println(invString);
-
-            // Save puzzle statuses
-            for (Puzzle p : puzzles) {
-                writer.println(p.getPuzzleID() + "," + p.isSolved());
-            }
 
             writer.close();
             System.out.println("Game saved successfully!");
@@ -194,12 +189,6 @@ public class FileManager {
             String invLine = reader.nextLine();
             String[] savedInventory = invLine.split(",");
 
-            while (reader.hasNextLine()) {
-                String puzzleLine = reader.nextLine();
-                String[] puzzleParts = puzzleLine.split(",");
-                String pID = puzzleParts[0];
-                boolean isSolved = Boolean.parseBoolean(puzzleParts[1]);
-            }
 
             reader.close();
             System.out.println("Welcome back! You are currently in " + savedRoom);
