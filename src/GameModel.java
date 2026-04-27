@@ -374,7 +374,13 @@ public class GameModel {
 
         if (lower.startsWith("unequip ")) {
             String itemName = trimmed.substring(8).trim();
-            Item item = player.findItemByName(itemName);
+            Item item;
+
+            if (itemName.equalsIgnoreCase("sword")) {
+                item = findFirstSwordInInventory();
+            } else {
+                item = player.findItemByName(itemName);
+            }
 
             if (item == null) {
                 GameResult result = new GameResult("You do not have that item.");
@@ -405,10 +411,22 @@ public class GameModel {
             return result;
         }
 
-        Item item = player.findItemByName(itemName);
+        Item item;
+
+        if (lower.startsWith("equip ") && itemName.equalsIgnoreCase("sword")) {
+            item = findFirstSwordInInventory();
+        } else {
+            item = player.findItemByName(itemName);
+        }
 
         if (item == null) {
             GameResult result = new GameResult("You do not have that item.");
+            result.setSuccess(false);
+            return result;
+        }
+
+        if (lower.startsWith("equip ") && !(item instanceof Sword)) {
+            GameResult result = new GameResult("That item cannot be equipped.");
             result.setSuccess(false);
             return result;
         }
@@ -439,6 +457,16 @@ public class GameModel {
         }
 
         return new GameResult("You used " + item.getItemName() + ".");
+    }
+
+    private Item findFirstSwordInInventory() {
+        for (Item item : player.getInventory()) {
+            if (item instanceof Sword) {
+                return item;
+            }
+        }
+
+        return null;
     }
 
     public GameResult saveGame() {
