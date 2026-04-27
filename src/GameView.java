@@ -100,6 +100,7 @@ public class GameView {
         System.out.println("status          - view player status");
         System.out.println("save            - save the game");
         System.out.println("load            - load the game");
+        System.out.println("restart        - restart the game from the beginning");
         System.out.println("exit            - quit the game");
     }
 

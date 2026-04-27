@@ -67,6 +67,27 @@ public class GameController {
         }
     }
 
+    private void handleRestartCommand() {
+        while (true) {
+            view.displayMessage("Restart from the beginning? yes/no");
+            System.out.print("> ");
+
+            String choice = input.nextLine().trim().toLowerCase();
+
+            if (choice.equals("yes") || choice.equals("y")) {
+                restartGame();
+                return;
+            }
+
+            if (choice.equals("no") || choice.equals("n")) {
+                view.displayMessage("Restart cancelled.");
+                return;
+            }
+
+            view.displayError("Please type yes or no.");
+        }
+    }
+
     private void restartGame() {
         Player newPlayer = new Player("EZ-01");
         RoomManager newRoomManager = new RoomManager();
@@ -159,6 +180,10 @@ public class GameController {
                 displayResult(model.loadGame());
                 return;
 
+            case "restart":
+                handleRestartCommand();
+                return;
+
             case "exit":
                 view.displayMessage("Exiting game.");
                 isRunning = false;
@@ -220,6 +245,11 @@ public class GameController {
 
         if (command.equalsIgnoreCase("load")) {
             displayResult(model.loadGame());
+            return;
+        }
+
+        if (command.equalsIgnoreCase("restart")) {
+            handleRestartCommand();
             return;
         }
 
