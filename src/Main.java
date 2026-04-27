@@ -1,20 +1,14 @@
+//team
 public class Main {
-
     public static void main(String[] args) {
-
-        // Create core components
         Player player = new Player("EZ-01");
         RoomManager roomManager = new RoomManager();
         GameView view = new GameView();
-        FileManager fileManager = new FileManager();
 
-        // Create controller
-        GameControllerNA controller =
-                new GameControllerNA(player, roomManager, view, fileManager);
+        GameModel model = new GameModel(player, roomManager);
+        GameController controller = new GameController(model, view);
 
-        // Start game
         controller.startGame();
-
     }
-
 }
+

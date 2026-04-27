@@ -1,135 +1,296 @@
-import java.io.IOException;
-import java.util.*;
+//danny
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RoomManager {
-
-    private Map<String, Room> rooms = new HashMap<>();
-    private Map<String, Item> items = new HashMap<>();
-    private Map<String, Monster> monsters = new HashMap<>();
-    private Map<String, Puzzle> puzzles = new HashMap<>();
-
-    private Player player;
+    private HashMap<String, Room> roomMap = new HashMap<>();
     private Room currentRoom;
-    private Set<String> visitedRooms = new HashSet<>();
 
-    private FileManager fileManager;
-
-    public RoomManager(String dataPath) {
-
-        this.fileManager = new FileManager(dataPath);
-
-        this.player = new Player();
-
-        try {
-            fileManager.loadAllData(this);
-            assignPuzzlesToRooms();
-            setStartingRoom();
-        }
-        catch (IOException e) {
-            System.out.println("Error loading game: " + e.getMessage());
-        }
-    }
-    private void setStartingRoom() {
-
-        currentRoom = rooms.get("START");
-
-        if (currentRoom == null && !rooms.isEmpty()) {
-            currentRoom = rooms.values().iterator().next();
-        }
-
-        if (currentRoom != null) {
-            visitedRooms.add(currentRoom.getId());
-        }
+    public RoomManager() {
+        loadRooms("rooms.txt");
+        loadItems("item.txt");
+        this.currentRoom = roomMap.get("EZ-01");
     }
 
-    private void assignPuzzlesToRooms() {
+    private void loadRooms(String filename) {
+        String fileData = FileManager.load(filename);
+        String[] lines = fileData.split("\n");
 
-        for (Puzzle p : puzzles.values()) {
-            Room r = rooms.get(p.getRoomID());
-            if (r != null) r.setPuzzle(p);
+        ArrayList<String[]> rawData = new ArrayList<>();
+
+        // First pass: create all rooms
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            if (line.startsWith("//")) {
+                continue;
+            }
+
+            if (line.toLowerCase().startsWith("id,")) {
+                continue;
+            }
+
+            String[] parts = splitCSVLine(line);
+
+            if (parts.length < 4) {
+                continue;
+            }
+
+            String id = parts[0].trim();
+            String name = parts[1].trim();
+            String desc = parts[2].trim();
+
+            Room room = new Room(id, name, desc);
+            roomMap.put(id, room);
+            rawData.add(parts);
         }
-    }
-    // -------- ROOM --------
 
-    public void showRoom() {
+        // Second pass: connect rooms
+        for (String[] parts : rawData) {
+            String roomId = parts[0].trim();
+            Room room = roomMap.get(roomId);
 
-        if (currentRoom == null) {
-            System.out.println("No room loaded.");
-            return;
-        }
+            if (room == null || parts.length < 4) {
+                continue;
+            }
 
-        System.out.println("\n" + currentRoom.getRoomName());
-        System.out.println(currentRoom.getRoomDesc());
+            StringBuilder exitsBuilder = new StringBuilder();
 
-        visitedRooms.add(currentRoom.getId());
+            for (int i = 3; i < parts.length; i++) {
+                if (parts[i] != null && !parts[i].trim().isEmpty()) {
+                    if (exitsBuilder.length() > 0) {
+                        exitsBuilder.append(";");
+                    }
+                    exitsBuilder.append(parts[i].trim());
+                }
+            }
 
-        if (!currentRoom.getItems().isEmpty()) {
-            System.out.println("\nItems:");
-            for (Item i : currentRoom.getItems()) {
-                System.out.println("- " + i.getitemName());
+            String exits = exitsBuilder.toString().trim();
+
+            if (exits.equals("0") || exits.isEmpty()) {
+                continue;
+            }
+
+            String[] exitIds = exits.split(";");
+
+            for (String exitId : exitIds) {
+                exitId = exitId.trim();
+
+                if (exitId.isEmpty() || exitId.equals("0")) {
+                    continue;
+                }
+
+                Room connectedRoom = roomMap.get(exitId);
+
+                if (connectedRoom != null) {
+                    room.connection(connectedRoom);
+                }
             }
         }
 
-        if (currentRoom.hasMonster()) {
-            System.out.println("\nMonster: " + currentRoom.getMonster().getName());
+        currentRoom = roomMap.get("EZ-01");
+    }
+
+    private void loadItems(String filename) {
+        String fileData = FileManager.load(filename);
+        String[] lines = fileData.split("\n");
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            if (line.startsWith("//")) {
+                continue;
+            }
+
+            if (line.toLowerCase().startsWith("id,")) {
+                continue;
+            }
+
+            String[] parts = splitItemLine(line);
+
+            if (parts.length < 6) {
+                continue;
+            }
+
+            String itemId = parts[0].trim();
+            String itemName = parts[1].trim();
+            String description = parts[2].trim();
+            String roomField = parts[3].trim();
+            String monsterField = parts[4].trim();
+            boolean stackable = Boolean.parseBoolean(parts[5].trim());
+
+            // Register monster drops if this item belongs to a monster.
+            if (!monsterField.equals("0")) {
+                Item rewardItem = createItem(itemId, itemName, description, stackable);
+                GameModel.registerMonsterReward(monsterField.trim(), rewardItem);
+            }
+
+            // Do not place items that are not assigned to a room.
+            if (roomField.equals("0")) {
+                continue;
+            }
+
+            // These are supposed to be revealed by Final Trial logic, not sitting in the room at start.
+            if (itemName.equalsIgnoreCase("Core Fragment") ||
+                    itemName.equalsIgnoreCase("Final Jewel")) {
+                continue;
+            }
+
+            String[] roomIds = roomField.split(";");
+
+            for (String rawRoomId : roomIds) {
+                String roomID = rawRoomId.trim();
+
+                if (roomMap.containsKey(roomID)) {
+                    Item roomItem = createItem(itemId, itemName, description, stackable);
+                    roomMap.get(roomID).addItem(roomItem);
+                }
+            }
         }
+    }
 
-        if (currentRoom.hasPuzzle()) {
-            System.out.println("\nPuzzle: " + currentRoom.getPuzzle().getTrialName());
-        }
-
-        System.out.println("\nConnections:");
-
-        List<String> exits = new ArrayList<>(currentRoom.getExits().keySet());
-
-        for (int i = 0; i < exits.size(); i++) {
-
-            String key = exits.get(i);
-            String target = currentRoom.getExits().get(key);
-
-            Room r = rooms.get(target);
-
-            System.out.println(i + ": " + (r != null ? r.getRoomName() : target));
+    private Item createItem(String itemId, String itemName, String description, boolean stackable) {
+        if (itemName.equalsIgnoreCase("Potion") || itemName.equalsIgnoreCase("Monster potion")) {
+            return new Potion(itemId, itemName, description, "0", stackable, 2);
+        } else if (itemName.toLowerCase().contains("sword")) {
+            return new Sword(itemId, itemName, description, "0", stackable, 1);
+        } else {
+            return new QuestItems(itemId, itemName, description, "0", stackable);
         }
     }
 
     public void move(int index) {
-
-        List<String> exits = new ArrayList<>(currentRoom.getExits().keySet());
-
-        if (index < 0 || index >= exits.size()) {
-            System.out.println("Invalid move.");
+        if (currentRoom == null) {
             return;
         }
 
-        String target = currentRoom.getExits().get(exits.get(index));
-
-        Room next = rooms.get(target);
-
-        if (next == null) {
-            System.out.println("You cannot go there.");
-            return;
+        if (index >= 0 && index < currentRoom.getConnections().size()) {
+            currentRoom = currentRoom.getConnections().get(index);
         }
-
-        currentRoom = next;
-        showRoom();
     }
-    public void addRoom(Room r) { rooms.put(r.getId(), r); }
-    public void addItem(Item i) { items.put(i.getId(), i); }
-    public void addMonster(Monster m) { monsters.put(m.getId(), m); }
-    public void addPuzzle(Puzzle p) { puzzles.put(p.getId(), p); }
 
-    public Room getCurrentRoom() { return currentRoom; }
-    public Player getPlayer() { return player; }
+    public String getRoomId() {
+        if (currentRoom == null) {
+            return "";
+        }
 
-    public Map<String, Room> getRooms() { return rooms; }
-    public Map<String, Item> getItems() { return items; }
-    public Map<String, Monster> getMonsters() { return monsters; }
-    public Map<String, Puzzle> getPuzzles() { return puzzles; }
+        return currentRoom.getRoomId();
+    }
 
-    public Set<String> getVisitedRooms() { return visitedRooms; }
+    public Room getCurrentRoom() {
+        return currentRoom;
+    }
 
-    public Item getItem(String id) { return items.get(id); }
-    public Monster getMonster(String id) { return monsters.get(id); }
-    public Puzzle getPuzzle(String id) { return puzzles.get(id); }
+    public void setRoom(String id) {
+        if (id == null) {
+            return;
+        }
+
+        String cleanId = id.trim().toUpperCase();
+
+        if (roomMap.containsKey(cleanId)) {
+            currentRoom = roomMap.get(cleanId);
+        }
+    }
+
+    public Room getRoomById(String id) {
+        if (id == null) {
+            return null;
+        }
+
+        return roomMap.get(id.trim().toUpperCase());
+    }
+
+    public boolean hasRoom(String id) {
+        if (id == null) {
+            return false;
+        }
+
+        return roomMap.containsKey(id.trim().toUpperCase());
+    }
+
+    public ArrayList<Room> getAllRooms() {
+        return new ArrayList<>(roomMap.values());
+    }
+
+    public int getRoomCount() {
+        return roomMap.size();
+    }
+
+    private String[] splitCSVLine(String line) {
+        ArrayList<String> result = new ArrayList<>();
+        StringBuilder currentCell = new StringBuilder();
+        boolean inQuotes = false;
+
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (c == ',' && !inQuotes) {
+                result.add(currentCell.toString().trim());
+                currentCell = new StringBuilder();
+            } else {
+                currentCell.append(c);
+            }
+        }
+
+        result.add(currentCell.toString().trim());
+        return result.toArray(new String[0]);
+    }
+
+    private String[] splitItemLine(String line) {
+        ArrayList<String> result = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inQuotes = false;
+
+        for (char c : line.toCharArray()) {
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (c == ',' && !inQuotes) {
+                result.add(current.toString());
+                current = new StringBuilder();
+            } else {
+                current.append(c);
+            }
+        }
+
+        result.add(current.toString());
+
+        if (result.size() > 6) {
+            String itemId = result.get(0).trim();
+            String itemName = result.get(1).trim();
+            String roomField = result.get(result.size() - 3).trim();
+            String monsterField = result.get(result.size() - 2).trim();
+            String stackable = result.get(result.size() - 1).trim();
+
+            StringBuilder description = new StringBuilder();
+
+            for (int i = 2; i < result.size() - 3; i++) {
+                if (i > 2) {
+                    description.append(",");
+                }
+                description.append(result.get(i));
+            }
+
+            return new String[] {
+                    itemId,
+                    itemName,
+                    description.toString().trim(),
+                    roomField,
+                    monsterField,
+                    stackable
+            };
+        }
+
+        return result.toArray(new String[0]);
+    }
 }

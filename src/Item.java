@@ -1,36 +1,33 @@
+//mai
 public abstract class Item {
     private String itemId;
     private String itemName;
     private String description;
-    private String roomID;
+    private String roomId;
     private Boolean stackable;
     private boolean inPlayerInventory;
 
-    // Item constructor
-    public Item(String itemId, String itemName, String description, String roomID, boolean stackable) {
+    public Item(String itemId, String itemName, String description, String roomId, Boolean stackable) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.description = description;
-        this.roomID = roomID;
+        this.roomId = roomId;
         this.stackable = stackable;
         this.inPlayerInventory = false;
     }
 
-    // Getter for itemId
     public String getItemId() {
         return itemId;
     }
 
-    // Getter and setter for name
-    public String getitemName() {
+    public String getItemName() {
         return itemName;
     }
 
-    public void setitemName(String name) {
+    public void setItemName(String name) {
         this.itemName = name;
     }
 
-    // Getter and setter for description
     public String getDescription() {
         return description;
     }
@@ -39,13 +36,12 @@ public abstract class Item {
         this.description = description;
     }
 
-    // getters and setters for roomID
     public String getRoomID() {
-        return roomID;
+        return roomId;
     }
 
     public void setRoomID(String roomID) {
-        this.roomID = roomID;
+        this.roomId = roomID;
     }
 
     public Boolean getStackable() {
@@ -60,25 +56,20 @@ public abstract class Item {
         return inPlayerInventory;
     }
 
-    // Method to move item to inventory
     public void moveToInventory() {
         this.inPlayerInventory = true;
-        this.roomID = null;
+        this.roomId = null;
     }
 
-    // Method to move item to a room
     public void moveToRoom(String roomID) {
         this.inPlayerInventory = false;
-        this.roomID = roomID;
+        this.roomId = roomID;
     }
 
-    public abstract void use(Player player); // Abstract method to be implemented by specific item types
+    public abstract void use(Player player);
 
-
-    //toString method
-     @Override
-     public String toString() {
-         return itemName + ": " + description;
-     }
-
+    @Override
+    public String toString() {
+        return itemName + ": " + description;
+    }
 }

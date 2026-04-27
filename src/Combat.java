@@ -1,109 +1,113 @@
+//nabaa
+import java.util.Scanner;
+
 public class Combat {
-
     private final Player player;
-    private Monster enemy;
+    private final Monster enemy;
     private int turnCount;
-    private boolean retreated;
 
-    // Constructor
     public Combat(Player player, Monster enemy) {
         this.player = player;
         this.enemy = enemy;
         this.turnCount = 1;
-        this.retreated = false;
     }
 
-    // Check if battle is over
     public boolean isBattleOver() {
-        return !player.isAlive() || !enemy.isAlive() || retreated;
-    }
-
-    public int getTurnCount() {
-        return turnCount;
-    }
-
-    public String getMonsterHealth() {
-        return String.valueOf(enemy.getHp());
+        return !player.isAlive() || !enemy.isAlive();
     }
 
     public boolean isMonsterAlive() {
         return enemy.isAlive();
     }
 
-    // Main action system
-    public String action(String command) {
+    public Monster getEnemy() {
+        return enemy;
+    }
 
+    public String action(String command) {
         String result = "";
 
         if (command.equalsIgnoreCase("attack")) {
-
-            // Sword logic
             if (player.hasSword()) {
                 enemy.takeDamage(enemy.getHp());
-                result += "You used the sword! Instant kill.\n";
+                result += "You grip the sword and strike with overwhelming force.\n";
+                result += "The sword cuts through " + enemy.getName() + " instantly.\n";
             } else {
-                // Clash system
                 enemy.clash(player);
-                result += "You and " + enemy.getName() + " both take 1 damage.\n";
+                result += "You and " + enemy.getName() + " clash.\n";
+                result += "Both of you take damage in the struggle.\n";
             }
+        } else if (command.equalsIgnoreCase("consume potion")) {
+            Item potion = player.findItemByName("Potion");
+
+            if (potion == null) {
+                return "You do not have a potion.\n";
+            }
+
+            int beforeHP = player.getCurrentHP();
+
+            potion.use(player);
+            player.removeItem(potion);
+
+            int healedAmount = player.getCurrentHP() - beforeHP;
+
+            if (healedAmount > 0) {
+                result += "You drink the potion during combat.\n";
+                result += "Your wounds begin to close as you recover " + healedAmount + " HP.\n";
+            } else {
+                result += "You drink the potion, but your HP was already full.\n";
+                result += "The potion is used up.\n";
+            }
+        } else {
+            return "Invalid combat command. Use 'attack' or 'consume potion'.\n";
         }
 
-        else if (command.equalsIgnoreCase("retreat")) {
-            result += "You retreat from the battle.\n";
-            retreated = true;
-        }
-
-        else if (command.equalsIgnoreCase("wait")) {
-            result += player.waitTurn() + "\n";
-        }
-
-        else {
-            result += "Invalid command. Try again.\n";
-            turnCount--; // don't count bad input
-        }
-
-        // Apply turn effects
-        applyTurnEffects();
-
-        // Status output
-        result += "Player HP: " + player.getHp() + "\n";
+        result += "Player HP: " + player.getCurrentHP() + "/" + player.getMaxHP() + "\n";
         result += enemy.getName() + " HP: " + enemy.getHp() + "\n";
 
         turnCount++;
         return result;
     }
 
-    public void applyTurnEffects() {
-        enemy.onTurn(player);
-    }
-
-    // Start battle loop
-    public void startBattle(GameView view) {
-
+    public void startBattle(GameView view, Scanner input) {
         enemy.onEncounter(player);
-
         view.displayCombat("A " + enemy.getName() + " appears!");
+
+        boolean swordWasUsed = false;
 
         while (!isBattleOver()) {
             view.displayCombat("Turn " + turnCount);
+            view.displayCombat("Type: attack or consume potion");
 
-            // For now auto-attack; replace with input later
-            String result = action("attack");
-
+            String command = input.nextLine().trim();
+            String result = action(command);
             view.displayCombat(result);
+
+            if (result.contains("sword cuts through")) {
+                swordWasUsed = true;
+            }
         }
 
-        if (retreated) {
-            view.displayCombat("You fled the battle.");
-        } else if (!player.isAlive()) {
+        if (!player.isAlive()) {
             view.displayCombat("You died.");
         } else {
             view.displayCombat("Monster defeated!");
 
-            // Loot
-            for (Item item : enemy.dropLoot()) {
-                player.addItem(item);
-                view.displayCombat("You got: " + item.getitemName());
+            if (swordWasUsed) {
+                Item swordToRemove = null;
+
+                for (Item item : player.getInventory()) {
+                    if (item.getItemName() != null &&
+                            item.getItemName().toLowerCase().contains("sword")) {
+                        swordToRemove = item;
+                        break;
+                    }
+                }
+
+                if (swordToRemove != null) {
+                    player.removeItem(swordToRemove);
+                    view.displayCombat("The sword crumbles after its powerful strike.");
+                }
             }
         }
     }
