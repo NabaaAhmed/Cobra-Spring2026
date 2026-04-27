@@ -34,11 +34,17 @@ public class Puzzle1Awareness extends Puzzle {
 
         if (awaitingEnterChoice) {
             if (cmd.equals("enter") || cmd.equals("yes") || cmd.equals("enter teleporter")) {
+                player.setCurrentRoomId("EZ-01");
+
                 return completeWithReward(player,
-                        "The teleporter stabilizes and carries you safely away.");
-            } else if (cmd.equals("no")) {
+                        "The teleporter stabilizes and carries you safely back to the Main Hall.");
+            }
+
+            if (cmd.equals("no")) {
                 return "The teleporter hums steadily in front of you. Type 'enter' when you are ready.";
             }
+
+            return "Please type 'enter' when you are ready, or 'no' to wait.";
         }
 
         if (cmd.equals("take red gem") || cmd.equals("take glowing red gem")) {
@@ -66,7 +72,7 @@ public class Puzzle1Awareness extends Puzzle {
 
             awaitingEnterChoice = true;
             return "The teleporter begins to stabilize.\n"
-                    + "Enter to return to the entrance zone. Type <enter>.";
+                    + "Enter to return to the Main Hall. Type <enter>.";
         }
 
         if (cmd.equals("throw rubble")) {
@@ -76,6 +82,7 @@ public class Puzzle1Awareness extends Puzzle {
 
             player.takeDamage(1);
             player.setCurrentRoomId("TP-TRAP-01");
+
             isFinished = true;
             trialComplete = true;
             rewardEarned = false;
@@ -85,18 +92,15 @@ public class Puzzle1Awareness extends Puzzle {
         }
 
         if (cmd.equals("inspect teleporter")) {
-            return "The teleporter crackles violently. It looks unstable and seems to need the correct item.";
+            if (redGemTaken) {
+                return "The teleporter pulses with red light. The glowing red gem seems connected to its unstable core.";
+            }
+
+            return "The teleporter is unstable. Its damaged core flickers with a red glow.";
         }
 
         if (cmd.equals("enter") || cmd.equals("enter teleporter")) {
-            player.setCurrentRoomId("TP-TRAP-01");
-            isFinished = true;
-            trialComplete = true;
-            rewardEarned = false;
-
-            return "You enter the unstable teleporter before stabilizing it.\n"
-                    + "The dungeon twists around you and throws you into the trap room.\n"
-                    + "You have completed the Trial of Awareness. (No Reward)";
+            return "The teleporter is still unstable. You need to stabilize it first.";
         }
 
         return "Invalid command.";
