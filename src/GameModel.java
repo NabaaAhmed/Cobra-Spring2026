@@ -341,6 +341,14 @@ public class GameModel {
         }
 
         String itemName = command.substring(5).trim();
+
+        if (itemName.equalsIgnoreCase("Wall Jewel") ||
+                itemName.equalsIgnoreCase("Explosive Device")) {
+            GameResult result = new GameResult("You should not drop that item. It is needed for final progression.");
+            result.setSuccess(false);
+            return result;
+        }
+
         Item item = player.findItemByName(itemName);
 
         if (item == null) {

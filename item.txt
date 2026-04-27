@@ -1,10 +1,10 @@
-/String id,String name,String description, String roomid, String monsterid boolean stackable
+//String id,String name,String description, String roomid, String monsterid boolean stackable
 //Team
 I-01,Broken Torch Handle,A cracked wooden torch shaft found at the dungeon entrance.,EZ-01, 0, false
 I-02,Strong Trial Sword,A glowing blade filled with unstable power.,SC-01, 0, false
 I-03,Explosive Device,A compact cylindrical bomb half the size of a hand.,EZ-02,0,false
 I-04,Core Fragment,A glowing shard from the shattered monster statue.,FN-02, 0, false
-II-05,Wall Jewel,A gem embedded in the EZ-01 entrance wall connected to the trial teleporters by glowing lines.,EZ-01,0,false
+I-05,Wall Jewel,A gem embedded in the EZ-01 entrance wall connected to the trial teleporters by glowing lines.,EZ-01,0,false
 I-06,Potion,A small vial of restorative red liquid.,RS-03;TR-02;SC-02;CM-03;CM-05, M-06, true
 I-07,Glowing Red Gem,A glowing red gem used in the Trial of Awareness.,AW-02, 0, false
 I-08,Rubble,Broken stone fragments.,AW-02, 0, false

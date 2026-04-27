@@ -229,22 +229,34 @@ public class GameController {
             return;
         }
 
+        /*
+         * Sacrifice special case:
+         * Only sword commands should update Puzzle4's sword state.
+         * Other take commands, like "take potion", should behave like normal item pickup.
+         */
         if (model.getActivePuzzle() instanceof Puzzle4Sacrifice && action.equals("take")) {
-            String takeCommand = command;
+            if (command.equalsIgnoreCase("take sword") ||
+                    command.equalsIgnoreCase("take strong trial sword")) {
 
-            if (command.equalsIgnoreCase("take sword")) {
-                takeCommand = "take strong trial sword";
-            }
+                String takeCommand = command;
 
-            GameResult takeResult = model.takeItem(takeCommand);
+                if (command.equalsIgnoreCase("take sword")) {
+                    takeCommand = "take strong trial sword";
+                }
 
-            if (!takeResult.isSuccess()) {
-                displayResult(takeResult);
+                GameResult takeResult = model.takeItem(takeCommand);
+
+                if (!takeResult.isSuccess()) {
+                    displayResult(takeResult);
+                    return;
+                }
+
+                GameResult puzzleTakeResult = model.handlePuzzleCommand("confirm sword taken");
+                handlePuzzleResult(puzzleTakeResult);
                 return;
             }
 
-            GameResult puzzleTakeResult = model.handlePuzzleCommand("confirm sword taken");
-            handlePuzzleResult(puzzleTakeResult);
+            displayResult(model.takeItem(command));
             return;
         }
 
