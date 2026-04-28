@@ -90,6 +90,7 @@ public class GameView {
         System.out.println("=== Commands ===");
         System.out.println("explore room    - read the current room description and exits");
         System.out.println("inspect room    - check items in the current room");
+        System.out.println("inspect [item]  - read an item description");
         System.out.println("move [number]   - move to a connected room");
         System.out.println("take [item]     - pick up an item");
         System.out.println("drop [item]     - drop an item");

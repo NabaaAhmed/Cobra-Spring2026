@@ -97,7 +97,6 @@ public class GameModel {
         String roomId = room.getRoomId();
         String description = room.getRoomDesc();
 
-        //updates description based of on completed trial
         if (roomId.equals("EZ-01") && allMainTrialsCompleted()) {
             description = "The Main Hall has changed. The Wall Jewel can now be removed from the wall. The hidden bomb room is sealed until the jewel is taken, and a final teleporter waits ahead.";
         } else if (player.hasCompletedTrial("AWARENESS") && roomId.equals("AW-01")) {
@@ -145,8 +144,6 @@ public class GameModel {
         sb.append("=== ").append(room.getRoomName())
                 .append(" (").append(room.getRoomId()).append(") ===\n");
         sb.append(description);
-        //print out === roomname  (roomId) ===
-        //                  description
 
         sb.append("\n\nConnections:");
 
@@ -201,6 +198,79 @@ public class GameModel {
         }
 
         return new GameResult(sb.toString());
+    }
+
+    public GameResult inspectItem(String command) {
+        if (command == null || command.trim().isEmpty()) {
+            GameResult result = new GameResult("Inspect what?");
+            result.setSuccess(false);
+            return result;
+        }
+
+        String trimmed = command.trim();
+        String lower = trimmed.toLowerCase();
+        String itemName;
+
+        if (lower.equals("inspect item")) {
+            GameResult result = new GameResult("Inspect what? Use: inspect [item name]");
+            result.setSuccess(false);
+            return result;
+        }
+
+        if (lower.startsWith("inspect item ")) {
+            itemName = trimmed.substring(13).trim();
+        } else if (lower.startsWith("inspect ")) {
+            itemName = trimmed.substring(8).trim();
+        } else {
+            GameResult result = new GameResult("Use: inspect [item name]");
+            result.setSuccess(false);
+            return result;
+        }
+
+        if (itemName.isEmpty() || itemName.equalsIgnoreCase("room")) {
+            GameResult result = new GameResult("Use 'inspect room' to check room items, or 'inspect [item name]' to inspect an item.");
+            result.setSuccess(false);
+            return result;
+        }
+
+        Item item = null;
+        Room room = roomManager.getCurrentRoom();
+
+        if (room != null) {
+            item = room.findItemByName(itemName);
+        }
+
+        if (item == null) {
+            item = player.findItemByName(itemName);
+        }
+
+        if (item == null && itemName.equalsIgnoreCase("sword")) {
+            item = findFirstSwordInInventory();
+
+            if (item == null && room != null) {
+                for (Item roomItem : room.getItems()) {
+                    if (roomItem instanceof Sword ||
+                            roomItem.getItemName().toLowerCase().contains("sword")) {
+                        item = roomItem;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (item == null) {
+            GameResult result = new GameResult("You do not see that item here or in your inventory.");
+            result.setSuccess(false);
+            return result;
+        }
+
+        String description = item.getDescription();
+
+        if (description == null || description.trim().isEmpty()) {
+            description = "No description available.";
+        }
+
+        return new GameResult(item.getItemName() + ": " + description);
     }
 
     public GameResult move(String command) {
@@ -402,6 +472,7 @@ public class GameModel {
         }
 
         String itemName;
+
         if (lower.startsWith("use ")) {
             itemName = trimmed.substring(4).trim();
         } else if (lower.startsWith("consume ")) {
@@ -464,7 +535,8 @@ public class GameModel {
 
     private Item findFirstSwordInInventory() {
         for (Item item : player.getInventory()) {
-            if (item instanceof Sword) {
+            if (item instanceof Sword ||
+                    item.getItemName().toLowerCase().contains("sword")) {
                 return item;
             }
         }

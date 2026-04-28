@@ -98,7 +98,7 @@ public class GameController {
         view.displayMessage("Restarting game...");
         view.displayMessage("");
 
-        printFreshGameStart(); //prints intro
+        printFreshGameStart();
     }
 
     private void handleMainCommand(String command) {
@@ -107,7 +107,7 @@ public class GameController {
             return;
         }
 
-        String action = command.split(" ")[0].toLowerCase(); //takes first word of command as action
+        String action = command.split(" ")[0].toLowerCase();
         GameResult result;
 
         switch (action) {
@@ -127,7 +127,7 @@ public class GameController {
                 if (command.equalsIgnoreCase("inspect room")) {
                     view.displayMessage(model.lookRoom().getMessage());
                 } else {
-                    view.displayError("Invalid command. Use 'inspect room'.");
+                    displayResult(model.inspectItem(command));
                 }
                 return;
 
@@ -150,16 +150,13 @@ public class GameController {
                 return;
 
             case "consume":
-                if (command.equalsIgnoreCase("consume potion")) {
-                    displayResult(model.useItem(command));
-                } else {
-                    view.displayError("Invalid command. Use 'consume potion'.");
-                }
-                return;
-
             case "equip":
             case "unequip":
                 displayResult(model.useItem(command));
+                return;
+
+            case "use":
+                view.displayError("Use 'consume potion' instead of 'use potion'.");
                 return;
 
             case "inventory":
@@ -342,6 +339,11 @@ public class GameController {
 
         if (!puzzleResult.getMessage().equalsIgnoreCase("Invalid command.")) {
             handlePuzzleResult(puzzleResult);
+            return;
+        }
+
+        if (action.equals("inspect")) {
+            displayResult(model.inspectItem(command));
             return;
         }
 
