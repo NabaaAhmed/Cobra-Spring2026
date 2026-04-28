@@ -150,12 +150,12 @@ public class GameController {
                 return;
 
             case "consume":
-                 if (command.equalsIgnoreCase("consume potion")) {
-                     displayResult(model.useItem(command));
-                 } else {
-                     view.displayError("Invalid command. Use 'consume potion'.");
-                 }
-                 return;
+                if (command.equalsIgnoreCase("consume potion")) {
+                    displayResult(model.useItem(command));
+                } else {
+                    view.displayError("Invalid command. Use 'consume potion'.");
+                }
+                return;
 
             case "equip":
             case "unequip":
