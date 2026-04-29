@@ -6,9 +6,16 @@ public class RoomManager {
     private HashMap<String, Room> roomMap = new HashMap<>();
     private Room currentRoom;
 
+    private HashMap<String, Monster> monsterTemplates = new HashMap<>();
+    private HashMap<String, String> puzzleRoomMap = new HashMap<>();
+    private HashMap<String, String> puzzleHintMap = new HashMap<>();
+    private static HashMap<String, Item> pendingRewards = new HashMap<>();
+
     public RoomManager() {
         loadRooms("rooms.txt");
         loadItems("item.txt");
+        loadMonsters("monster.txt");
+        loadPuzzles("puzzle.txt");
         this.currentRoom = roomMap.get("EZ-01");
     }
 
@@ -18,7 +25,7 @@ public class RoomManager {
 
         ArrayList<String[]> rawData = new ArrayList<>();
 
-        // First pass: create all rooms
+        // First pass: create all rooms from rooms.txt.
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i].trim();
 
@@ -49,7 +56,7 @@ public class RoomManager {
             rawData.add(parts);
         }
 
-        // Second pass: connect rooms
+        // Second pass: connect rooms after all rooms already exist.
         for (String[] parts : rawData) {
             String roomId = parts[0].trim();
             Room room = roomMap.get(roomId);
@@ -127,10 +134,10 @@ public class RoomManager {
             String monsterField = parts[4].trim();
             boolean stackable = Boolean.parseBoolean(parts[5].trim());
 
-            // Register monster drops if this item belongs to a monster.
+            // If an item has a monster ID, save it as a possible monster reward.
             if (!monsterField.equals("0")) {
                 Item rewardItem = createItem(itemId, itemName, description, stackable);
-                GameModel.registerMonsterReward(monsterField.trim(), rewardItem);
+                pendingRewards.put(monsterField.trim(), rewardItem);
             }
 
             // Do not place items that are not assigned to a room.
@@ -138,7 +145,7 @@ public class RoomManager {
                 continue;
             }
 
-            // These are supposed to be revealed by Final Trial logic, not sitting in the room at start.
+            // These are revealed by Final Trial logic, not placed in the room at game start.
             if (itemName.equalsIgnoreCase("Core Fragment") ||
                     itemName.equalsIgnoreCase("Final Jewel")) {
                 continue;
@@ -152,6 +159,71 @@ public class RoomManager {
                 if (roomMap.containsKey(roomID)) {
                     Item roomItem = createItem(itemId, itemName, description, stackable);
                     roomMap.get(roomID).addItem(roomItem);
+                }
+            }
+        }
+    }
+
+    private void loadMonsters(String filename) {
+        String fileData = FileManager.load(filename);
+        String[] lines = fileData.split("\n");
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+
+            if (line.isEmpty() || line.startsWith("//") || line.toLowerCase().startsWith("monsterid")) {
+                continue;
+            }
+
+            String[] parts = line.split(",");
+
+            if (parts.length < 4) {
+                continue;
+            }
+
+            String monsterID = parts[0].trim();
+            String name = parts[1].trim();
+            int hp = Integer.parseInt(parts[2].trim());
+            int atkValue = Integer.parseInt(parts[3].trim());
+
+            Monster monster = new Monster(monsterID, name, hp, atkValue);
+
+            if (pendingRewards.containsKey(monsterID)) {
+                Item reward = pendingRewards.get(monsterID);
+                monster.setRewardItemName(reward.getItemName());
+            }
+
+            monsterTemplates.put(monsterID, monster);
+        }
+    }
+
+    private void loadPuzzles(String filename) {
+        String fileData = FileManager.load(filename);
+        String[] lines = fileData.split("\n");
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+
+            if (line.isEmpty() || line.startsWith("//") || line.toLowerCase().startsWith("puzzleid")) {
+                continue;
+            }
+
+            String[] parts = line.split(",", 5);
+
+            if (parts.length < 3) {
+                continue;
+            }
+
+            String puzzleID = parts[0].trim();
+            String roomId = parts[2].trim();
+
+            puzzleRoomMap.put(roomId, puzzleID);
+
+            if (parts.length >= 5) {
+                String hint = parts[4].trim();
+
+                if (!hint.isEmpty()) {
+                    puzzleHintMap.put(puzzleID, hint);
                 }
             }
         }
@@ -223,6 +295,18 @@ public class RoomManager {
 
     public int getRoomCount() {
         return roomMap.size();
+    }
+
+    public HashMap<String, Monster> getMonsterTemplates() {
+        return monsterTemplates;
+    }
+
+    public HashMap<String, String> getPuzzleRoomMap() {
+        return puzzleRoomMap;
+    }
+
+    public HashMap<String, String> getPuzzleHintMap() {
+        return puzzleHintMap;
     }
 
     private String[] splitCSVLine(String line) {

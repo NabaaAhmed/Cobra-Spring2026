@@ -9,19 +9,15 @@ public class GameModel {
     private HashMap<String, Monster> monsterTemplates;
     private HashMap<String, String> puzzleRoomMap;
     private HashMap<String, String> puzzleHintMap;
-    private static HashMap<String, Item> pendingRewards = new HashMap<>();
 
     public GameModel(Player player, RoomManager roomManager) {
         this.player = player;
         this.roomManager = roomManager;
         this.activePuzzle = null;
 
-        this.monsterTemplates = new HashMap<>();
-        this.puzzleRoomMap = new HashMap<>();
-        this.puzzleHintMap = new HashMap<>();
-
-        loadMonsters("monster.txt");
-        loadPuzzles("puzzle.txt");
+        this.monsterTemplates = roomManager.getMonsterTemplates();
+        this.puzzleRoomMap = roomManager.getPuzzleRoomMap();
+        this.puzzleHintMap = roomManager.getPuzzleHintMap();
     }
 
     public Player getPlayer() {
@@ -794,74 +790,6 @@ public class GameModel {
         }
 
         return null;
-    }
-
-    public static void registerMonsterReward(String monsterId, Item item) {
-        pendingRewards.put(monsterId, item);
-    }
-
-    private void loadMonsters(String filename) {
-        String fileData = FileManager.load(filename);
-        String[] lines = fileData.split("\n");
-
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i].trim();
-
-            if (line.isEmpty() || line.startsWith("//") || line.toLowerCase().startsWith("monsterid")) {
-                continue;
-            }
-
-            String[] parts = line.split(",");
-            if (parts.length < 4) {
-                continue;
-            }
-
-            String monsterID = parts[0].trim();
-            String name = parts[1].trim();
-            int hp = Integer.parseInt(parts[2].trim());
-            int atkValue = Integer.parseInt(parts[3].trim());
-
-            Monster monster = new Monster(monsterID, name, hp, atkValue);
-
-            if (pendingRewards.containsKey(monsterID)) {
-                Item reward = pendingRewards.get(monsterID);
-                monster.setRewardItemName(reward.getItemName());
-            }
-
-            monsterTemplates.put(monsterID, monster);
-        }
-    }
-
-    private void loadPuzzles(String filename) {
-        String fileData = FileManager.load(filename);
-        String[] lines = fileData.split("\n");
-
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i].trim();
-
-            if (line.isEmpty() || line.startsWith("//") || line.toLowerCase().startsWith("puzzleid")) {
-                continue;
-            }
-
-            String[] parts = line.split(",", 5);
-
-            if (parts.length < 3) {
-                continue;
-            }
-
-            String puzzleID = parts[0].trim();
-            String roomId = parts[2].trim();
-
-            puzzleRoomMap.put(roomId, puzzleID);
-
-            if (parts.length >= 5) {
-                String hint = parts[4].trim();
-
-                if (!hint.isEmpty()) {
-                    puzzleHintMap.put(puzzleID, hint);
-                }
-            }
-        }
     }
 
     private Monster getMonsterForCurrentRoom() {
