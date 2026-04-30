@@ -82,7 +82,7 @@ The game follows the **Model-View-Controller (MVC)** pattern:
 * `Monster` – Represents enemies
 * `Combat` – Controls clash-based combat
 * `Item` – Base class for all items
-* `GameControllerNA` – Controls the game flow
+* `GameController` – Controls the game flow
 * `GameView` – Handles display/output
 
 ---
